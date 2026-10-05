@@ -1,0 +1,166 @@
+/* Planner styles — intentionally quiet and simple. Theme colours come from
+   src/index.css. Classes are prefixed pl- to stay separate from the Portfolio. */
+
+.pl-page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 32px 16px 64px;
+}
+
+/* ---------- Header ---------- */
+.pl-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.pl-header h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  letter-spacing: -0.01em;
+}
+
+.pl-date {
+  margin: 4px 0 0;
+  color: var(--text-muted);
+}
+
+/* ---------- Sections ---------- */
+.pl-section {
+  margin-top: 28px;
+}
+
+.pl-section h2 {
+  margin: 0 0 12px;
+  font-size: 1rem;
+}
+
+.pl-placeholder {
+  padding: 32px 16px;
+  text-align: center;
+  color: var(--text-muted);
+  border: 1px dashed var(--border);
+  border-radius: 10px;
+}
+
+/* ---------- Buttons ---------- */
+.pl-btn {
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+  cursor: pointer;
+}
+
+.pl-btn:hover:not(:disabled) {
+  border-color: var(--text-muted);
+}
+
+.pl-btn:focus-visible,
+.pl-unlock-card input:focus-visible {
+  outline: 2px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.pl-btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: var(--on-primary);
+}
+
+.pl-btn-primary:hover:not(:disabled) {
+  border-color: var(--primary);
+  opacity: 0.92;
+}
+
+.pl-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+/* ---------- Unlock ---------- */
+.pl-unlock {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+
+.pl-unlock-card {
+  width: 100%;
+  max-width: 340px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pl-unlock-card h1 {
+  margin: 0 0 16px;
+  font-size: 1.4rem;
+  text-align: center;
+}
+
+.pl-unlock-card label {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--text-h);
+}
+
+.pl-unlock-card input {
+  font: inherit;
+  font-size: 1rem; /* 16px+ prevents iOS zoom on focus */
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  color: var(--text-h);
+}
+
+.pl-unlock-card .pl-btn {
+  margin-top: 6px;
+  padding: 10px 16px;
+  font-size: 1rem;
+}
+
+.pl-error {
+  margin: 0;
+  font-size: 0.9rem;
+  color: var(--coral);
+}
+
+/* ---------- Loading ---------- */
+.pl-loading {
+  min-height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.pl-spinner {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  border-top-color: var(--text-muted);
+  animation: pl-spin 0.8s linear infinite;
+}
+
+@keyframes pl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-spinner {
+    animation: none;
+  }
+}
