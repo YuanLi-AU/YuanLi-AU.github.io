@@ -12,6 +12,7 @@ import {
   signInWithEmailAndPassword,
   signOut,
 } from 'firebase/auth'
+import { getFirestore } from 'firebase/firestore'
 
 const app = initializeApp({
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -27,6 +28,9 @@ const app = initializeApp({
 export const auth = initializeAuth(app, {
   persistence: [indexedDBLocalPersistence, browserLocalPersistence],
 })
+
+// Planner data. Access is enforced by firestore.rules (owner UID only).
+export const db = getFirestore(app)
 
 const PLANNER_EMAIL = import.meta.env.VITE_PLANNER_EMAIL
 

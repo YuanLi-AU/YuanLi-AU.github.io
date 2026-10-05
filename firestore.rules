@@ -1,0 +1,29 @@
+rules_version = '2';
+
+// Private Planner — only the owner's Firebase UID can read or write, and only
+// under their own users/{uid}/dailyPlans and users/{uid}/settings/planner.
+// Any path not matched below is denied by default.
+//
+// This file is the source of truth, but it does NOT protect the live database
+// until it is published (Firebase Console → Firestore → Rules → Publish).
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isOwner(userId) {
+      return request.auth != null
+        && request.auth.uid == 'nT8r9eqsdaWGdAcLUhV68iUh9hf2'
+        && request.auth.uid == userId;
+    }
+
+    // users/{uid}/dailyPlans/{YYYY-MM-DD}
+    match /users/{userId}/dailyPlans/{dateKey} {
+      allow read, write: if isOwner(userId)
+        && dateKey.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
+    }
+
+    // users/{uid}/settings/planner
+    match /users/{userId}/settings/{docId} {
+      allow read, write: if isOwner(userId) && docId == 'planner';
+    }
+  }
+}
