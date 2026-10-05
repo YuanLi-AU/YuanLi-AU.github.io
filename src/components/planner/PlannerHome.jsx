@@ -1,6 +1,8 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { lock } from '../../lib/firebase.js'
 import { formatLongDate, toDateKey } from '../../lib/dates.js'
+import BrandMark from '../BrandMark.jsx'
 import CompletedHistory from './CompletedHistory.jsx'
 import DailyPlanner from './DailyPlanner.jsx'
 import ImportantDate from './ImportantDate.jsx'
@@ -22,15 +24,30 @@ export default function PlannerHome() {
 
   return (
     <main className="pl-page">
+      {/* Site identity bar: same YL brand as the Portfolio */}
+      <nav className="pl-topbar" aria-label="Site">
+        <span className="pl-brand">
+          <BrandMark />
+          <span>
+            <span className="pl-hide-sm">Personal </span>Planner
+          </span>
+        </span>
+        <div className="pl-topbar-actions">
+          <Link to="/" className="pl-link pl-site-link">
+            Portfolio
+          </Link>
+          <button type="button" className="pl-btn" onClick={handleLock} disabled={locking}>
+            Lock
+          </button>
+        </div>
+      </nav>
+
       <header className="pl-header">
         <div>
           <h1>Hi, Yuan</h1>
           <p className="pl-date">{today}</p>
           <ImportantDate />
         </div>
-        <button type="button" className="pl-btn" onClick={handleLock} disabled={locking}>
-          Lock
-        </button>
       </header>
 
       <DailyPlanner flushers={flushers} />

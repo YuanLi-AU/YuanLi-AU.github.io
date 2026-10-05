@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { profile } from '../../data/resume.js'
+import BrandMark from '../BrandMark.jsx'
 import Icon from './Icon.jsx'
 
 const LINKS = [
@@ -20,6 +21,7 @@ export default function Nav() {
     <header className="nav">
       <div className="container nav-inner">
         <a href="#top" className="nav-brand" onClick={close}>
+          <BrandMark />
           {profile.name}
         </a>
 
@@ -39,9 +41,9 @@ export default function Nav() {
               {label}
             </a>
           ))}
-          {/* Low-key entry to the private planner */}
+          {/* Low-key entry to the private planner (password-protected) */}
           <Link to="/planner" className="nav-signin">
-            <Icon name="lock" size={15} /> Sign in
+            <Icon name="lock" size={15} /> Planner
           </Link>
         </nav>
       </div>

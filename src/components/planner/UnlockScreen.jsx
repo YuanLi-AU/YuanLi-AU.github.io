@@ -1,5 +1,7 @@
 import { useState } from 'react'
+import { Link } from 'react-router'
 import { unlock } from '../../lib/firebase.js'
+import BrandMark from '../BrandMark.jsx'
 
 function errorMessage(code) {
   switch (code) {
@@ -39,6 +41,9 @@ export default function UnlockScreen() {
   return (
     <main className="pl-unlock">
       <form className="pl-unlock-card" onSubmit={handleSubmit}>
+        <div className="pl-unlock-brand">
+          <BrandMark large />
+        </div>
         <h1>Private Planner</h1>
 
         {/* Lets password managers / iCloud Keychain match the saved login */}
@@ -74,6 +79,10 @@ export default function UnlockScreen() {
         <button type="submit" className="pl-btn pl-btn-primary" disabled={busy || !password}>
           {busy ? 'Unlocking…' : 'Unlock'}
         </button>
+
+        <Link to="/" className="pl-link pl-back">
+          ← Back to Portfolio
+        </Link>
       </form>
     </main>
   )

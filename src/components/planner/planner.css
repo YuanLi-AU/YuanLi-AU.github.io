@@ -70,6 +70,54 @@ body:has(.pl-loading) {
   --acc: var(--pl-green);
 }
 
+/* ---------- Site identity bar (YL · Personal Planner · Portfolio · Lock) ---------- */
+/* Matches the Portfolio nav: 64px bar, same brand type and link treatment.
+   The navy-tinted rule under it ties it to the shared YL brand. */
+.pl-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 64px;
+  margin: -20px 0 26px; /* bar sits near the top, like the Portfolio nav */
+  border-bottom: 1px solid color-mix(in srgb, #1f2a6b 16%, var(--pl-line));
+}
+
+.pl-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 1.15rem; /* = Portfolio .nav-brand */
+  font-weight: 700;
+  color: #1f2a6b; /* brand navy */
+}
+
+.pl-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+/* Same as the Portfolio's "Planner" link: quiet grey, rounded hover tint */
+.pl-link.pl-site-link {
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: var(--pl-muted);
+  text-decoration: none;
+}
+
+.pl-link.pl-site-link:hover {
+  color: #141a3c;
+  background: #eef3fb;
+}
+
+.pl-link:focus-visible {
+  outline: 2px solid var(--pl-blue);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
 /* ---------- Header ---------- */
 .pl-header {
   display: flex;
@@ -564,6 +612,23 @@ body:has(.pl-loading) {
   gap: 10px;
 }
 
+.pl-unlock-brand {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 14px;
+}
+
+.pl-back {
+  align-self: center;
+  margin-top: 14px;
+  font-size: 0.9rem;
+  text-decoration: none;
+}
+
+.pl-back:hover {
+  text-decoration: underline;
+}
+
 .pl-unlock-card h1 {
   margin: 0 0 16px;
   font-size: 1.4rem;
@@ -603,6 +668,8 @@ body:has(.pl-loading) {
 .pl-loading {
   min-height: 100svh;
   display: flex;
+  flex-direction: column;
+  gap: 20px;
   align-items: center;
   justify-content: center;
 }

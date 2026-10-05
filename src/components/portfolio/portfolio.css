@@ -47,6 +47,9 @@
 }
 
 .nav-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
   font-weight: 700;
   font-size: 1.15rem;
   color: var(--text-h);

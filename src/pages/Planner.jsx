@@ -1,3 +1,4 @@
+import BrandMark from '../components/BrandMark.jsx'
 import useAuthUser from '../components/planner/useAuthUser.js'
 import UnlockScreen from '../components/planner/UnlockScreen.jsx'
 import PlannerHome from '../components/planner/PlannerHome.jsx'
@@ -12,6 +13,7 @@ export default function Planner() {
     // Restoring a saved session: show a quiet state instead of flashing Unlock.
     return (
       <main className="pl-loading" aria-busy="true">
+        <BrandMark large />
         <span className="pl-spinner" aria-label="Loading" />
       </main>
     )
