@@ -1,10 +1,73 @@
-/* Planner styles — intentionally quiet and simple. Theme colours come from
-   src/index.css. Classes are prefixed pl- to stay separate from the Portfolio. */
+/* Planner styles — a calm, light personal planner. Classes are prefixed pl-
+   to stay separate from the Portfolio.
 
+   The Planner is always LIGHT, whatever the OS / browser theme: it defines
+   its own colour tokens (no prefers-color-scheme switching) and forces
+   color-scheme: light so native inputs (time/date pickers) stay light too.
+   A manual theme toggle can be added later. */
+
+.pl-page,
+.pl-unlock,
+.pl-loading {
+  color-scheme: light;
+
+  /* Section accents (restrained) */
+  --pl-blue: #3b6fd6;
+  --pl-purple: #7a5fc8;
+  --pl-teal: #14958a;
+  --pl-green: #2f9a68;
+  --pl-red: #d4545a;
+  --pl-amber: #c07a1c; /* restore */
+
+  /* Surfaces and lines */
+  --pl-bg: #f2f4f8; /* page: very light cool grey */
+  --pl-card: #ffffff; /* tables and inputs */
+  --pl-line: #d6dce6; /* inner lines */
+  --pl-frame: #c8d0dc; /* table outer border */
+  --pl-text: #1c2541; /* task / plan text */
+  --pl-note: #5b6680; /* notes: lighter but readable */
+  --pl-muted: #6b7489;
+  --pl-primary: #1f2a6b; /* Unlock / Save buttons */
+  --pl-shadow: 0 1px 2px rgba(28, 37, 65, 0.05);
+}
+
+/* Light page background (and light scrollbars) only while the Planner is
+   on screen — the Portfolio keeps its own light/dark behaviour. */
+html:has(.pl-page),
+html:has(.pl-unlock),
+html:has(.pl-loading) {
+  color-scheme: light;
+}
+
+body:has(.pl-page),
+body:has(.pl-unlock),
+body:has(.pl-loading) {
+  background: #f2f4f8;
+}
+
+/* Responsive wide container: header, countdown, date nav and tables share it */
 .pl-page {
-  max-width: 760px;
+  width: min(92vw, 1400px);
   margin: 0 auto;
-  padding: 32px 16px 64px;
+  padding: 36px 0 72px;
+  color: var(--pl-text);
+}
+
+/* Section accent: each table reads --acc */
+.pl-sec-daily {
+  --acc: var(--pl-blue);
+}
+
+.pl-sec-midTerm {
+  --acc: var(--pl-purple);
+}
+
+.pl-sec-longTerm {
+  --acc: var(--pl-teal);
+}
+
+.pl-sec-history {
+  --acc: var(--pl-green);
 }
 
 /* ---------- Header ---------- */
@@ -13,37 +76,435 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border);
+  padding-bottom: 24px;
+  border-bottom: 1px solid var(--pl-line);
 }
 
 .pl-header h1 {
   margin: 0;
-  font-size: 1.6rem;
-  letter-spacing: -0.01em;
+  font-size: 1.75rem;
+  letter-spacing: -0.015em;
+  color: var(--pl-text);
 }
 
 .pl-date {
   margin: 4px 0 0;
-  color: var(--text-muted);
+  color: var(--pl-muted);
+}
+
+/* ---------- Important date countdown ---------- */
+.pl-countdown {
+  display: inline-flex;
+  align-items: flex-end;
+  gap: 18px;
+  margin-top: 16px;
+  padding: 8px 14px 8px 12px;
+  border-left: 3px solid var(--pl-teal);
+  border-radius: 0 8px 8px 0;
+  background: color-mix(in srgb, var(--pl-teal) 7%, var(--pl-card));
+}
+
+.pl-countdown.is-empty {
+  min-height: 36px;
+  align-items: center;
+  gap: 10px;
+  border-left-color: var(--pl-line);
+  background: transparent;
+}
+
+.pl-countdown.is-empty .pl-link {
+  padding-left: 0;
+}
+
+.pl-cd-label {
+  margin: 0;
+  font-size: 0.82rem;
+  color: var(--pl-muted);
+}
+
+.pl-cd-date {
+  white-space: nowrap;
+}
+
+.pl-cd-value {
+  margin: 2px 0 0;
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--pl-teal) 60%, var(--pl-text));
+}
+
+.pl-countdown-form {
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+}
+
+.pl-cd-input {
+  font: inherit;
+  font-size: 1rem; /* 16px+ prevents iOS zoom on focus */
+  padding: 7px 10px;
+  border: 1px solid var(--pl-frame);
+  border-radius: 8px;
+  background: var(--pl-card);
+  color: var(--pl-text);
+  min-width: 0;
+}
+
+.pl-cd-input:focus {
+  outline: none;
+  border-color: var(--pl-teal);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--pl-teal) 20%, transparent);
+}
+
+.pl-cd-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.pl-countdown-form .pl-error {
+  flex-basis: 100%;
 }
 
 /* ---------- Sections ---------- */
 .pl-section {
-  margin-top: 28px;
+  margin-top: 44px;
 }
 
 .pl-section h2 {
-  margin: 0 0 12px;
-  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  font-size: 1.08rem;
+  color: var(--pl-text);
 }
 
-.pl-placeholder {
-  padding: 32px 16px;
+/* Small accent marker before each section title */
+.pl-section h2::before {
+  content: '';
+  width: 4px;
+  height: 18px;
+  border-radius: 2px;
+  background: var(--acc, var(--pl-blue));
+}
+
+/* ---------- Date navigation ---------- */
+.pl-datenav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.pl-datenav-center {
   text-align: center;
-  color: var(--text-muted);
-  border: 1px dashed var(--border);
-  border-radius: 10px;
+  min-width: 0;
+}
+
+.pl-datenav-date {
+  margin: 0;
+  font-weight: 600;
+  color: var(--pl-text);
+}
+
+.pl-link {
+  font: inherit;
+  font-size: 0.85rem;
+  padding: 2px 4px;
+  border: none;
+  background: none;
+  color: var(--pl-blue);
+  cursor: pointer;
+}
+
+.pl-link:disabled {
+  color: var(--pl-muted);
+  cursor: default;
+}
+
+/* ---------- Tables (Daily, Mid-term, Long-term, History) ----------
+   Clear outer frame, accent-tinted header, visible column and row lines
+   (1px grid gaps over a line-coloured row background), tinted date column. */
+.pl-table {
+  --acc-head: color-mix(in srgb, var(--acc, var(--pl-blue)) 9%, var(--pl-card));
+  --acc-when: color-mix(in srgb, var(--acc, var(--pl-blue)) 4%, var(--pl-card));
+  --acc-hover: color-mix(in srgb, var(--acc, var(--pl-blue)) 3%, var(--pl-card));
+  border: 1px solid var(--pl-frame);
+  border-radius: 12px;
+  overflow: hidden;
+  background: var(--pl-card);
+  box-shadow: var(--pl-shadow);
+}
+
+.pl-plan-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.pl-save {
+  font-size: 0.8rem;
+  color: var(--pl-muted);
+}
+
+.pl-save.is-error {
+  color: var(--pl-red);
+}
+
+.pl-cols,
+.pl-row {
+  display: grid;
+  column-gap: 1px;
+  background: var(--pl-line);
+}
+
+.pl-daily .pl-cols,
+.pl-daily .pl-row {
+  /* Time 14% | Task 40% | Note 30% | Status 7% | Actions 9% */
+  grid-template-columns:
+    minmax(110px, 14fr) minmax(0, 40fr) minmax(0, 30fr) minmax(64px, 7fr)
+    minmax(88px, 9fr);
+}
+
+.pl-plans .pl-cols,
+.pl-plans .pl-row {
+  /* Target 15% | Plan 40% | Note 30% | Status 7% | Actions 8% */
+  grid-template-columns:
+    minmax(150px, 15fr) minmax(0, 40fr) minmax(0, 30fr) minmax(64px, 7fr)
+    minmax(72px, 8fr);
+}
+
+.pl-history .pl-cols,
+.pl-history .pl-row {
+  /* Completed 14% | Type 9% | Task 31% | Note 24% | Original date 15% | Actions 7% */
+  grid-template-columns:
+    minmax(166px, 14fr) minmax(104px, 9fr) minmax(0, 31fr) minmax(0, 24fr)
+    minmax(150px, 15fr) minmax(64px, 7fr);
+}
+
+.pl-cols {
+  border-bottom: 1px solid color-mix(in srgb, var(--acc, var(--pl-blue)) 28%, var(--pl-line));
+}
+
+.pl-cols > span {
+  padding: 10px 12px;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--acc, var(--pl-blue)) 45%, var(--pl-text));
+  background: var(--acc-head);
+}
+
+.pl-list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pl-row + .pl-row {
+  border-top: 1px solid var(--pl-line);
+}
+
+/* Each cell sits on the card colour; the 1px gaps show the line colour. */
+.pl-row > * {
+  background: var(--pl-card);
+}
+
+.pl-row > .pl-when {
+  background: var(--acc-when);
+}
+
+.pl-row:hover > * {
+  background: var(--acc-hover);
+}
+
+.pl-row:hover > .pl-when {
+  background: var(--acc-when);
+}
+
+/* Inputs blend into the table; focus shows a soft accent ring. */
+.pl-field {
+  width: 100%;
+  min-width: 0;
+  font: inherit;
+  font-size: 1rem; /* 16px+ prevents iOS zoom on focus */
+  padding: 12px;
+  border: none;
+  border-radius: 0;
+  color: var(--pl-text);
+}
+
+.pl-field:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--acc, var(--pl-blue)) 70%, transparent);
+}
+
+.pl-field::placeholder {
+  color: color-mix(in srgb, var(--pl-muted) 60%, transparent);
+}
+
+.pl-task {
+  font-weight: 500;
+}
+
+.pl-when {
+  font-variant-numeric: tabular-nums;
+  color: var(--pl-note);
+}
+
+.pl-notes {
+  font-size: 0.92rem;
+  color: var(--pl-note);
+}
+
+.pl-status,
+.pl-row-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+
+/* Read-only history cells */
+.pl-cell {
+  padding: 12px;
+  font-size: 0.92rem;
+  color: var(--pl-text);
+  overflow-wrap: anywhere;
+}
+
+.pl-cell.pl-when,
+.pl-cell.pl-orig,
+.pl-cell.pl-notes {
+  font-size: 0.86rem;
+  color: var(--pl-note);
+}
+
+.pl-type {
+  display: inline-block;
+  white-space: nowrap;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  color: color-mix(in srgb, var(--c, var(--pl-blue)) 75%, var(--pl-text));
+  background: color-mix(in srgb, var(--c, var(--pl-blue)) 12%, var(--pl-card));
+  border: 1px solid color-mix(in srgb, var(--c, var(--pl-blue)) 25%, transparent);
+}
+
+.pl-type.is-daily {
+  --c: var(--pl-blue);
+}
+
+.pl-type.is-mid-term {
+  --c: var(--pl-purple);
+}
+
+.pl-type.is-long-term {
+  --c: var(--pl-teal);
+}
+
+.pl-empty {
+  margin: 0;
+  padding: 20px 12px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: var(--pl-muted);
+  background: var(--pl-card);
+}
+
+.pl-history-note {
+  border-top: 1px solid var(--pl-line);
+  font-size: 0.8rem;
+}
+
+/* ---------- Row buttons: ✓ green, → blue, × red ----------
+   Tinted background + matching border/text; stronger on hover. */
+.pl-icon-btn {
+  --b: var(--pl-muted);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 600;
+  line-height: 1;
+  border: 1px solid color-mix(in srgb, var(--b) 30%, transparent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--b) 7%, var(--pl-card));
+  color: color-mix(in srgb, var(--b) 85%, var(--pl-text));
+  cursor: pointer;
+}
+
+.pl-icon-btn:hover:not(:disabled) {
+  border-color: color-mix(in srgb, var(--b) 60%, transparent);
+  background: color-mix(in srgb, var(--b) 15%, var(--pl-card));
+  color: var(--b);
+}
+
+.pl-icon-btn:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--b) 70%, transparent);
+  outline-offset: 2px;
+}
+
+.pl-icon-btn:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+.pl-complete {
+  --b: var(--pl-green);
+}
+
+.pl-move {
+  --b: var(--pl-blue);
+}
+
+.pl-restore {
+  --b: var(--pl-amber);
+}
+
+.pl-delete {
+  --b: var(--pl-red);
+  font-size: 1.2rem;
+  font-weight: 500;
+}
+
+.pl-check {
+  font-size: 0.95rem;
+}
+
+/* ---------- Actions ---------- */
+.pl-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.pl-btn.pl-btn-add {
+  color: color-mix(in srgb, var(--acc, var(--pl-blue)) 85%, var(--pl-text));
+  border-color: color-mix(in srgb, var(--acc, var(--pl-blue)) 35%, var(--pl-line));
+  background: color-mix(in srgb, var(--acc, var(--pl-blue)) 5%, var(--pl-card));
+}
+
+.pl-btn.pl-btn-add:hover:not(:disabled) {
+  border-color: var(--acc, var(--pl-blue));
+  background: color-mix(in srgb, var(--acc, var(--pl-blue)) 10%, var(--pl-card));
+}
+
+.pl-message {
+  min-height: 1.5em;
+  margin: 8px 0 0;
+  font-size: 0.875rem;
+  color: var(--pl-muted);
 }
 
 /* ---------- Buttons ---------- */
@@ -53,30 +514,30 @@
   font-weight: 500;
   padding: 8px 16px;
   border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-h);
+  border: 1px solid var(--pl-frame);
+  background: var(--pl-card);
+  color: var(--pl-text);
   cursor: pointer;
 }
 
 .pl-btn:hover:not(:disabled) {
-  border-color: var(--text-muted);
+  border-color: var(--pl-muted);
 }
 
 .pl-btn:focus-visible,
 .pl-unlock-card input:focus-visible {
-  outline: 2px solid var(--blue);
+  outline: 2px solid var(--pl-blue);
   outline-offset: 2px;
 }
 
 .pl-btn-primary {
-  background: var(--primary);
-  border-color: var(--primary);
-  color: var(--on-primary);
+  background: var(--pl-primary);
+  border-color: var(--pl-primary);
+  color: #ffffff;
 }
 
 .pl-btn-primary:hover:not(:disabled) {
-  border-color: var(--primary);
+  border-color: var(--pl-primary);
   opacity: 0.92;
 }
 
@@ -92,6 +553,7 @@
   align-items: center;
   justify-content: center;
   padding: 16px;
+  color: var(--pl-text);
 }
 
 .pl-unlock-card {
@@ -106,12 +568,13 @@
   margin: 0 0 16px;
   font-size: 1.4rem;
   text-align: center;
+  color: var(--pl-text);
 }
 
 .pl-unlock-card label {
   font-size: 0.9rem;
   font-weight: 500;
-  color: var(--text-h);
+  color: var(--pl-text);
 }
 
 .pl-unlock-card input {
@@ -119,9 +582,9 @@
   font-size: 1rem; /* 16px+ prevents iOS zoom on focus */
   padding: 10px 12px;
   border-radius: 8px;
-  border: 1px solid var(--border);
-  background: var(--surface);
-  color: var(--text-h);
+  border: 1px solid var(--pl-frame);
+  background: var(--pl-card);
+  color: var(--pl-text);
 }
 
 .pl-unlock-card .pl-btn {
@@ -133,7 +596,7 @@
 .pl-error {
   margin: 0;
   font-size: 0.9rem;
-  color: var(--coral);
+  color: var(--pl-red);
 }
 
 /* ---------- Loading ---------- */
@@ -148,8 +611,8 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  border: 2px solid var(--border);
-  border-top-color: var(--text-muted);
+  border: 2px solid var(--pl-line);
+  border-top-color: var(--pl-muted);
   animation: pl-spin 0.8s linear infinite;
 }
 
@@ -162,5 +625,117 @@
 @media (prefers-reduced-motion: reduce) {
   .pl-spinner {
     animation: none;
+  }
+}
+
+/* ---------- Mobile: compact stacked rows inside the bordered table ----------
+     08:30                    ✓  →  ×
+     Finish report
+     Before lunch                                                     */
+@media (max-width: 640px) {
+  .pl-page {
+    width: auto;
+    padding: 28px 14px 56px;
+  }
+
+  .pl-hide-sm {
+    display: none;
+  }
+
+  .pl-cols {
+    display: none;
+  }
+
+  /* Header row is hidden, so mark the table with its accent on top */
+  .pl-table {
+    border-top: 3px solid var(--acc, var(--pl-blue));
+  }
+
+  .pl-daily .pl-row,
+  .pl-plans .pl-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      'when status act'
+      'task task task'
+      'notes notes notes';
+    column-gap: 0;
+    padding: 4px 0 6px;
+    background: var(--pl-card);
+  }
+
+  .pl-history .pl-row {
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    grid-template-areas:
+      'when type act'
+      'task task task'
+      'notes notes notes'
+      'orig orig orig';
+    align-items: center;
+    column-gap: 0;
+    padding: 8px 0;
+    background: var(--pl-card);
+  }
+
+  .pl-row > .pl-when,
+  .pl-row:hover > .pl-when {
+    grid-area: when;
+    background: transparent;
+  }
+
+  .pl-row:hover > * {
+    background: transparent;
+  }
+
+  .pl-row > .pl-task {
+    grid-area: task;
+  }
+
+  .pl-row > .pl-notes {
+    grid-area: notes;
+  }
+
+  .pl-status {
+    grid-area: status;
+    padding-right: 6px;
+  }
+
+  .pl-row-actions {
+    grid-area: act;
+    padding-right: 6px;
+  }
+
+  .pl-history .pl-row > :nth-child(2) {
+    grid-area: type;
+  }
+
+  .pl-orig {
+    grid-area: orig;
+  }
+
+  .pl-field {
+    padding: 6px 12px;
+  }
+
+  .pl-when {
+    font-size: 0.9rem;
+    color: color-mix(in srgb, var(--acc, var(--pl-blue)) 55%, var(--pl-note));
+    font-weight: 600;
+  }
+
+  .pl-cell {
+    padding: 3px 12px;
+  }
+
+  .pl-icon-btn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .pl-countdown {
+    display: flex;
+  }
+
+  .pl-countdown-form .pl-cd-input {
+    flex: 1 1 100%;
   }
 }
