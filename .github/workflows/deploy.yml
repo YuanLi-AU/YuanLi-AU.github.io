@@ -1,0 +1,96 @@
+# Build the Vite site and publish dist/ to GitHub Pages.
+#
+# Firebase web config and the planner login email come from GitHub
+# Repository Variables (Settings → Secrets and variables → Actions →
+# Variables). They are public client values that end up in the browser
+# bundle anyway. No password is ever stored here — the planner password is
+# only typed into the unlock screen.
+
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One deployment at a time; never cancel a deployment that is running.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+      VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+      VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+      VITE_FIREBASE_STORAGE_BUCKET: ${{ vars.VITE_FIREBASE_STORAGE_BUCKET }}
+      VITE_FIREBASE_MESSAGING_SENDER_ID: ${{ vars.VITE_FIREBASE_MESSAGING_SENDER_ID }}
+      VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+      VITE_PLANNER_EMAIL: ${{ vars.VITE_PLANNER_EMAIL }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Set up Node 24
+        uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies (exact versions from package-lock.json)
+        run: npm ci
+
+      # Fail early if any variable is missing, so a site that can't sign in
+      # is never deployed. Only variable NAMES are printed, never values.
+      - name: Check required build variables
+        run: |
+          missing=0
+          for name in \
+            VITE_FIREBASE_API_KEY \
+            VITE_FIREBASE_AUTH_DOMAIN \
+            VITE_FIREBASE_PROJECT_ID \
+            VITE_FIREBASE_STORAGE_BUCKET \
+            VITE_FIREBASE_MESSAGING_SENDER_ID \
+            VITE_FIREBASE_APP_ID \
+            VITE_PLANNER_EMAIL
+          do
+            if [ -z "${!name}" ]; then
+              echo "::error::Missing repository variable: $name"
+              missing=1
+            fi
+          done
+          if [ "$missing" -ne 0 ]; then
+            exit 1
+          fi
+          echo "All 7 required variables are set."
+
+      # Uses the existing package.json script: vite build, then
+      # scripts/copy-spa-html.js creates dist/planner.html and dist/404.html.
+      - name: Build
+        run: npm run build
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v6
+
+      - name: Upload dist/ as the Pages artifact
+        uses: actions/upload-pages-artifact@v5
+        with:
+          path: ./dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
