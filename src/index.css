@@ -1,12 +1,30 @@
-/* Base styles shared by all pages. Page-specific design comes in Phase 3. */
+/* Base styles and theme colours shared by the Portfolio and the Planner.
+   CDU-inspired palette: deep navy / purple / blue / teal, with coral,
+   orange and light blue as supporting accents. */
 :root {
-  --text: #374151;
-  --text-h: #111827;
-  --bg: #ffffff;
-  --accent: #2563eb;
+  --bg: #f6f8fc;
+  --surface: #ffffff;
+  --surface-alt: #eef3fb;
+  --border: #e2e8f2;
+  --text: #3b4560;
+  --text-muted: #66718a;
+  --text-h: #141a3c;
+  --primary: #1f2a6b;
+  --on-primary: #ffffff;
+
+  --blue: #2563eb;
+  --purple: #6d4ad8;
+  --teal: #0f9b8e;
+  --coral: #e5484d;
+  --orange: #e8770e;
+  --lightblue: #7cc0f5;
+
+  --radius: 16px;
+  --shadow: 0 1px 2px rgba(20, 26, 60, 0.04), 0 8px 24px rgba(20, 26, 60, 0.06);
+  --shadow-hover: 0 2px 4px rgba(20, 26, 60, 0.05), 0 14px 32px rgba(20, 26, 60, 0.1);
 
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-  line-height: 1.5;
+  line-height: 1.6;
   color-scheme: light dark;
   color: var(--text);
   background: var(--bg);
@@ -15,11 +33,43 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --text: #d1d5db;
-    --text-h: #f9fafb;
-    --bg: #111827;
-    --accent: #60a5fa;
+    --bg: #0a1020;
+    --surface: #111a2e;
+    --surface-alt: #0d1527;
+    --border: #1e2a45;
+    --text: #cbd5e1;
+    --text-muted: #94a3b8;
+    --text-h: #f1f5f9;
+    --primary: #a5b4fc;
+    --on-primary: #0a1020;
+
+    --blue: #60a5fa;
+    --purple: #a78bfa;
+    --teal: #2dd4bf;
+    --coral: #fb7185;
+    --orange: #fb923c;
+    --lightblue: #7dd3fc;
+
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.3), 0 8px 24px rgba(0, 0, 0, 0.25);
+    --shadow-hover: 0 2px 4px rgba(0, 0, 0, 0.35), 0 14px 32px rgba(0, 0, 0, 0.35);
   }
+}
+
+/* Category colours: a component sets accent-* and reads var(--c). */
+.accent-blue {
+  --c: var(--blue);
+}
+.accent-purple {
+  --c: var(--purple);
+}
+.accent-teal {
+  --c: var(--teal);
+}
+.accent-coral {
+  --c: var(--coral);
+}
+.accent-orange {
+  --c: var(--orange);
 }
 
 *,
@@ -28,22 +78,38 @@
   box-sizing: border-box;
 }
 
+html {
+  scroll-padding-top: 76px; /* keep anchored headings clear of the sticky nav */
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
 body {
   margin: 0;
   min-height: 100svh;
+  background: var(--bg);
 }
 
 h1,
 h2,
 h3 {
   color: var(--text-h);
-  line-height: 1.2;
+  line-height: 1.25;
 }
 
 a {
-  color: var(--accent);
+  color: var(--blue);
 }
 
+img {
+  max-width: 100%;
+}
+
+/* Simple centred page, used by Planner and NotFound placeholders. */
 .page {
   max-width: 960px;
   margin: 0 auto;
