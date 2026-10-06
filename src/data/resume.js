@@ -22,17 +22,23 @@ import lpcWorkplaceThumb from '../assets/publications/lpc/lpc-workplace-800.jpg'
 import lpcWorkplaceFull from '../assets/publications/lpc/lpc-workplace-1800.jpg'
 import tcassTeamThumb from '../assets/projects/tcass/tcass-team-400.jpg'
 import tcassTeamFull from '../assets/projects/tcass/tcass-team-1600.jpg'
+import whiteCardThumb from '../assets/work/builder-clean/white-card-800.jpg'
+import whiteCardFull from '../assets/work/builder-clean/white-card-1600.jpg'
+import lpcMaterialsThumb from '../assets/publications/lpc/lpc-materials-800.jpg'
+import lpcMaterialsFull from '../assets/publications/lpc/lpc-materials-1600.jpg'
+import websiteShowcaseThumb from '../assets/projects/website/website-showcase-800.jpg'
+import websiteShowcaseFull from '../assets/projects/website/website-showcase-1600.jpg'
 
 export const profile = {
   name: 'Yuan Li',
-  title: 'IT · Data · Engineering',
+  title: 'IT · Software Engineering · Data Analytics · EA-Assessed Engineer',
   subtitle:
     'Master of IT (Software Engineering) student with an engineering and operations background',
   location: 'Darwin, NT',
   intro:
     'I combine hands-on engineering and site operations experience with IT support, Power BI data analytics and content production — and I’m now completing a Master of Information Technology in Software Engineering at Charles Darwin University.',
   email: 'svip.leo@gmail.com',
-  linkedin: '', // add the full URL when ready, e.g. 'https://www.linkedin.com/in/...'
+  linkedin: 'https://www.linkedin.com/in/yuan-li-a982533b5/',
   resumeUrl: '', // e.g. '/Yuan_Li_Resume_Public.pdf' once the public version is in public/
 }
 
@@ -40,18 +46,19 @@ export const about = [
   {
     heading: 'Engineering & operations background',
     accent: 'orange',
-    text: 'My background is in engineering. I hold a Bachelor of Engineering in Material Forming and Control Engineering, and in the Northern Territory I have worked as a site supervisor for plant, irrigation and infrastructure — maintaining machinery and site infrastructure, supervising work crews and keeping operational records. I have also worked as a subcontractor under my own trading name, NT Cleaning & Maintenance Services.',
+    text: 'My background is in engineering. I hold a Bachelor of Engineering in Material Forming and Control Engineering, and in the Northern Territory I have worked as a farm site supervisor — maintaining machinery, irrigation and farm infrastructure, supervising work crews and keeping operational records. I have also worked as a subcontractor under my own trading name, NT Cleaning & Maintenance Services.',
   },
   {
     heading: 'Current direction: IT, software & data',
     accent: 'teal',
-    text: 'I’m now completing a Master of Information Technology (Software Engineering) at Charles Darwin University, while working part-time in IT support, tech tutoring and graphic design at a school in Wadeye, NT. I build Power BI dashboards on real operational and workforce data, and I have produced training, video and publication content along the way.',
+    text: 'I’m now completing a Master of Information Technology (Software Engineering) at Charles Darwin University, while working part-time in desktop publishing and graphic design at a school in Wadeye, NT, where I also give some staff basic technical help. I build Power BI dashboards on real operational and workforce data, and I have produced training, video and publication content along the way.',
   },
 ]
 
 // status: optional label such as 'In progress'
 // image: optional screenshot path in public/, e.g. '/projects/tcass.png'
 // teamPhoto: optional small photo shown in the card header (opens the lightbox)
+// showcase: optional screenshot shown at the top of the card (opens the lightbox)
 // links: optional [{ label, url }]
 export const projects = [
   {
@@ -90,12 +97,11 @@ export const projects = [
     title: 'Personal Portfolio & Planner Website',
     accent: 'purple',
     icon: 'laptop',
-    status: 'In progress',
     summary:
-      'This website: a public portfolio plus a private, sign-in-only daily planner designed to sync across mobile and desktop.',
+      'Designed and developed this responsive personal portfolio and private planning web app with React and Vite, deployed to GitHub Pages through automated GitHub Actions.',
     points: [
-      'Done so far: portfolio site and client-side routing with GitHub Pages deep-link support',
-      'Planned: Firebase sign-in, real-time cloud sync with Firestore, installable PWA',
+      'Public portfolio plus a password-protected Planner (daily, mid-term and long-term plans) using Firebase Authentication and real-time Cloud Firestore sync',
+      'Installable PWA with responsive desktop and mobile layouts',
     ],
     tags: [
       'React',
@@ -105,7 +111,15 @@ export const projects = [
       'Cloud Firestore',
       'PWA',
       'GitHub Pages',
+      'GitHub Actions',
     ],
+    showcase: {
+      label: 'Live site',
+      image: websiteShowcaseThumb,
+      imageFull: websiteShowcaseFull,
+      alt: 'Screenshots of this website: the portfolio home page on desktop and the Planner unlock screen on mobile',
+      caption: 'Personal Portfolio & Planner Website — yuanli-au.github.io',
+    },
   },
 ]
 
@@ -142,7 +156,10 @@ export const experience = [
       {
         title: 'Builder Cleans · Northern Territory',
         text: 'Builder and post-construction cleaning on sites across the NT.',
-        icon: 'building',
+        image: whiteCardThumb,
+        imageFull: whiteCardFull,
+        alt: 'Western Australia Construction Induction (White Card) issued to Yuan Li',
+        caption: 'Construction Induction (White Card) — Western Australia',
       },
       {
         title: 'Remote School Cleaning · Northern Territory',
@@ -157,17 +174,16 @@ export const experience = [
     ],
   },
   {
-    role: 'IT Support / Tech Tutor / Graphic Design',
+    role: 'LPC IT Support',
     org: 'Literature Production Centre (LPC), OLSH Thamarrurr Catholic College',
     location: 'Wadeye, NT',
     period: '2023 – Present (part-time)',
-    area: 'IT · Design',
+    area: 'Design · Publishing · IT',
     accent: 'blue',
     featured: true,
     points: [
-      'IT support and tech tutoring for staff and students across all year levels',
-      'Troubleshoot hardware, software and network connectivity issues',
-      'Graphic and publication design in Adobe InDesign, including local Indigenous cultural and literature works; contributed to a lift in the Centre’s production rate',
+      'Desktop publishing and graphic design in Adobe InDesign for educational materials, including local Indigenous cultural and literature works; contributed to a lift in the Centre’s production rate',
+      'Provided basic technical guidance and assistance to some staff with routine hardware, software and connectivity issues',
       'Joined as a volunteer in 2023 before moving to a paid part-time role',
     ],
     // Add only publication images confirmed suitable to publish
@@ -177,16 +193,22 @@ export const experience = [
       title: 'Selected Publication Work',
       items: [
         {
-          image: lpcPublicationsThumb,
-          imageFull: lpcPublicationsFull,
-          alt: 'Selected publication work produced at the Literature Production Centre in Wadeye',
-          caption: 'Selected publication work',
+          image: lpcMaterialsThumb,
+          imageFull: lpcMaterialsFull,
+          alt: 'Printed educational materials produced at the Literature Production Centre in Wadeye',
+          caption: 'Educational materials produced through the Literature Production Centre',
         },
         {
           image: lpcWorkplaceThumb,
           imageFull: lpcWorkplaceFull,
           alt: 'Yuan Li with colleagues at the Literature Production Centre in Wadeye',
           caption: 'Workplace · Literature Production Centre, Wadeye',
+        },
+        {
+          image: lpcPublicationsThumb,
+          imageFull: lpcPublicationsFull,
+          alt: 'Selected publication work produced at the Literature Production Centre in Wadeye',
+          caption: 'Selected publication work',
         },
       ],
     },
@@ -277,8 +299,11 @@ export const skills = [
     group: 'Engineering / Operations',
     accent: 'orange',
     items: [
-      'Plant & equipment maintenance',
+      'Machinery & equipment maintenance',
       'Fault diagnosis',
+      'Basic vehicle servicing',
+      'Routine mechanical maintenance',
+      'Hand & power tools',
       'Site supervision',
       'Safety compliance',
       'Materials forming & control',

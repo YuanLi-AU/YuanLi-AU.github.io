@@ -17,18 +17,24 @@
   --pl-teal: #14958a;
   --pl-green: #2f9a68;
   --pl-red: #d4545a;
+  --pl-rose: #b4645f; /* Recycle Bin: muted warm red */
   --pl-amber: #c07a1c; /* restore */
 
   /* Surfaces and lines */
   --pl-bg: #f2f4f8; /* page: very light cool grey */
-  --pl-card: #ffffff; /* tables and inputs */
+  --pl-card: #ffffff; /* inputs */
   --pl-line: #d6dce6; /* inner lines */
-  --pl-frame: #c8d0dc; /* table outer border */
+  --pl-soft-line: #e3e7ee; /* between tasks, surface borders */
+  --pl-hover: #f6f8fb; /* row hover */
+  --pl-surface-alt: #fafbfd; /* add-task row */
+  --pl-radius: 14px; /* list surfaces */
+  --pl-radius-sm: 12px; /* countdown */
+  --pl-frame: #c8d0dc; /* input borders */
   --pl-text: #1c2541; /* task / plan text */
-  --pl-note: #5b6680; /* notes: lighter but readable */
+  --pl-note: #5b6680; /* secondary text: lighter but readable */
   --pl-muted: #6b7489;
   --pl-primary: #1f2a6b; /* Unlock / Save buttons */
-  --pl-shadow: 0 1px 2px rgba(28, 37, 65, 0.05);
+  --pl-shadow: 0 1px 2px rgba(28, 37, 65, 0.04), 0 1px 1px rgba(28, 37, 65, 0.02);
 }
 
 /* Light page background (and light scrollbars) only while the Planner is
@@ -45,29 +51,33 @@ body:has(.pl-loading) {
   background: #f2f4f8;
 }
 
-/* Responsive wide container: header, countdown, date nav and tables share it */
+/* Centred column: a task list reads best at a moderate width */
 .pl-page {
-  width: min(92vw, 1400px);
+  width: min(92vw, 860px);
   margin: 0 auto;
   padding: 36px 0 72px;
   color: var(--pl-text);
 }
 
-/* Section accent: each table reads --acc */
+/* Section accent: each list reads --acc */
 .pl-sec-daily {
   --acc: var(--pl-blue);
 }
 
 .pl-sec-midTerm {
-  --acc: var(--pl-purple);
+  --acc: var(--pl-teal);
 }
 
 .pl-sec-longTerm {
-  --acc: var(--pl-teal);
+  --acc: var(--pl-purple);
 }
 
 .pl-sec-history {
   --acc: var(--pl-green);
+}
+
+.pl-sec-bin {
+  --acc: var(--pl-rose);
 }
 
 /* ---------- Site identity bar (YL · Personal Planner · Portfolio · Lock) ---------- */
@@ -112,6 +122,39 @@ body:has(.pl-loading) {
   background: #eef3fb;
 }
 
+/* ↶ Undo last action: a quiet icon beside Portfolio / Lock */
+.pl-undo {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--pl-muted);
+  cursor: pointer;
+  transition:
+    background-color 0.15s,
+    color 0.15s;
+}
+
+.pl-undo:hover:not(:disabled) {
+  color: #141a3c;
+  background: #eef3fb;
+}
+
+.pl-undo:focus-visible {
+  outline: 2px solid var(--pl-blue);
+  outline-offset: 2px;
+}
+
+.pl-undo:disabled {
+  cursor: default;
+  color: color-mix(in srgb, var(--pl-muted) 40%, var(--pl-bg));
+}
+
 .pl-link:focus-visible {
   outline: 2px solid var(--pl-blue);
   outline-offset: 2px;
@@ -119,45 +162,62 @@ body:has(.pl-loading) {
 }
 
 /* ---------- Header ---------- */
+/* Greeting + date on the left, countdown on the right (one row) */
 .pl-header {
   display: flex;
-  align-items: flex-start;
+  flex-wrap: wrap;
+  align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding-bottom: 24px;
-  border-bottom: 1px solid var(--pl-line);
+  gap: 16px 32px;
+}
+
+.pl-header .pl-countdown {
+  margin-top: 0;
 }
 
 .pl-header h1 {
   margin: 0;
   font-size: 1.75rem;
-  letter-spacing: -0.015em;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   color: var(--pl-text);
 }
 
 .pl-date {
   margin: 4px 0 0;
+  font-size: 0.95rem;
+  color: var(--pl-note);
+}
+
+/* Lunar date: secondary to the Gregorian date */
+.pl-lunar {
   color: var(--pl-muted);
 }
 
-/* ---------- Important date countdown ---------- */
+/* ---------- Important date countdown ----------
+     距离「毕业」还有 · 12 Dec 2026                       Edit
+     35 天   18 小时   26 分钟                                   */
 .pl-countdown {
   display: inline-flex;
-  align-items: flex-end;
-  gap: 18px;
-  margin-top: 16px;
-  padding: 8px 14px 8px 12px;
+  align-items: flex-start;
+  gap: 28px;
+  margin-top: 18px;
+  padding: 12px 18px 12px 16px;
+  border: 1px solid var(--pl-soft-line);
   border-left: 3px solid var(--pl-teal);
-  border-radius: 0 8px 8px 0;
-  background: color-mix(in srgb, var(--pl-teal) 7%, var(--pl-card));
+  border-radius: var(--pl-radius-sm);
+  background: var(--pl-card);
+  box-shadow: var(--pl-shadow);
 }
 
 .pl-countdown.is-empty {
   min-height: 36px;
   align-items: center;
   gap: 10px;
-  border-left-color: var(--pl-line);
+  padding: 0;
+  border: none;
   background: transparent;
+  box-shadow: none;
 }
 
 .pl-countdown.is-empty .pl-link {
@@ -166,19 +226,52 @@ body:has(.pl-loading) {
 
 .pl-cd-label {
   margin: 0;
-  font-size: 0.82rem;
-  color: var(--pl-muted);
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--pl-note);
 }
 
 .pl-cd-date {
   white-space: nowrap;
+  font-size: 0.8rem;
+  font-weight: 400;
+  color: var(--pl-muted);
 }
 
 .pl-cd-value {
-  margin: 2px 0 0;
-  font-size: 1.2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 16px;
+  margin: 4px 0 0;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--pl-muted);
+}
+
+.pl-cd-num {
+  margin-right: 3px;
+  font-size: 1.3rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--pl-teal) 45%, var(--pl-note));
+}
+
+/* Days lead; hours / minutes sit back a little */
+.pl-cd-part.is-days {
+  color: var(--pl-note);
+}
+
+.pl-cd-part.is-days .pl-cd-num {
+  font-size: 2rem;
   font-weight: 700;
-  color: color-mix(in srgb, var(--pl-teal) 60%, var(--pl-text));
+  letter-spacing: -0.02em;
+  color: color-mix(in srgb, var(--pl-teal) 70%, var(--pl-text));
+}
+
+.pl-countdown > .pl-link {
+  margin-top: 1px;
 }
 
 .pl-countdown-form {
@@ -220,40 +313,22 @@ body:has(.pl-loading) {
 
 .pl-section h2 {
   display: flex;
-  align-items: center;
-  gap: 10px;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 8px;
   margin: 0;
-  font-size: 1.08rem;
-  color: var(--pl-text);
-}
-
-/* Small accent marker before each section title */
-.pl-section h2::before {
-  content: '';
-  width: 4px;
-  height: 18px;
-  border-radius: 2px;
-  background: var(--acc, var(--pl-blue));
-}
-
-/* ---------- Date navigation ---------- */
-.pl-datenav {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 28px;
-}
-
-.pl-datenav-center {
-  text-align: center;
-  min-width: 0;
-}
-
-.pl-datenav-date {
-  margin: 0;
+  font-size: 1rem;
   font-weight: 600;
   color: var(--pl-text);
+}
+
+/* Section identity: small uppercase label in the section accent */
+.pl-label {
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--acc, var(--pl-blue)) 75%, var(--pl-text));
 }
 
 .pl-link {
@@ -261,9 +336,15 @@ body:has(.pl-loading) {
   font-size: 0.85rem;
   padding: 2px 4px;
   border: none;
+  border-radius: 4px;
   background: none;
   color: var(--pl-blue);
   cursor: pointer;
+}
+
+.pl-link:hover:not(:disabled) {
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .pl-link:disabled {
@@ -271,177 +352,466 @@ body:has(.pl-loading) {
   cursor: default;
 }
 
-/* ---------- Tables (Daily, Mid-term, Long-term, History) ----------
-   Clear outer frame, accent-tinted header, visible column and row lines
-   (1px grid gaps over a line-coloured row background), tinted date column. */
-.pl-table {
-  --acc-head: color-mix(in srgb, var(--acc, var(--pl-blue)) 9%, var(--pl-card));
-  --acc-when: color-mix(in srgb, var(--acc, var(--pl-blue)) 4%, var(--pl-card));
-  --acc-hover: color-mix(in srgb, var(--acc, var(--pl-blue)) 3%, var(--pl-card));
-  border: 1px solid var(--pl-frame);
-  border-radius: 12px;
-  overflow: hidden;
-  background: var(--pl-card);
-  box-shadow: var(--pl-shadow);
+/* ---------- Planner tabs: | Daily Plan | Mid-term Plan | Long-term Plan | Recycle Bin |
+   Four equal columns spanning the content width over one full-width divider.
+   Each tab has a restrained accent (dot, hover tint, active underline). */
+.pl-tabs {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  margin-top: 28px;
+  border-bottom: 1px solid var(--pl-line);
 }
 
+/* The underline is an inset shadow, so the active tab's thicker line and
+   bolder text never change the bar's height. */
+.pl-tab {
+  --t: var(--pl-blue);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-width: 0;
+  height: 50px;
+  margin-bottom: -1px;
+  padding: 0 8px;
+  font: inherit;
+  font-size: 0.98rem;
+  font-weight: 500;
+  line-height: 1.3;
+  white-space: nowrap;
+  color: var(--pl-muted);
+  border: none;
+  border-radius: 10px 10px 0 0;
+  background: none;
+  cursor: pointer;
+  transition:
+    color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
+}
+
+.pl-tab-midTerm {
+  --t: var(--pl-teal);
+}
+
+.pl-tab-longTerm {
+  --t: var(--pl-purple);
+}
+
+.pl-tab-bin {
+  --t: var(--pl-rose);
+}
+
+/* Small accent dot: soft when idle, full colour when active */
+.pl-tab-dot {
+  flex: 0 0 auto;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--t) 40%, var(--pl-line));
+  transition: background-color 0.18s ease;
+}
+
+.pl-tab:hover {
+  color: var(--pl-text);
+  background: color-mix(in srgb, var(--t) 5%, transparent);
+  box-shadow: inset 0 -2px 0 color-mix(in srgb, var(--t) 30%, transparent);
+}
+
+/* Selected tab = the section title: larger, bolder, accent text + underline */
+.pl-tab[aria-selected='true'] {
+  font-size: 1.04rem;
+  font-weight: 700;
+  color: color-mix(in srgb, var(--t) 55%, var(--pl-text));
+  background: color-mix(in srgb, var(--t) 8%, transparent);
+  box-shadow: inset 0 -3px 0 var(--t);
+}
+
+.pl-tab[aria-selected='true'] .pl-tab-dot {
+  width: 8px;
+  height: 8px;
+}
+
+.pl-tab:hover .pl-tab-dot,
+.pl-tab[aria-selected='true'] .pl-tab-dot {
+  background: var(--t);
+}
+
+.pl-tab:focus-visible {
+  outline: 2px solid var(--t);
+  outline-offset: -3px;
+}
+
+.pl-panel > .pl-section:first-child {
+  margin-top: 18px;
+}
+
+.pl-sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- Task lists (Daily, Mid-term, Long-term, History, Recycle Bin) ----------
+   One white surface per list; one line per task. Size order: checkbox /
+   number / task first, then the time or target date (muted), then the
+   quiet actions.
+     ( )   1   09:00   Task text, wrapping naturally          →  ✎  🗑     */
 .pl-plan-head {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  min-height: 1.4rem;
   margin-bottom: 12px;
 }
 
 .pl-save {
-  font-size: 0.8rem;
+  margin-left: auto;
+  font-size: 0.78rem;
   color: var(--pl-muted);
+}
+
+/* Under each list: status message on the left, "Saved" on the right */
+.pl-foot {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 1.6em;
+  margin-top: 8px;
+}
+
+.pl-foot .pl-message {
+  margin: 0;
+}
+
+.pl-foot .pl-save {
+  flex-shrink: 0;
+  line-height: 1.5;
 }
 
 .pl-save.is-error {
   color: var(--pl-red);
 }
 
-.pl-cols,
-.pl-row {
-  display: grid;
-  column-gap: 1px;
-  background: var(--pl-line);
+.pl-section-note {
+  margin: 0;
+  font-size: 0.88rem;
+  color: var(--pl-muted);
 }
 
-.pl-daily .pl-cols,
-.pl-daily .pl-row {
-  /* Time 14% | Task 40% | Note 30% | Status 7% | Actions 9% */
-  grid-template-columns:
-    minmax(110px, 14fr) minmax(0, 40fr) minmax(0, 30fr) minmax(64px, 7fr)
-    minmax(88px, 9fr);
+/* The list surface: one quiet card, no cards inside it */
+.pl-surface {
+  overflow: hidden;
+  border: 1px solid var(--pl-soft-line);
+  border-radius: var(--pl-radius);
+  background: var(--pl-card);
+  box-shadow: var(--pl-shadow);
 }
 
-.pl-plans .pl-cols,
-.pl-plans .pl-row {
-  /* Target 15% | Plan 40% | Note 30% | Status 7% | Actions 8% */
-  grid-template-columns:
-    minmax(150px, 15fr) minmax(0, 40fr) minmax(0, 30fr) minmax(64px, 7fr)
-    minmax(72px, 8fr);
+/* Daily workspace: keeps the height of three one-line tasks (64px rows +
+   1px dividers) even when fewer are planned — empty space only, no
+   placeholder rows. Grows naturally with more tasks. */
+.pl-workspace {
+  min-height: 194px;
 }
 
-.pl-history .pl-cols,
-.pl-history .pl-row {
-  /* Completed 14% | Type 9% | Task 31% | Note 24% | Original date 15% | Actions 7% */
-  grid-template-columns:
-    minmax(166px, 14fr) minmax(104px, 9fr) minmax(0, 31fr) minmax(0, 24fr)
-    minmax(150px, 15fr) minmax(64px, 7fr);
+/* Empty row positions: same 64px height and faint divider as real rows */
+.pl-slot {
+  height: 64px;
 }
 
-.pl-cols {
-  border-bottom: 1px solid color-mix(in srgb, var(--acc, var(--pl-blue)) 28%, var(--pl-line));
+.pl-slot + .pl-slot,
+.pl-tasks + .pl-slots .pl-slot:first-child {
+  border-top: 1px solid var(--pl-soft-line);
 }
 
-.pl-cols > span {
-  padding: 10px 12px;
-  font-size: 0.72rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--acc, var(--pl-blue)) 45%, var(--pl-text));
-  background: var(--acc-head);
+/* Recent Completed: same frame, a step quieter than the active list */
+.pl-surface.is-quiet {
+  background: color-mix(in srgb, var(--pl-card) 55%, transparent);
+  box-shadow: none;
 }
 
-.pl-list {
+.pl-tasks {
+  --when-w: 3.4rem; /* daily: "09:00" */
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.pl-row + .pl-row {
-  border-top: 1px solid var(--pl-line);
+.pl-tasks.is-date {
+  --when-w: 6.4rem; /* "20 Oct" / "20 Oct 2027" */
 }
 
-/* Each cell sits on the card colour; the 1px gaps show the line colour. */
-.pl-row > * {
-  background: var(--pl-card);
-}
-
-.pl-row > .pl-when {
-  background: var(--acc-when);
-}
-
-.pl-row:hover > * {
-  background: var(--acc-hover);
-}
-
-.pl-row:hover > .pl-when {
-  background: var(--acc-when);
-}
-
-/* Inputs blend into the table; focus shows a soft accent ring. */
-.pl-field {
-  width: 100%;
-  min-width: 0;
-  font: inherit;
-  font-size: 1rem; /* 16px+ prevents iOS zoom on focus */
-  padding: 12px;
-  border: none;
-  border-radius: 0;
-  color: var(--pl-text);
-}
-
-.pl-field:focus {
-  outline: none;
-  box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--acc, var(--pl-blue)) 70%, transparent);
-}
-
-.pl-field::placeholder {
-  color: color-mix(in srgb, var(--pl-muted) 60%, transparent);
+.pl-tasks.is-type {
+  --when-w: 5.6rem; /* Daily / Mid-term / Long-term label */
 }
 
 .pl-task {
-  font-weight: 500;
+  display: grid;
+  grid-template-columns: 48px 2.1rem var(--when-w) minmax(0, 1fr) auto;
+  grid-template-areas: 'check num when task act';
+  align-items: start;
+  column-gap: 12px;
+  padding: 13px 12px 13px 6px;
+  transition: background-color 0.12s;
 }
 
-.pl-when {
-  font-variant-numeric: tabular-nums;
-  color: var(--pl-note);
+.pl-task + .pl-task {
+  border-top: 1px solid var(--pl-soft-line);
 }
 
-.pl-notes {
-  font-size: 0.92rem;
-  color: var(--pl-note);
+.pl-task:hover,
+.pl-task:focus-within {
+  background: var(--pl-hover);
 }
 
-.pl-status,
-.pl-row-actions {
+/* Recycle Bin rows have no checkbox */
+.pl-task.is-binned {
+  grid-template-columns: 2.1rem var(--when-w) minmax(0, 1fr) auto;
+  grid-template-areas: 'num when task act';
+  padding-left: 14px;
+}
+
+/* Editing: the text box spans the time and actions columns */
+.pl-task.is-editing .pl-task-body {
+  grid-column: 3 / -1;
+}
+
+.pl-task.is-editing,
+.pl-task.is-editing:hover {
+  background: color-mix(in srgb, var(--acc, var(--pl-blue)) 4%, var(--pl-card));
+}
+
+/* Round checkbox: 48px tap area, 28px circle centred on the first text line */
+.pl-checkbox {
+  grid-area: check;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 6px;
+  width: 48px;
+  height: 48px;
+  margin-top: -10px;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
 }
 
-/* Read-only history cells */
-.pl-cell {
-  padding: 12px;
-  font-size: 0.92rem;
+.pl-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid color-mix(in srgb, var(--acc, var(--pl-blue)) 55%, var(--pl-line));
+  border-radius: 50%;
+  background: var(--pl-card);
+  color: transparent;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    transform 0.18s ease;
+}
+
+.pl-box svg {
+  width: 17px;
+  height: 17px;
+  transform: scale(0.6);
+  transition: transform 0.2s ease;
+}
+
+.pl-checkbox:hover:not(:disabled) .pl-box {
+  border-color: var(--acc, var(--pl-blue));
+  color: color-mix(in srgb, var(--acc, var(--pl-blue)) 45%, transparent);
+}
+
+.pl-checkbox:hover:not(:disabled) .pl-box svg,
+.pl-checkbox[aria-checked='true'] .pl-box svg {
+  transform: scale(1);
+}
+
+.pl-checkbox:active:not(:disabled) .pl-box {
+  transform: scale(0.92);
+}
+
+.pl-checkbox[aria-checked='true'] .pl-box {
+  border-color: var(--acc, var(--pl-blue));
+  background: var(--acc, var(--pl-blue));
+  color: #ffffff;
+}
+
+.pl-checkbox:focus-visible {
+  outline: none;
+}
+
+.pl-checkbox:focus-visible .pl-box {
+  outline: 2px solid var(--acc, var(--pl-blue));
+  outline-offset: 3px;
+}
+
+.pl-checkbox:disabled {
+  cursor: default;
+}
+
+.pl-checkbox:disabled[aria-checked='false'] .pl-box {
+  opacity: 0.45;
+}
+
+/* Sequence number: the visual anchor of each row */
+.pl-num {
+  grid-area: num;
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1.75rem;
+  letter-spacing: -0.02em;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  color: color-mix(in srgb, var(--acc, var(--pl-blue)) 70%, var(--pl-text));
+}
+
+/* Time / target date / history type: secondary */
+.pl-when {
+  grid-area: when;
+  min-width: 0;
+  font-size: 0.95rem;
+  line-height: 1.75rem;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  color: var(--pl-muted);
+}
+
+.pl-task-body {
+  grid-area: task;
+  min-width: 0;
+}
+
+.pl-task-text {
+  margin: 0;
+  font-size: 1.15rem;
+  font-weight: 500;
+  line-height: 1.75rem;
+  letter-spacing: -0.005em;
   color: var(--pl-text);
   overflow-wrap: anywhere;
+  cursor: text;
+  transition: color 0.18s ease;
 }
 
-.pl-cell.pl-when,
-.pl-cell.pl-orig,
-.pl-cell.pl-notes {
-  font-size: 0.86rem;
+/* History / bin detail line under the task */
+.pl-sub {
+  margin: 1px 0 0;
+  font-size: 0.82rem;
+  color: var(--pl-muted);
+}
+
+.pl-untitled {
+  font-weight: 400;
+  font-style: italic;
+  color: var(--pl-muted);
+}
+
+.pl-task-actions {
+  grid-area: act;
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: -3px;
+  transition: opacity 0.15s;
+}
+
+/* With a mouse, actions stay in the background until the row is hovered */
+@media (hover: hover) {
+  .pl-task-actions {
+    opacity: 0.55;
+  }
+
+  .pl-task:hover .pl-task-actions,
+  .pl-task:focus-within .pl-task-actions {
+    opacity: 1;
+  }
+}
+
+/* Quiet icon actions: grey until hovered */
+.pl-act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  min-width: 34px;
+  height: 34px;
+  padding: 0 7px;
+  font: inherit;
+  font-size: 0.82rem;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  color: var(--pl-muted);
+  cursor: pointer;
+  transition:
+    background-color 0.12s,
+    color 0.12s;
+}
+
+.pl-act:hover:not(:disabled) {
+  color: var(--pl-text);
+  background: color-mix(in srgb, var(--acc, var(--pl-blue)) 10%, var(--pl-card));
+}
+
+.pl-act.is-danger:hover:not(:disabled) {
+  color: var(--pl-red);
+  background: color-mix(in srgb, var(--pl-red) 9%, var(--pl-card));
+}
+
+.pl-act:focus-visible {
+  outline: 2px solid var(--acc, var(--pl-blue));
+  outline-offset: 1px;
+}
+
+.pl-act:disabled {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* Completed: ticked, struck through, faded */
+.pl-task.is-done .pl-task-text {
+  color: var(--pl-muted);
+  text-decoration: line-through;
+  text-decoration-color: color-mix(in srgb, var(--pl-muted) 70%, transparent);
+}
+
+.pl-task.is-done .pl-num,
+.pl-task.is-done .pl-when {
+  opacity: 0.55;
+}
+
+.pl-task.is-binned .pl-task-text {
   color: var(--pl-note);
+}
+
+.pl-task[aria-busy='true'] {
+  opacity: 0.75;
 }
 
 .pl-type {
   display: inline-block;
-  white-space: nowrap;
-  padding: 2px 9px;
+  padding: 0 8px;
   border-radius: 999px;
   font-size: 0.74rem;
   font-weight: 600;
+  line-height: 1.4rem;
+  vertical-align: 1px;
   color: color-mix(in srgb, var(--c, var(--pl-blue)) 75%, var(--pl-text));
-  background: color-mix(in srgb, var(--c, var(--pl-blue)) 12%, var(--pl-card));
-  border: 1px solid color-mix(in srgb, var(--c, var(--pl-blue)) 25%, transparent);
+  background: color-mix(in srgb, var(--c, var(--pl-blue)) 10%, var(--pl-card));
 }
 
 .pl-type.is-daily {
@@ -449,110 +819,170 @@ body:has(.pl-loading) {
 }
 
 .pl-type.is-mid-term {
-  --c: var(--pl-purple);
+  --c: var(--pl-teal);
 }
 
 .pl-type.is-long-term {
-  --c: var(--pl-teal);
+  --c: var(--pl-purple);
+}
+
+/* ---------- Editing a task / adding a task ---------- */
+.pl-task-input {
+  display: block;
+  width: 100%;
+  font: inherit;
+  font-size: 1.15rem; /* 16px+ prevents iOS zoom on focus */
+  font-weight: 500;
+  line-height: 1.75rem;
+  margin: -5px 0 8px;
+  padding: 4px 10px;
+  border: 1px solid color-mix(in srgb, var(--acc, var(--pl-blue)) 45%, var(--pl-line));
+  border-radius: 8px;
+  background: var(--pl-card);
+  color: var(--pl-text);
+  resize: none;
+  overflow: hidden;
+}
+
+.pl-when-input,
+.pl-add-task {
+  min-width: 0;
+  font: inherit;
+  font-size: 1rem; /* 16px+ prevents iOS zoom on focus */
+  border: 1px solid var(--pl-frame);
+  border-radius: 8px;
+  background: var(--pl-card);
+  color: var(--pl-text);
+}
+
+.pl-when-input {
+  padding: 4px 8px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pl-task-input:focus,
+.pl-when-input:focus {
+  outline: none;
+  border-color: var(--acc, var(--pl-blue));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc, var(--pl-blue)) 16%, transparent);
+}
+
+.pl-edit-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Add row: the last line of the list surface, "+ Add a task" */
+.pl-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px 8px 6px;
+  border-top: 1px solid var(--pl-soft-line);
+  background: var(--pl-surface-alt);
+  transition: background-color 0.15s;
+}
+
+.pl-add:focus-within {
+  background: var(--pl-card);
+}
+
+/* "+" sits in the checkbox column so new tasks line up with the list */
+.pl-add-icon {
+  display: flex;
+  flex: 0 0 48px;
+  justify-content: center;
+  color: color-mix(in srgb, var(--acc, var(--pl-blue)) 65%, var(--pl-muted));
+}
+
+.pl-add .pl-add-task {
+  flex: 1 1 auto;
+  padding: 8px 6px;
+  border-color: transparent;
+  background: transparent;
+}
+
+.pl-add .pl-add-task:focus {
+  outline: none;
+}
+
+.pl-add-task::placeholder {
+  color: color-mix(in srgb, var(--pl-muted) 80%, transparent);
+}
+
+.pl-add-row {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.pl-add-row .pl-when-input {
+  padding: 6px 8px;
+  border-color: var(--pl-soft-line);
+  color: var(--pl-note);
+}
+
+.pl-add-row .pl-when-input:focus {
+  border-color: var(--acc, var(--pl-blue));
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc, var(--pl-blue)) 16%, transparent);
 }
 
 .pl-empty {
   margin: 0;
-  padding: 20px 12px;
-  text-align: center;
+  padding: 18px 20px;
   font-size: 0.9rem;
   color: var(--pl-muted);
-  background: var(--pl-card);
 }
 
 .pl-history-note {
-  border-top: 1px solid var(--pl-line);
+  border-top: 1px solid var(--pl-soft-line);
   font-size: 0.8rem;
 }
 
-/* ---------- Row buttons: ✓ green, → blue, × red ----------
-   Tinted background + matching border/text; stronger on hover. */
-.pl-icon-btn {
-  --b: var(--pl-muted);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  font: inherit;
-  font-size: 1.05rem;
-  font-weight: 600;
-  line-height: 1;
-  border: 1px solid color-mix(in srgb, var(--b) 30%, transparent);
-  border-radius: 8px;
-  background: color-mix(in srgb, var(--b) 7%, var(--pl-card));
-  color: color-mix(in srgb, var(--b) 85%, var(--pl-text));
-  cursor: pointer;
-}
-
-.pl-icon-btn:hover:not(:disabled) {
-  border-color: color-mix(in srgb, var(--b) 60%, transparent);
-  background: color-mix(in srgb, var(--b) 15%, var(--pl-card));
-  color: var(--b);
-}
-
-.pl-icon-btn:focus-visible {
-  outline: 2px solid color-mix(in srgb, var(--b) 70%, transparent);
-  outline-offset: 2px;
-}
-
-.pl-icon-btn:disabled {
-  opacity: 0.4;
-  cursor: default;
-}
-
-.pl-complete {
-  --b: var(--pl-green);
-}
-
-.pl-move {
-  --b: var(--pl-blue);
-}
-
-.pl-restore {
-  --b: var(--pl-amber);
-}
-
-.pl-delete {
-  --b: var(--pl-red);
-  font-size: 1.2rem;
-  font-weight: 500;
-}
-
-.pl-check {
-  font-size: 0.95rem;
-}
-
-/* ---------- Actions ---------- */
-.pl-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  margin-top: 12px;
+.pl-confirm-text {
+  margin-right: 4px;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  color: var(--pl-red);
 }
 
 .pl-btn.pl-btn-add {
-  color: color-mix(in srgb, var(--acc, var(--pl-blue)) 85%, var(--pl-text));
-  border-color: color-mix(in srgb, var(--acc, var(--pl-blue)) 35%, var(--pl-line));
-  background: color-mix(in srgb, var(--acc, var(--pl-blue)) 5%, var(--pl-card));
+  padding: 6px 16px;
+  color: #ffffff;
+  border-color: color-mix(in srgb, var(--acc, var(--pl-blue)) 85%, var(--pl-text));
+  background: color-mix(in srgb, var(--acc, var(--pl-blue)) 85%, var(--pl-text));
 }
 
 .pl-btn.pl-btn-add:hover:not(:disabled) {
-  border-color: var(--acc, var(--pl-blue));
-  background: color-mix(in srgb, var(--acc, var(--pl-blue)) 10%, var(--pl-card));
+  border-color: color-mix(in srgb, var(--acc, var(--pl-blue)) 70%, var(--pl-text));
+  background: color-mix(in srgb, var(--acc, var(--pl-blue)) 70%, var(--pl-text));
+}
+
+/* Nothing typed yet: a quiet ghost button */
+.pl-btn.pl-btn-add:disabled {
+  opacity: 1;
+  color: color-mix(in srgb, var(--pl-muted) 70%, var(--pl-card));
+  border-color: var(--pl-soft-line);
+  background: var(--pl-card);
 }
 
 .pl-message {
   min-height: 1.5em;
   margin: 8px 0 0;
-  font-size: 0.875rem;
+  font-size: 0.85rem;
   color: var(--pl-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pl-box,
+  .pl-box svg,
+  .pl-task,
+  .pl-task-text,
+  .pl-tab,
+  .pl-tab-dot {
+    transition: none;
+  }
 }
 
 /* ---------- Buttons ---------- */
@@ -587,6 +1017,17 @@ body:has(.pl-loading) {
 .pl-btn-primary:hover:not(:disabled) {
   border-color: var(--pl-primary);
   opacity: 0.92;
+}
+
+.pl-btn.pl-btn-sm {
+  padding: 5px 12px;
+  font-size: 0.85rem;
+}
+
+.pl-btn.pl-btn-danger {
+  border-color: var(--pl-red);
+  background: var(--pl-red);
+  color: #ffffff;
 }
 
 .pl-btn:disabled {
@@ -695,107 +1136,199 @@ body:has(.pl-loading) {
   }
 }
 
-/* ---------- Mobile: compact stacked rows inside the bordered table ----------
-     08:30                    ✓  →  ×
-     Finish report
-     Before lunch                                                     */
+/* ---------- Mobile (≈390px): time and actions drop under the task ----------
+   Compact header, single-line tabs, more room for task text, 44px touch
+   targets. Everything here applies at ≤640px only. */
 @media (max-width: 640px) {
   .pl-page {
     width: auto;
-    padding: 28px 14px 56px;
+    padding: 22px 12px 56px;
+  }
+
+  /* ---- compact header ---- */
+  .pl-topbar {
+    margin-bottom: 18px;
+  }
+
+  .pl-header {
+    gap: 12px;
+  }
+
+  .pl-header h1 {
+    font-size: 1.5rem;
+  }
+
+  .pl-header .pl-countdown {
+    flex: 1 1 100%; /* full content width */
+  }
+
+  .pl-tabs {
+    margin-top: 20px;
+  }
+
+  .pl-panel > .pl-section:first-child {
+    margin-top: 14px;
   }
 
   .pl-hide-sm {
     display: none;
   }
 
-  .pl-cols {
-    display: none;
+  /* ---- tabs: one line each; the selected one is bolder, not larger ---- */
+  .pl-tab {
+    gap: 4px;
+    padding: 0 2px;
+    font-size: 0.84rem;
   }
 
-  /* Header row is hidden, so mark the table with its accent on top */
-  .pl-table {
-    border-top: 3px solid var(--acc, var(--pl-blue));
+  .pl-tab[aria-selected='true'] {
+    font-size: 0.84rem;
   }
 
-  .pl-daily .pl-row,
-  .pl-plans .pl-row {
-    grid-template-columns: minmax(0, 1fr) auto auto;
+  .pl-tab-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .pl-tab {
+    white-space: nowrap;
+    line-height: 1.2;
+    text-align: center;
+  }
+
+  /* ---- task rows: same structure, narrower number column ---- */
+  .pl-task {
+    grid-template-columns: 44px 1.35rem minmax(0, 1fr) auto;
     grid-template-areas:
-      'when status act'
-      'task task task'
-      'notes notes notes';
-    column-gap: 0;
-    padding: 4px 0 6px;
-    background: var(--pl-card);
+      'check num task task'
+      'check num when act';
+    column-gap: 4px;
+    padding: 10px 2px 6px 0;
   }
 
-  .pl-history .pl-row {
-    grid-template-columns: minmax(0, 1fr) auto auto;
+  .pl-task.is-binned {
+    grid-template-columns: 1.35rem minmax(0, 1fr) auto;
     grid-template-areas:
-      'when type act'
-      'task task task'
-      'notes notes notes'
-      'orig orig orig';
-    align-items: center;
-    column-gap: 0;
-    padding: 8px 0;
-    background: var(--pl-card);
+      'num task task'
+      'num when act';
+    column-gap: 8px;
+    padding-left: 4px;
   }
 
-  .pl-row > .pl-when,
-  .pl-row:hover > .pl-when {
-    grid-area: when;
-    background: transparent;
+  /* Recycle Bin "Delete forever?": its own line under the type label, with spacing */
+  .pl-task.is-binned:has(.pl-confirm-text) {
+    grid-template-areas:
+      'num task task'
+      'num when when'
+      'num act act';
   }
 
-  .pl-row:hover > * {
-    background: transparent;
+  .pl-task.is-binned:has(.pl-confirm-text) .pl-task-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px;
+    margin-top: 6px;
   }
 
-  .pl-row > .pl-task {
-    grid-area: task;
+  .pl-confirm-text {
+    margin-right: auto;
   }
 
-  .pl-row > .pl-notes {
-    grid-area: notes;
+  .pl-checkbox {
+    width: 44px; /* touch target stays 44px */
+    height: 44px;
+    margin-top: -8px;
   }
 
-  .pl-status {
-    grid-area: status;
-    padding-right: 6px;
+  .pl-box {
+    width: 26px;
+    height: 26px;
   }
 
-  .pl-row-actions {
-    grid-area: act;
-    padding-right: 6px;
-  }
-
-  .pl-history .pl-row > :nth-child(2) {
-    grid-area: type;
-  }
-
-  .pl-orig {
-    grid-area: orig;
-  }
-
-  .pl-field {
-    padding: 6px 12px;
+  .pl-num {
+    font-size: 1.15rem;
   }
 
   .pl-when {
-    font-size: 0.9rem;
-    color: color-mix(in srgb, var(--acc, var(--pl-blue)) 55%, var(--pl-note));
-    font-weight: 600;
+    align-self: center;
+    font-size: 0.88rem;
   }
 
-  .pl-cell {
-    padding: 3px 12px;
+  .pl-task-text {
+    font-size: 1.06rem;
   }
 
-  .pl-icon-btn {
-    width: 40px;
-    height: 40px;
+  .pl-task-actions {
+    margin-top: 0;
+  }
+
+  /* ---- 44px touch targets (padding / min sizes; visuals unchanged) ---- */
+  .pl-act {
+    min-width: 44px;
+    height: 44px;
+  }
+
+  .pl-undo {
+    width: 44px;
+    height: 44px;
+  }
+
+  .pl-link.pl-site-link {
+    display: inline-flex;
+    align-items: center;
+    min-height: 44px;
+  }
+
+  .pl-topbar .pl-btn,
+  .pl-btn.pl-btn-add,
+  .pl-task.is-binned .pl-btn.pl-btn-sm {
+    min-height: 44px;
+  }
+
+  /* text links: taller hit area, same place on screen */
+  .pl-countdown > .pl-link,
+  .pl-sec-history .pl-plan-head .pl-link,
+  .pl-message .pl-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 44px;
+    min-height: 44px;
+    margin-top: -9px;
+    margin-bottom: -9px;
+    padding-left: 8px;
+    padding-right: 8px;
+  }
+
+  .pl-act.has-text {
+    padding: 0 8px;
+  }
+
+  /* Add: "+ task" on one line, then time/date + Add */
+  .pl-add {
+    flex-wrap: wrap;
+    padding-right: 10px;
+  }
+
+  .pl-add-icon {
+    flex-basis: 40px;
+  }
+
+  .pl-add .pl-add-task {
+    flex: 1 1 calc(100% - 56px);
+  }
+
+  .pl-add-row {
+    flex: 1 1 100%;
+    padding-left: 48px;
+  }
+
+  .pl-task {
+    padding-right: 8px;
+  }
+
+  .pl-add-row .pl-when-input {
+    flex: 1 1 auto;
   }
 
   .pl-countdown {

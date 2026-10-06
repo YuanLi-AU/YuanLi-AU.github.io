@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { insertAt } from '../../lib/plannerData.js'
 
 const SAVE_DELAY = 700 // ms after the last edit before writing to Firestore
 
@@ -13,16 +14,27 @@ const SAVE_DELAY = 700 // ms after the last edit before writing to Firestore
 //      restored row is added to the matching table's local list as an edit,
 //      so every later write includes it.
 let savesPaused = null // Promise while a restore transaction is running
+let pauses = 0 // nested pauses (e.g. a rollover and a restore at once)
+let releasePause = null
 const adopters = new Set()
 
+// Saves resume only when the LAST overlapping pause has ended.
 export function pauseSaves() {
-  let release
-  savesPaused = new Promise((resolve) => {
-    release = resolve
-  })
+  if (pauses === 0) {
+    savesPaused = new Promise((resolve) => {
+      releasePause = resolve
+    })
+  }
+  pauses += 1
+  let done = false
   return () => {
-    savesPaused = null
-    release()
+    if (done) return
+    done = true
+    pauses -= 1
+    if (pauses === 0) {
+      savesPaused = null
+      releasePause()
+    }
   }
 }
 
@@ -30,8 +42,30 @@ async function waitForSaves() {
   while (savesPaused) await savesPaused
 }
 
-export function adoptRestoredRow(key, row) {
-  adopters.forEach((adopt) => adopt(key, row))
+export function adoptRestoredRow(key, row, index) {
+  adopters.forEach((adopt) => adopt(key, row, index))
+}
+
+// Runs a restore transaction (history ↩ Restore, Recycle Bin Restore, Undo
+// delete) safely:
+//  1. save pending edits in every table;
+//  2. pause table writes while the transaction runs, so no stale list can be
+//     written meanwhile;
+//  3. on success, hand the restored row to its table before writes resume,
+//     so later auto-saves include it.
+// `run()` returns { destination, key, row, index? } (or several `rows`) from
+// plannerData.js.
+export async function restoreWithSync(flushers, run) {
+  if (flushers) await Promise.all([...flushers].map((flush) => flush()))
+  const resume = pauseSaves()
+  try {
+    const result = await run()
+    if (result.row) adoptRestoredRow(result.key, result.row, result.index)
+    for (const row of result.rows ?? []) adoptRestoredRow(result.key, row) // rollover: appended in order
+    return result
+  } finally {
+    resume()
+  }
 }
 
 // A list of rows kept in sync with one Firestore document (a day's plan, or
@@ -60,6 +94,7 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
   const dirtyKey = useRef(null) // key with edits not yet confirmed saved
   const version = useRef(0) // bumps on every edit
   const waiting = useRef(new Set()) // lists captured while saves are paused
+  const loadedKey = useRef(null) // key whose Firestore data this list has received
 
   // Write any pending edits now. Uses refs only, so it is safe to call from
   // cleanup, from key changes and from the Lock button.
@@ -93,15 +128,26 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
   }
 
   // A row restored from history into `rowKey`: add it to this table's lists
-  // if missing. Treated as an edit (dirty + auto-save), so stale snapshots
-  // are ignored and every later write keeps it. Never adds a duplicate.
-  function adopt(rowKey, row) {
+  // if missing (at `index` for Undo, the same place the transaction put it;
+  // otherwise last). Treated as an edit (dirty + auto-save), so stale
+  // snapshots are ignored and every later write keeps it. Never adds a
+  // duplicate.
+  function adopt(rowKey, row, index) {
     const missing = (list) => !list.some((item) => item.id === row.id)
     for (const target of waiting.current) {
-      if (target.key === rowKey && missing(target.items)) target.items = [...target.items, row]
+      if (target.key === rowKey && missing(target.items)) {
+        target.items = insertAt(target.items, row, index)
+      }
     }
-    if (latest.current.key === rowKey && missing(latest.current.items)) {
-      update([...latest.current.items, row], rowKey)
+    // Only into a list that has loaded: a list still waiting for its first
+    // snapshot would otherwise save just this row over the day's real rows.
+    // (Not loaded yet = not dirty, so the snapshot itself brings the row.)
+    if (
+      latest.current.key === rowKey &&
+      loadedKey.current === rowKey &&
+      missing(latest.current.items)
+    ) {
+      update(insertAt(latest.current.items, row, index), rowKey)
     }
   }
 
@@ -125,6 +171,7 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
       subscribe(
         key,
         (remote) => {
+          loadedKey.current = key
           if (dirtyKey.current === key) return // keep local edits
           latest.current = { key, items: remote }
           setItems(remote)

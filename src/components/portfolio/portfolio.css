@@ -1169,3 +1169,70 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* ---------- Compact project preview (bottom of a project card) ---------- */
+.card-preview {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border);
+}
+
+.media.card-preview-img {
+  width: 120px;
+  height: 75px; /* 16:10, same ratio as the screenshot */
+  flex-shrink: 0;
+  border-radius: 8px;
+}
+
+.media.card-preview-img img {
+  object-position: top center;
+}
+
+.media.card-preview-img .media-expand {
+  right: 4px;
+  bottom: 4px;
+  padding: 4px;
+}
+
+.card-preview p {
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
+.card-preview-label {
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+/* ---------- Featured gallery with 3+ photos: full-width row ---------- */
+.featured-body.has-gallery.gallery-wide {
+  grid-template-columns: 1fr;
+}
+
+.gallery-wide .pub-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 600px) {
+  .gallery-wide .pub-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Desktop: two project cards side by side, the card with a site preview
+   spans the full row below — so no card is stretched with empty space. */
+@media (min-width: 900px) {
+  .cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .card.card-wide {
+    grid-column: 1 / -1;
+  }
+}

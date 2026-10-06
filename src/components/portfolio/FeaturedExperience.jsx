@@ -23,7 +23,15 @@ export default function FeaturedExperience({ job }) {
         )}
       </header>
 
-      <div className={job.gallery ? 'featured-body has-gallery' : 'featured-body'}>
+      <div
+        className={
+          !job.gallery
+            ? 'featured-body'
+            : job.gallery.items.length >= 3
+              ? 'featured-body has-gallery gallery-wide' // 3+ photos: full-width row under the text
+              : 'featured-body has-gallery'
+        }
+      >
         <div>
           {job.summary && <p className="featured-summary">{job.summary}</p>}
           {job.points && (

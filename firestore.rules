@@ -15,21 +15,29 @@ service cloud.firestore {
         && request.auth.uid == userId;
     }
 
-    // users/{uid}/dailyPlans/{YYYY-MM-DD} — active rows for one day
+    // users/{uid}/dailyPlans/{YYYY-MM-DD} — legacy one-list-per-day Daily
+    // data (read and emptied once by the one-time migration, by document id)
     match /users/{userId}/dailyPlans/{dateKey} {
-      allow read, write: if isOwner(userId)
+      allow get, write: if isOwner(userId)
         && dateKey.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}$');
     }
 
-    // users/{uid}/plans/midTerm and users/{uid}/plans/longTerm
+    // users/{uid}/plans/daily (the active Daily list), plans/midTerm, plans/longTerm
     match /users/{userId}/plans/{planId} {
-      allow read, write: if isOwner(userId) && planId in ['midTerm', 'longTerm'];
+      allow read, write: if isOwner(userId) && planId in ['daily', 'midTerm', 'longTerm'];
     }
 
     // users/{uid}/completedHistory/{itemId} — completed rows.
     // delete is only used by Restore (in a transaction that puts the row back
     // into its active list); there is no plain "delete history" in the app.
     match /users/{userId}/completedHistory/{itemId} {
+      allow read, create, update, delete: if isOwner(userId);
+    }
+
+    // users/{uid}/recycleBin/{itemId} — deleted rows.
+    // delete is used by Restore (in a transaction that puts the row back)
+    // and by "Delete permanently" in the Recycle Bin.
+    match /users/{userId}/recycleBin/{itemId} {
       allow read, create, update, delete: if isOwner(userId);
     }
 

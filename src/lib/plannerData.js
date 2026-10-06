@@ -1,26 +1,39 @@
 // Planner data access (Firestore). Schema:
 //
-//   users/{uid}/dailyPlans/{YYYY-MM-DD}       active rows for one day
-//     date:      "2026-10-06"
-//     items:     [{ id, time, task, notes }]   // time may be ""
+//   users/{uid}/plans/daily                    THE active Daily list
+//     items:     [{ id, time, task, notes }]   // time may be ""; notes are
+//                                              // no longer shown or asked for,
+//                                              // but older values are kept
 //     updatedAt: server timestamp
+//   A task stays here until it is completed (→ completedHistory) or deleted
+//   (→ recycleBin). No dates, no rollover, no expiry.
 //
 //   users/{uid}/plans/{midTerm | longTerm}     active mid/long-term plans
 //     items:     [{ id, targetDate, task, notes }]   // targetDate may be ""
 //     updatedAt: server timestamp
 //
+//   users/{uid}/dailyPlans/{YYYY-MM-DD}       LEGACY one-list-per-day Daily
+//     data; only read once, by the one-time migration below.
+//
 //   users/{uid}/completedHistory/{itemId}     one doc per completed row
 //     id, type ("daily" | "mid-term" | "long-term"), task, notes,
-//     originalDate (daily: the plan date; otherwise null),
+//     originalDate (daily: the day it was completed; otherwise null),
 //     time (daily) or targetDate (mid/long), completedAt: server timestamp
 //
+//   users/{uid}/recycleBin/{itemId}           one doc per deleted row
+//     id, type, task, originalDate (daily) or null, time (daily) or
+//     targetDate (mid/long), notes (only if an older row had one),
+//     deletedAt: server timestamp
+//
 //   users/{uid}/settings/planner
-//     importantDateLabel, importantDate, updatedAt
+//     importantDateLabel, importantDate, updatedAt,
+//     dailyMigrated: true once the legacy Daily data has been moved
 //
 // The uid always comes from the signed-in Firebase user; firestore.rules
 // decide whether that uid is allowed. Nothing else (email, password) is stored.
 import {
   collection,
+  deleteDoc,
   doc,
   getDoc,
   limit,
@@ -31,6 +44,7 @@ import {
   serverTimestamp,
   setDoc,
 } from 'firebase/firestore'
+import { addDays, toDateKey } from './dates.js'
 import { auth, db } from './firebase.js'
 
 function userPath() {
@@ -43,6 +57,7 @@ const userDoc = (...path) => doc(db, ...userPath(), ...path)
 const dailyPlanRef = (dateKey) => userDoc('dailyPlans', dateKey)
 const planRef = (planId) => userDoc('plans', planId)
 const historyRef = (itemId) => userDoc('completedHistory', itemId)
+const binRef = (itemId) => userDoc('recycleBin', itemId)
 const settingsRef = () => userDoc('settings', 'planner')
 
 // Keep only the current fields. Older test data may still contain
@@ -52,80 +67,150 @@ const normalize = (items) =>
 const normalizePlan = (items) =>
   items.map(({ id, targetDate = '', task = '', notes = '' }) => ({ id, targetDate, task, notes }))
 
+// `index` puts a row back where it was (Undo); without one it goes last.
+export function insertAt(list, row, index) {
+  if (!Number.isInteger(index) || index < 0 || index > list.length) return [...list, row]
+  return [...list.slice(0, index), row, ...list.slice(index)]
+}
+
 const itemsOf = (snap) => (snap.exists() ? normalize(snap.data().items ?? []) : [])
 const planItemsOf = (snap) => (snap.exists() ? normalizePlan(snap.data().items ?? []) : [])
 const settingsOf = (snap) => (snap.exists() ? snap.data() : null)
 
-// Writes a completed row to history and the source list without it, in one
-// transaction — both happen or neither does, so completing can't lose a row.
-function completeInto(sourceRef, sourceData, entry) {
+// Writes a row to history (completed) or the Recycle Bin (deleted) and the
+// source list without it, in one transaction — both happen or neither does,
+// so completing or deleting can't lose a row.
+function removeInto(targetRef, stampField, sourceRef, sourceData, entry) {
   return runTransaction(db, async (tx) => {
-    tx.set(historyRef(entry.id), { ...entry, completedAt: serverTimestamp() })
+    tx.set(targetRef, { ...entry, [stampField]: serverTimestamp() })
     tx.set(sourceRef, { ...sourceData, updatedAt: serverTimestamp() })
   })
 }
 
-// ---------- Daily plan ----------
+const completeInto = (sourceRef, sourceData, entry) =>
+  removeInto(historyRef(entry.id), 'completedAt', sourceRef, sourceData, entry)
+const binInto = (sourceRef, sourceData, entry) =>
+  removeInto(binRef(entry.id), 'deletedAt', sourceRef, sourceData, entry)
+
+// Old notes are only kept when there is one, so new entries stay minimal.
+const notesOf = (item) => (item.notes ? { notes: item.notes } : {})
+
+const dailyEntry = (dateKey, item) => ({
+  id: item.id,
+  type: 'daily',
+  task: item.task,
+  ...notesOf(item),
+  time: item.time,
+  originalDate: dateKey,
+})
+
+// ---------- Daily plan (plans/daily) ----------
+
+const DAILY = 'daily' // plan id of the one active Daily list (also its list key)
+const dailyRef = () => planRef(DAILY)
 
 export function createItem() {
   return { id: crypto.randomUUID(), time: '', task: '', notes: '' }
 }
 
-export async function getDailyPlan(dateKey) {
-  return itemsOf(await getDoc(dailyPlanRef(dateKey)))
+// Live updates across devices. Returns the unsubscribe function. (The key
+// argument is the list key from useSyncedItems; Daily has only one list.)
+export function subscribeDaily(_key, onItems, onError) {
+  return onSnapshot(dailyRef(), (snap) => onItems(itemsOf(snap)), onError)
 }
 
-// Live updates across devices. Returns the unsubscribe function.
-export function subscribeDailyPlan(dateKey, onItems, onError) {
-  return onSnapshot(dailyPlanRef(dateKey), (snap) => onItems(itemsOf(snap)), onError)
+// Saves the whole list (last write wins — fine for a single user).
+export function saveDaily(_key, items) {
+  return setDoc(dailyRef(), { items: normalize(items), updatedAt: serverTimestamp() })
 }
 
-// Saves the whole day's list (last write wins — fine for a single user).
-export function saveDailyPlan(dateKey, items) {
-  return setDoc(dailyPlanRef(dateKey), {
-    date: dateKey,
-    items: normalize(items),
-    updatedAt: serverTimestamp(),
+// History / bin entries keep the same shape as before: originalDate is the
+// day the task was completed / deleted.
+export function completeDailyItem(item, remaining) {
+  return completeInto(dailyRef(), { items: normalize(remaining) }, dailyEntry(toDateKey(), item))
+}
+
+// Delete = move to the Recycle Bin (nothing is permanently deleted here).
+export function binDailyItem(item, remaining) {
+  return binInto(dailyRef(), { items: normalize(remaining) }, dailyEntry(toDateKey(), item))
+}
+
+// ---------- One-time migration of the legacy per-day Daily data ----------
+// Moves the unfinished tasks of the old dailyPlans/{date} documents into
+// plans/daily, ONCE. Only these explicit days are read — today−6 … today,
+// plus today+1 (the old "Move to tomorrow") — at most 8 single-document
+// reads; no collection query, no list permission. Older legacy days are left
+// untouched (not migrated, not read).
+//
+// One transaction: the active list gets the tasks (after any it already
+// has, oldest day first, each day's order kept, no duplicate ids), the
+// migrated days are emptied, and settings/planner.dailyMigrated = true —
+// all or nothing. On failure nothing changes and the next open retries.
+// A device that has seen the flag remembers it locally, so later opens
+// don't even read settings for it.
+const MIGRATED_KEY = 'planner.dailyMigrated'
+const LEGACY_DAYS_BACK = 6
+const LEGACY_DAYS_AHEAD = 1
+
+function migratedHere() {
+  try {
+    return localStorage.getItem(MIGRATED_KEY) === auth.currentUser?.uid
+  } catch {
+    return false
+  }
+}
+
+function rememberMigrated() {
+  try {
+    localStorage.setItem(MIGRATED_KEY, auth.currentUser?.uid ?? '')
+  } catch {
+    // private mode etc.: we'll just check settings again next time
+  }
+}
+
+let migrating = null // the running migration, shared by overlapping calls
+
+export function migrateLegacyDaily(todayKey = toDateKey()) {
+  if (migratedHere()) return Promise.resolve({ destination: null, key: DAILY, rows: [] })
+  migrating ??= runMigration(todayKey).finally(() => {
+    migrating = null
   })
+  return migrating
 }
 
-// Moves one row from `fromKey` to the end of `toKey`, in a single transaction:
-// both days are written together or not at all, so a failure can never lose
-// the row. `remaining` is the from-day list without the row (it may include
-// edits not yet auto-saved). If the target day already has a row with the same
-// id, it is not added again — the row is only removed from the from-day.
-export function moveItem(fromKey, toKey, item, remaining) {
-  return runTransaction(db, async (tx) => {
-    const toRef = dailyPlanRef(toKey)
-    const toItems = itemsOf(await tx.get(toRef))
-    const alreadyThere = toItems.some((existing) => existing.id === item.id)
-    tx.set(toRef, {
-      date: toKey,
-      items: normalize(alreadyThere ? toItems : [...toItems, item]),
-      updatedAt: serverTimestamp(),
-    })
-    tx.set(dailyPlanRef(fromKey), {
-      date: fromKey,
-      items: normalize(remaining),
-      updatedAt: serverTimestamp(),
-    })
-    return { added: !alreadyThere }
+async function runMigration(todayKey) {
+  const days = []
+  for (let d = -LEGACY_DAYS_BACK; d <= LEGACY_DAYS_AHEAD; d += 1) days.push(addDays(todayKey, d))
+
+  const rows = await runTransaction(db, async (tx) => {
+    const settingsSnap = await tx.get(settingsRef())
+    if (settingsSnap.exists() && settingsSnap.data().dailyMigrated === true) return null
+    const active = itemsOf(await tx.get(dailyRef()))
+    const legacy = []
+    for (const key of days) legacy.push([key, itemsOf(await tx.get(dailyPlanRef(key)))])
+
+    const seen = new Set(active.map((item) => item.id))
+    const moved = []
+    for (const [, items] of legacy) {
+      for (const item of items) {
+        if (seen.has(item.id)) continue
+        seen.add(item.id)
+        moved.push(item)
+      }
+    }
+    for (const [key, items] of legacy) {
+      if (items.length === 0) continue
+      tx.set(dailyPlanRef(key), { date: key, items: [], updatedAt: serverTimestamp() })
+    }
+    if (moved.length > 0) {
+      tx.set(dailyRef(), { items: normalize([...active, ...moved]), updatedAt: serverTimestamp() })
+    }
+    tx.set(settingsRef(), { dailyMigrated: true }, { merge: true })
+    return moved
   })
-}
-
-export function completeDailyItem(dateKey, item, remaining) {
-  return completeInto(
-    dailyPlanRef(dateKey),
-    { date: dateKey, items: normalize(remaining) },
-    {
-      id: item.id,
-      type: 'daily',
-      task: item.task,
-      notes: item.notes,
-      time: item.time,
-      originalDate: dateKey,
-    },
-  )
+  rememberMigrated()
+  // Same shape as a restore result, so the Daily list can take the rows in.
+  return { destination: rows?.length ? 'daily' : null, key: DAILY, rows: rows ?? [] }
 }
 
 // ---------- Mid-term / long-term plans ----------
@@ -144,64 +229,77 @@ export function savePlan(planId, items) {
   return setDoc(planRef(planId), { items: normalizePlan(items), updatedAt: serverTimestamp() })
 }
 
+const planEntry = (planId, item) => ({
+  id: item.id,
+  type: PLAN_TYPES[planId],
+  task: item.task,
+  ...notesOf(item),
+  targetDate: item.targetDate,
+  originalDate: null,
+})
+
 export function completePlanItem(planId, item, remaining) {
-  return completeInto(
-    planRef(planId),
-    { items: normalizePlan(remaining) },
-    {
-      id: item.id,
-      type: PLAN_TYPES[planId],
-      task: item.task,
-      notes: item.notes,
-      targetDate: item.targetDate,
-      originalDate: null,
-    },
-  )
+  return completeInto(planRef(planId), { items: normalizePlan(remaining) }, planEntry(planId, item))
 }
 
-// ---------- Restore from history ----------
+export function binPlanItem(planId, item, remaining) {
+  return binInto(planRef(planId), { items: normalizePlan(remaining) }, planEntry(planId, item))
+}
 
-const PLAN_IDS = { 'mid-term': 'midTerm', 'long-term': 'longTerm' }
+// ---------- Restore (from history or the Recycle Bin) ----------
 
-// Puts a completed row back into its active list and removes the history
-// record, in one transaction (both or neither — a failure leaves history
-// intact and the active list unchanged). Daily rows go back to `todayKey`
-// (the user's local today), not their original date. If the active list
-// already has a row with the same id, it is not added again; the history
-// record is still removed, so nothing is duplicated.
-export function restoreHistoryItem(itemId, todayKey) {
+const PLAN_IDS = { daily: DAILY, 'mid-term': 'midTerm', 'long-term': 'longTerm' }
+
+// Puts a completed / deleted row back into its active list and removes the
+// history / bin record, in one transaction (both or neither — a failure
+// leaves the record intact and the active list unchanged). Daily rows go back
+// to the active Daily list (plans/daily). If the active list already has a row with
+// the same id, it is not added again; the record is still removed, so
+// nothing is duplicated. `index` (Undo only) puts the row back at its old
+// position; otherwise it is added last.
+function restoreEntry(entryRef, index) {
   return runTransaction(db, async (tx) => {
-    const histRef = historyRef(itemId)
-    const histSnap = await tx.get(histRef)
-    if (!histSnap.exists()) return { destination: null } // already restored elsewhere
-    const entry = histSnap.data()
+    const entrySnap = await tx.get(entryRef)
+    if (!entrySnap.exists()) return { destination: null } // already restored elsewhere
+    const entry = entrySnap.data()
 
     const isDaily = entry.type === 'daily'
     const planId = PLAN_IDS[entry.type]
-    if (!isDaily && !planId) throw new Error(`Unknown history type: ${entry.type}`)
+    if (!planId) throw new Error(`Unknown entry type: ${entry.type}`)
 
-    const targetRef = isDaily ? dailyPlanRef(todayKey) : planRef(planId)
+    const targetRef = planRef(planId)
     const targetSnap = await tx.get(targetRef)
     const items = isDaily ? itemsOf(targetSnap) : planItemsOf(targetSnap)
     const row = isDaily
-      ? { id: entry.id, time: entry.time ?? '', task: entry.task, notes: entry.notes }
-      : { id: entry.id, targetDate: entry.targetDate ?? '', task: entry.task, notes: entry.notes }
+      ? { id: entry.id, time: entry.time ?? '', task: entry.task, notes: entry.notes ?? '' }
+      : {
+          id: entry.id,
+          targetDate: entry.targetDate ?? '',
+          task: entry.task,
+          notes: entry.notes ?? '',
+        }
 
     if (!items.some((item) => item.id === entry.id)) {
-      if (isDaily) {
-        tx.set(targetRef, {
-          date: todayKey,
-          items: normalize([...items, row]),
-          updatedAt: serverTimestamp(),
-        })
-      } else {
-        tx.set(targetRef, { items: normalizePlan([...items, row]), updatedAt: serverTimestamp() })
-      }
+      const next = insertAt(items, row, index)
+      tx.set(targetRef, {
+        items: isDaily ? normalize(next) : normalizePlan(next),
+        updatedAt: serverTimestamp(),
+      })
     }
-    tx.delete(histRef)
-    // `key` matches the table's useSyncedItems key (a date, or the plan id).
-    return { destination: isDaily ? 'daily' : planId, key: isDaily ? todayKey : planId, row }
+    tx.delete(entryRef)
+    // `key` matches the list's useSyncedItems key (the plan id).
+    return { destination: planId, key: planId, row, index }
   })
+}
+
+// Completed History ↩ Restore (and Undo complete).
+export function restoreHistoryItem(itemId, index) {
+  return restoreEntry(historyRef(itemId), index)
+}
+
+// Recycle Bin Restore (and Undo delete).
+export function restoreBinItem(itemId, index) {
+  return restoreEntry(binRef(itemId), index)
 }
 
 // ---------- Completed history ----------
@@ -219,6 +317,27 @@ export function subscribeHistory(onEntries, onError, max = 50) {
     (snap) => onEntries(snap.docs.map((d) => d.data({ serverTimestamps: 'estimate' }))),
     onError,
   )
+}
+
+// ---------- Recycle Bin ----------
+
+// Most recently deleted first (same estimate trick as history).
+export function subscribeBin(onEntries, onError, max = 50) {
+  const q = query(
+    collection(db, ...userPath(), 'recycleBin'),
+    orderBy('deletedAt', 'desc'),
+    limit(max),
+  )
+  return onSnapshot(
+    q,
+    (snap) => onEntries(snap.docs.map((d) => d.data({ serverTimestamps: 'estimate' }))),
+    onError,
+  )
+}
+
+// The only permanent delete in the Planner (after the user confirms).
+export function deleteBinItem(itemId) {
+  return deleteDoc(binRef(itemId))
 }
 
 // ---------- Settings (important date countdown) ----------

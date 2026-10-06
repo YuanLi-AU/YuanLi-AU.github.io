@@ -23,8 +23,8 @@ export default function Contact() {
               <Icon name="linkedin" size={18} /> LinkedIn
             </span>
             {profile.linkedin ? (
-              <a href={profile.linkedin} target="_blank" rel="noreferrer">
-                View profile ↗
+              <a href={profile.linkedin} target="_blank" rel="noopener noreferrer">
+                LinkedIn profile ↗
               </a>
             ) : (
               <span className="muted">Coming soon</span>

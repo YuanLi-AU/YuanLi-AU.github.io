@@ -1,10 +1,42 @@
 import { useEffect, useState } from 'react'
-import { countdownText, daysBetween, formatShortDate, toDateKey } from '../../lib/dates.js'
+import { countdownParts, formatShortDate } from '../../lib/dates.js'
 import { savePlannerSettings, subscribePlannerSettings } from '../../lib/plannerData.js'
 
 const DATE_KEY = /^\d{4}-\d{2}-\d{2}$/
 
-// One important date with a live countdown, stored in users/{uid}/settings/planner.
+// The current time, refreshed at the start of every minute (and straight
+// away when the app comes back to the foreground), so the countdown's
+// minutes tick over without showing seconds.
+function useMinuteClock() {
+  const [now, setNow] = useState(() => new Date())
+  useEffect(() => {
+    let timer
+    const tick = () => {
+      const current = new Date()
+      setNow(current)
+      const msToNextMinute = 60000 - (current.getSeconds() * 1000 + current.getMilliseconds())
+      timer = setTimeout(tick, msToNextMinute + 50)
+    }
+    const onVisible = () => {
+      if (document.visibilityState !== 'visible') return
+      clearTimeout(timer)
+      tick()
+    }
+    tick()
+    document.addEventListener('visibilitychange', onVisible)
+    return () => {
+      clearTimeout(timer)
+      document.removeEventListener('visibilitychange', onVisible)
+    }
+  }, [])
+  return now
+}
+
+// One important date with a live countdown, stored in users/{uid}/settings/planner
+// as { importantDateLabel, importantDate: "YYYY-MM-DD" }. The countdown runs
+// to the start (00:00 local) of that date.
+//   距离「毕业」还有
+//   35 天 18 小时 26 分钟
 export default function ImportantDate() {
   const [settings, setSettings] = useState(undefined) // undefined = loading
   const [editing, setEditing] = useState(false)
@@ -12,6 +44,7 @@ export default function ImportantDate() {
   const [date, setDate] = useState('')
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+  const now = useMinuteClock()
 
   useEffect(
     () =>
@@ -60,9 +93,10 @@ export default function ImportantDate() {
           className="pl-cd-input"
           value={label}
           onChange={(e) => setLabel(e.target.value)}
-          placeholder="Important date name"
-          aria-label="Important date name"
+          placeholder="事件名称，例如：毕业"
+          aria-label="Event name"
           maxLength={60}
+          required
           autoFocus
         />
         <input
@@ -74,7 +108,11 @@ export default function ImportantDate() {
           required
         />
         <div className="pl-cd-buttons">
-          <button type="submit" className="pl-btn pl-btn-primary" disabled={saving || !date}>
+          <button
+            type="submit"
+            className="pl-btn pl-btn-primary"
+            disabled={saving || !date || !label.trim()}
+          >
             {saving ? 'Saving…' : 'Save'}
           </button>
           <button type="button" className="pl-btn" onClick={() => setEditing(false)}>
@@ -101,16 +139,36 @@ export default function ImportantDate() {
     )
   }
 
-  const days = daysBetween(toDateKey(), savedDate)
+  const title = settings.importantDateLabel || 'Important date'
+  const left = countdownParts(savedDate, now)
 
   return (
     <div className="pl-countdown">
-      <div>
+      <div lang="zh-Hans">
         <p className="pl-cd-label">
-          {settings.importantDateLabel || 'Important date'}
-          <span className="pl-cd-date"> · {formatShortDate(savedDate)}</span>
+          {left.daysAgo === undefined ? `距离「${title}」还有` : `「${title}」`}
+          <span className="pl-cd-date" lang="en">
+            {' '}
+            · {formatShortDate(savedDate)}
+          </span>
         </p>
-        <p className="pl-cd-value">{countdownText(days)}</p>
+        {left.daysAgo === undefined ? (
+          <p className="pl-cd-value">
+            <span className="pl-cd-part is-days">
+              <span className="pl-cd-num">{left.days}</span> 天
+            </span>
+            <span className="pl-cd-part">
+              <span className="pl-cd-num">{left.hours}</span> 小时
+            </span>
+            <span className="pl-cd-part">
+              <span className="pl-cd-num">{left.minutes}</span> 分钟
+            </span>
+          </p>
+        ) : (
+          <p className="pl-cd-value">
+            {left.daysAgo === 0 ? '就是今天' : `已经过去 ${left.daysAgo} 天`}
+          </p>
+        )}
       </div>
       <button type="button" className="pl-link" onClick={startEdit}>
         Edit

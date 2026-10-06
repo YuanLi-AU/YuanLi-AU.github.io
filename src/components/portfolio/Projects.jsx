@@ -9,7 +9,10 @@ export default function Projects() {
     <Section id="projects" title="Projects" accent="purple">
       <div className="cards">
         {projects.map((project) => (
-          <article key={project.title} className={`card accent-${project.accent}`}>
+          <article
+            key={project.title}
+            className={`card accent-${project.accent}${project.showcase ? ' card-wide' : ''}`}
+          >
             {project.image && (
               <img src={project.image} alt={`${project.title} screenshot`} className="card-image" />
             )}
@@ -41,6 +44,16 @@ export default function Projects() {
                   </a>
                 ))}
               </p>
+            )}
+            {project.showcase && (
+              // Compact preview at the bottom of the card (opens the lightbox)
+              <div className="card-preview">
+                <MediaSlot {...project.showcase} className="card-preview-img" />
+                <p>
+                  <span className="card-preview-label">{project.showcase.label}</span>
+                  <span className="muted">yuanli-au.github.io</span>
+                </p>
+              </div>
             )}
           </article>
         ))}
