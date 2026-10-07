@@ -3,7 +3,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { formatShortDate, fromDateKey } from '../../lib/dates.js'
 import PlannerIcon from './PlannerIcons.jsx'
-import { Checkbox, RowAction, TimeSelect } from './TableParts.jsx'
+import { Checkbox, RowAction } from './TableParts.jsx'
 
 // Enter / Escape finish editing — but not while an IME (e.g. Chinese
 // input) is still composing, where Enter only confirms the characters.
@@ -20,12 +20,14 @@ function compactDate(dateKey) {
   })
 }
 
-// One task in Daily / Mid-term / Long-term, on one line (desktop):
+// One task in Daily / Mid-term / Long-term, on one line:
 //
-//   ( )  A   09:00    Task text (wraps naturally)            ⠿  ✎  🗑
+//   ( )  A   Task text                                       ⠿  ✎  🗑     Daily
+//   ( )  1   20 Oct   Task text (wraps naturally)            ⠿  ✎  🗑     Mid / Long
 //
 // `number` is the row's label (A, B, … for Daily; 1, 2, … otherwise).
-// `whenType` is "time" (daily) or "date" (mid/long-term target). `done`
+// `whenType="date"` adds the target date (Mid-term / Long-term); Daily rows
+// have no time or date (an older saved `time` is kept untouched). `done`
 // shows the completed look while the complete transaction runs; the row then
 // moves to Completed History. Edits are saved by the list's auto-save.
 // Only the ⠿ handle starts a drag (see SortableTasks.jsx); not while editing
@@ -44,8 +46,7 @@ export default function TaskRow({
   const [editing, setEditing] = useState(false)
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
     useSortable({ id: item.id, disabled: editing || locked })
-  const field = whenType === 'time' ? 'time' : 'targetDate'
-  const when = item[field]
+  const when = whenType === 'date' ? item.targetDate : ''
   const blank = !item.task.trim()
 
   const startEdit = () => setEditing(true)
@@ -68,12 +69,9 @@ export default function TaskRow({
       />
       <span className="pl-num">{number}</span>
 
-      {!editing && (
-        <span
-          className="pl-when"
-          title={whenType === 'date' && when ? `Target ${formatShortDate(when)}` : undefined}
-        >
-          {whenType === 'date' && when ? compactDate(when) : when}
+      {whenType === 'date' && !editing && (
+        <span className="pl-when" title={when ? `Target ${formatShortDate(when)}` : undefined}>
+          {when ? compactDate(when) : ''}
         </span>
       )}
 
@@ -86,9 +84,7 @@ export default function TaskRow({
               onDone={finishEdit}
             />
             <div className="pl-edit-row">
-              {whenType === 'time' ? (
-                <TimeSelect value={when} onChange={(time) => onChange({ time })} label="Time" />
-              ) : (
+              {whenType === 'date' && (
                 <input
                   type="date"
                   className="pl-when-input"
@@ -103,7 +99,11 @@ export default function TaskRow({
             </div>
           </>
         ) : (
-          <p className="pl-task-text" onClick={() => !busy && startEdit()}>
+          <p
+            className="pl-task-text"
+            onClick={() => !busy && startEdit()}
+            title={whenType ? undefined : item.task} // Daily text may be cut short (…)
+          >
             {blank ? <span className="pl-untitled">Untitled task</span> : item.task}
           </p>
         )}

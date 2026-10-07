@@ -162,14 +162,14 @@ body:has(.pl-loading) {
 }
 
 /* ---------- Important date countdown ----------
-     距离「毕业」还有 · 12 Dec 2026                       Edit
-     35 天   18 小时   26 分钟                                   */
+     Until 「毕业」 · 12 Dec 2026                                  Edit
+     还有 (remaining)  35 天 (days)  18 小时 (hrs)  26 分钟 (mins)        */
 .pl-countdown {
   display: inline-flex;
   align-items: flex-start;
   gap: 28px;
   margin-top: 18px;
-  padding: 12px 18px 12px 16px;
+  padding: 10px 18px 10px 16px;
   border: 1px solid var(--pl-soft-line);
   border-left: 3px solid var(--pl-teal);
   border-radius: var(--pl-radius-sm);
@@ -209,8 +209,8 @@ body:has(.pl-loading) {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  column-gap: 16px;
-  margin: 4px 0 0;
+  column-gap: 14px;
+  margin: 2px 0 0;
   font-size: 0.9rem;
   font-weight: 500;
   color: var(--pl-muted);
@@ -235,6 +235,26 @@ body:has(.pl-loading) {
   font-weight: 700;
   letter-spacing: -0.02em;
   color: color-mix(in srgb, var(--pl-teal) 70%, var(--pl-text));
+}
+
+/* Each part (number + unit + gloss) stays together; parts wrap as a whole
+   if the line is too narrow */
+.pl-cd-part {
+  white-space: nowrap;
+}
+
+/* Hours + minutes: one unit when the line wraps */
+.pl-cd-rest {
+  display: inline-flex;
+  align-items: baseline;
+  column-gap: inherit;
+}
+
+/* English gloss in brackets: small and quiet */
+.pl-cd-en {
+  font-size: 0.72rem;
+  font-weight: 400;
+  color: color-mix(in srgb, var(--pl-muted) 85%, transparent);
 }
 
 .pl-countdown > .pl-link {
@@ -446,10 +466,17 @@ body:has(.pl-loading) {
 }
 
 /* ---------- Task lists (Daily, Mid-term, Long-term, History, Recycle Bin) ----------
-   One white surface per list; one line per task. Size order: checkbox /
-   number / task first, then the time or target date (muted), then the
-   quiet actions.
-     ( )   1   09:00   Task text, wrapping naturally          →  ✎  🗑     */
+   One white surface per list; one line per task. Every list uses the same
+   columns, so they read alike:
+     status | sequence | gap | date / type | gap | task | gap | actions
+     ( )      A                                 Task text…        ⠿ ✎ 🗑   Daily
+     ( )      1              20 Oct             Task text         ⠿ ✎ 🗑   Mid / Long
+     (✓)     128             Daily              Task text      ↩ Restore   History
+              3              Daily              Task text      ↩ Restore 🗑 Recycle Bin
+   The sequence (A/B/C or 1/2/3) is its own fixed, centred column: close to
+   the small circle, with a wider gap before the content, so it never reads
+   as part of the text and every task starts at the same x. Widths come from
+   the variables below (per list type, and narrower on phones). */
 .pl-plan-head {
   display: flex;
   align-items: center;
@@ -528,7 +555,12 @@ body:has(.pl-loading) {
 }
 
 .pl-tasks {
-  --when-w: 3.4rem; /* daily: "09:00" */
+  --check-w: 48px; /* status column = tap area of the circle */
+  --seq-w: 2.1rem; /* sequence column (A … AA, 1 … 99) */
+  --seq-gap: 20px; /* sequence → date / task */
+  --when-w: 0px; /* date / type label column (none on Daily) */
+  --when-gap: 0px; /* date / type → task */
+  --act-gap: 12px; /* task → actions */
   margin: 0;
   padding: 0;
   list-style: none;
@@ -536,29 +568,66 @@ body:has(.pl-loading) {
 
 .pl-tasks.is-date {
   --when-w: 6.4rem; /* "20 Oct" / "20 Oct 2027" */
+  --when-gap: 12px;
 }
 
 .pl-tasks.is-type {
   --when-w: 5.6rem; /* Daily / Mid-term / Long-term label */
+  --when-gap: 12px;
 }
 
-/* Completed History: numbers count all of history (e.g. 128), so they are
-   smaller and get a wider column */
+/* Daily: one line per task, everything vertically centred; text that is
+   too long is cut short with … (the full text shows on hover and when
+   editing). Same 64px row height as the empty slots below. */
+.pl-tasks.is-daily .pl-task {
+  align-items: center;
+  min-height: 64px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.pl-tasks.is-daily .pl-checkbox,
+.pl-tasks.is-daily .pl-task-actions {
+  margin-top: 0;
+}
+
+.pl-tasks.is-daily .pl-task-text {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Editing a Daily task: text box and Done side by side */
+.pl-tasks.is-daily .pl-task.is-editing .pl-task-body {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pl-tasks.is-daily .pl-task.is-editing .pl-task-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+/* Completed History: numbers count all of history (e.g. 128), so they get
+   a wider column and a slightly smaller size than A/B/C */
 .pl-tasks.is-counted {
-  --num-w: 2.9rem;
-  --num-w-sm: 2.1rem;
+  --seq-w: 3rem;
 }
 
 .pl-tasks.is-counted .pl-num {
-  font-size: 1.15rem;
+  font-size: 1.35rem;
 }
 
 .pl-task {
   display: grid;
-  grid-template-columns: 48px var(--num-w, 2.1rem) var(--when-w) minmax(0, 1fr) auto;
-  grid-template-areas: 'check num when task act';
+  grid-template-columns:
+    var(--check-w) var(--seq-w) var(--seq-gap) var(--when-w) var(--when-gap)
+    minmax(0, 1fr) var(--act-gap) auto;
+  grid-template-areas: 'check num . when . task . act';
   align-items: start;
-  column-gap: 12px;
+  column-gap: 0;
   padding: 13px 12px 13px 6px;
   transition: background-color 0.12s;
 }
@@ -572,16 +641,15 @@ body:has(.pl-loading) {
   background: var(--pl-hover);
 }
 
-/* Recycle Bin rows have no checkbox */
+/* Recycle Bin rows have no circle: no status column */
 .pl-task.is-binned {
-  grid-template-columns: 2.1rem var(--when-w) minmax(0, 1fr) auto;
-  grid-template-areas: 'num when task act';
+  --check-w: 0px;
   padding-left: 14px;
 }
 
-/* Editing: the text box spans the time and actions columns */
+/* Editing: the text box spans the date, task and actions columns */
 .pl-task.is-editing .pl-task-body {
-  grid-column: 3 / -1;
+  grid-column: 4 / -1;
 }
 
 .pl-task.is-editing,
@@ -589,7 +657,8 @@ body:has(.pl-loading) {
   background: color-mix(in srgb, var(--acc, var(--pl-blue)) 4%, var(--pl-card));
 }
 
-/* Round checkbox: 48px tap area, 28px circle centred on the first text line */
+/* Round checkbox: 48px tap area (44px on phones), small 24px circle centred
+   on the first text line — a quiet control; the sequence is the anchor */
 .pl-checkbox {
   grid-area: check;
   display: flex;
@@ -608,8 +677,8 @@ body:has(.pl-loading) {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   border: 2px solid color-mix(in srgb, var(--acc, var(--pl-blue)) 55%, var(--pl-line));
   border-radius: 50%;
   background: var(--pl-card);
@@ -622,8 +691,8 @@ body:has(.pl-loading) {
 }
 
 .pl-box svg {
-  width: 17px;
-  height: 17px;
+  width: 15px;
+  height: 15px;
   transform: scale(0.6);
   transition: transform 0.2s ease;
 }
@@ -665,14 +734,16 @@ body:has(.pl-loading) {
   opacity: 0.45;
 }
 
-/* Sequence number: the visual anchor of each row */
+/* Sequence (A/B/C or 1/2/3): the visual anchor of each row, centred in its
+   fixed column */
 .pl-num {
   grid-area: num;
-  font-size: 1.5rem;
+  font-size: 1.65rem;
   font-weight: 700;
   line-height: 1.75rem;
   letter-spacing: -0.02em;
-  text-align: right;
+  text-align: center;
+  white-space: nowrap;
   font-variant-numeric: tabular-nums;
   color: color-mix(in srgb, var(--acc, var(--pl-blue)) 70%, var(--pl-text));
 }
@@ -899,26 +970,6 @@ body.pl-dragging * {
   outline: none;
   border-color: var(--acc, var(--pl-blue));
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc, var(--pl-blue)) 16%, transparent);
-}
-
-/* Daily time: native <select> (30-minute steps), styled like the inputs.
-   (Element + both classes so it outranks ".pl-add-row .pl-when-input".) */
-select.pl-when-input.pl-time-select {
-  appearance: none;
-  padding-right: 28px;
-  background-image:
-    linear-gradient(45deg, transparent 50%, var(--pl-muted) 50%),
-    linear-gradient(135deg, var(--pl-muted) 50%, transparent 50%);
-  background-position:
-    calc(100% - 14px) 50%,
-    calc(100% - 9px) 50%;
-  background-size: 5px 5px;
-  background-repeat: no-repeat;
-  cursor: pointer;
-}
-
-.pl-time-select:disabled {
-  cursor: default;
 }
 
 .pl-edit-row {
@@ -1259,31 +1310,39 @@ select.pl-when-input.pl-time-select {
     text-align: center;
   }
 
-  /* ---- task rows: same structure, narrower number column ---- */
+  /* ---- task rows: same columns, narrower; the date / type label and the
+     actions drop under the task (Daily stays on one line, below) ---- */
+  .pl-tasks {
+    --check-w: 44px;
+    --seq-w: 1.5rem;
+    --seq-gap: 14px;
+    --act-gap: 2px;
+  }
+
+  .pl-tasks.is-counted {
+    --seq-w: 2.3rem; /* history totals up to 999 */
+  }
+
   .pl-task {
-    grid-template-columns: 44px var(--num-w-sm, 1.35rem) minmax(0, 1fr) auto;
+    grid-template-columns:
+      var(--check-w) var(--seq-w) var(--seq-gap) minmax(0, 1fr) var(--act-gap)
+      auto;
     grid-template-areas:
-      'check num task task'
-      'check num when act';
-    column-gap: 4px;
+      'check num . task task task'
+      'check num . when when act';
     padding: 10px 2px 6px 0;
   }
 
   .pl-task.is-binned {
-    grid-template-columns: 1.35rem minmax(0, 1fr) auto;
-    grid-template-areas:
-      'num task task'
-      'num when act';
-    column-gap: 8px;
-    padding-left: 4px;
+    padding-left: 8px;
   }
 
   /* Recycle Bin "Delete forever?": its own line under the type label, with spacing */
   .pl-task.is-binned:has(.pl-confirm-text) {
     grid-template-areas:
-      'num task task'
-      'num when when'
-      'num act act';
+      'check num . task task task'
+      'check num . when when when'
+      'check num . act act act';
   }
 
   .pl-task.is-binned:has(.pl-confirm-text) .pl-task-actions {
@@ -1297,23 +1356,41 @@ select.pl-when-input.pl-time-select {
     margin-right: auto;
   }
 
+  /* 44px touch target; the small circle sits slightly right of centre so
+     it stays close to its sequence */
   .pl-checkbox {
-    width: 44px; /* touch target stays 44px */
+    width: 44px;
     height: 44px;
     margin-top: -8px;
+    padding-left: 6px;
   }
 
   .pl-box {
-    width: 26px;
-    height: 26px;
+    width: 22px;
+    height: 22px;
+  }
+
+  .pl-box svg {
+    width: 14px;
+    height: 14px;
   }
 
   .pl-num {
-    font-size: 1.15rem;
+    font-size: 1.3rem;
   }
 
   .pl-tasks.is-counted .pl-num {
-    font-size: 0.98rem;
+    font-size: 1.1rem;
+  }
+
+  /* Daily stays one line: ( ) A   Task…  ⠿ ✎ 🗑 */
+  .pl-tasks.is-daily .pl-task {
+    grid-template-areas: 'check num . task . act';
+    padding: 6px 2px 6px 0;
+  }
+
+  .pl-tasks.is-daily .pl-task-actions {
+    gap: 0;
   }
 
   .pl-when {
@@ -1393,8 +1470,53 @@ select.pl-when-input.pl-time-select {
     flex: 1 1 auto;
   }
 
+  /* Daily add (no date): [ + Add a task… ] [ Add ] on one line */
+  .pl-add.is-single {
+    flex-wrap: nowrap;
+  }
+
+  .pl-add.is-single .pl-add-task {
+    flex: 1 1 auto;
+  }
+
+  .pl-add.is-single .pl-add-row {
+    flex: 0 0 auto;
+    padding-left: 0;
+  }
+
   .pl-countdown {
     display: flex;
+    position: relative;
+  }
+
+  /* Edit sits in the top-right corner, so the countdown line below gets
+     the card's full width (and stays on one line where it fits) */
+  .pl-countdown > .pl-link {
+    position: absolute;
+    top: 0;
+    right: 6px;
+    margin: 0;
+  }
+
+  .pl-countdown:not(.pl-countdown-form) .pl-cd-label {
+    padding-right: 48px;
+  }
+
+  .pl-cd-value {
+    column-gap: 8px;
+  }
+
+  .pl-cd-num {
+    margin-right: 2px;
+    font-size: 1.15rem;
+  }
+
+  .pl-cd-part.is-days .pl-cd-num {
+    font-size: 1.8rem;
+  }
+
+  .pl-cd-en {
+    font-size: 0.66rem;
   }
 
   .pl-countdown-form .pl-cd-input {

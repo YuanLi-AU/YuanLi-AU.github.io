@@ -73,8 +73,8 @@ export default function DailyPlanner({ flushers }) {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
-  function addItem(task, time) {
-    rows.add({ ...createItem(), task, time })
+  function addItem(task) {
+    rows.add({ ...createItem(), task })
   }
 
   function changeItem(id, patch) {
@@ -100,14 +100,13 @@ export default function DailyPlanner({ flushers }) {
                   items={list.items}
                   label={sequenceLetter}
                   onReorder={rows.reorder}
-                  className="pl-tasks is-time"
+                  className="pl-tasks is-daily"
                 >
                   {list.items.map((item, index) => (
                     <TaskRow
                       key={item.id}
                       number={sequenceLetter(index)}
                       item={item}
-                      whenType="time"
                       done={rows.busy?.id === item.id && rows.busy.kind === 'complete'}
                       busy={rows.busy?.id === item.id}
                       locked={rows.busy !== null}
@@ -127,7 +126,7 @@ export default function DailyPlanner({ flushers }) {
           )}
         </div>
 
-        <AddTaskForm whenType="time" onAdd={addItem} disabled={list.loading} />
+        <AddTaskForm onAdd={addItem} disabled={list.loading} />
       </div>
       <div className="pl-foot">
         <Message message={message} />

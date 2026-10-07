@@ -32,11 +32,19 @@ function useMinuteClock() {
   return now
 }
 
+// Small muted English gloss after the Chinese, e.g. 天 (days).
+const En = ({ children }) => (
+  <span className="pl-cd-en" lang="en">
+    {children}
+  </span>
+)
+
 // One important date with a live countdown, stored in users/{uid}/settings/planner
 // as { importantDateLabel, importantDate: "YYYY-MM-DD" }. The countdown runs
-// to the start (00:00 local) of that date.
-//   距离「毕业」还有
-//   35 天 18 小时 26 分钟
+// to the start (00:00 local) of that date. One line, Chinese first with the
+// English in brackets; the days number leads:
+//   Until 「毕业」 · 12 Dec 2026
+//   还有 (remaining) 35 天 (days) 18 小时 (hrs) 26 分钟 (mins)
 export default function ImportantDate() {
   const [settings, setSettings] = useState(undefined) // undefined = loading
   const [editing, setEditing] = useState(false)
@@ -144,29 +152,44 @@ export default function ImportantDate() {
 
   return (
     <div className="pl-countdown">
-      <div lang="zh-Hans">
+      <div>
         <p className="pl-cd-label">
-          {left.daysAgo === undefined ? `距离「${title}」还有` : `「${title}」`}
-          <span className="pl-cd-date" lang="en">
-            {' '}
-            · {formatShortDate(savedDate)}
-          </span>
+          {left.daysAgo === undefined && 'Until '}
+          <span lang="zh-Hans">「{title}」</span>
+          <span className="pl-cd-date"> · {formatShortDate(savedDate)}</span>
         </p>
         {left.daysAgo === undefined ? (
-          <p className="pl-cd-value">
+          <p className="pl-cd-value" lang="zh-Hans">
+            <span className="pl-cd-part">
+              还有 <En>(remaining)</En>
+            </span>
             <span className="pl-cd-part is-days">
-              <span className="pl-cd-num">{left.days}</span> 天
+              <span className="pl-cd-num">{left.days}</span> 天 <En>({left.days === 1 ? 'day' : 'days'})</En>
             </span>
-            <span className="pl-cd-part">
-              <span className="pl-cd-num">{left.hours}</span> 小时
+            {/* hours + minutes wrap together (narrow phones: days on line 1) */}
+            <span className="pl-cd-rest">
+              <span className="pl-cd-part">
+                <span className="pl-cd-num">{left.hours}</span> 小时 <En>({left.hours === 1 ? 'hr' : 'hrs'})</En>
+              </span>
+              <span className="pl-cd-part">
+                <span className="pl-cd-num">{left.minutes}</span> 分钟 <En>({left.minutes === 1 ? 'min' : 'mins'})</En>
+              </span>
             </span>
+          </p>
+        ) : left.daysAgo === 0 ? (
+          <p className="pl-cd-value" lang="zh-Hans">
             <span className="pl-cd-part">
-              <span className="pl-cd-num">{left.minutes}</span> 分钟
+              就是今天 <En>(today)</En>
             </span>
           </p>
         ) : (
-          <p className="pl-cd-value">
-            {left.daysAgo === 0 ? '就是今天' : `已经过去 ${left.daysAgo} 天`}
+          <p className="pl-cd-value" lang="zh-Hans">
+            <span className="pl-cd-part">
+              已经过去 <En>(passed)</En>
+            </span>
+            <span className="pl-cd-part is-days">
+              <span className="pl-cd-num">{left.daysAgo}</span> 天 <En>({left.daysAgo === 1 ? 'day' : 'days'})</En>
+            </span>
           </p>
         )}
       </div>

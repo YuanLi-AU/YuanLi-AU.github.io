@@ -1,9 +1,9 @@
 import { useRef, useState } from 'react'
 import PlannerIcon from './PlannerIcons.jsx'
-import { TimeSelect } from './TableParts.jsx'
 
-// "Add a task" line under each list: task text + optional time (daily) or
-// target date (mid/long-term). Nothing is written until Add / Enter.
+// "Add a task" line under each list: task text, plus an optional target date
+// for Mid-term / Long-term (`whenType="date"`); Daily has none, so it is
+// a single line: [ Add a task… ] [ Add ]. Nothing is written until Add / Enter.
 export default function AddTaskForm({ whenType, onAdd, disabled }) {
   const [task, setTask] = useState('')
   const [when, setWhen] = useState('')
@@ -20,7 +20,7 @@ export default function AddTaskForm({ whenType, onAdd, disabled }) {
   }
 
   return (
-    <form className="pl-add" onSubmit={submit}>
+    <form className={`pl-add${whenType ? '' : ' is-single'}`} onSubmit={submit}>
       <span className="pl-add-icon" aria-hidden="true">
         <PlannerIcon name="plus" size={18} />
       </span>
@@ -36,14 +36,7 @@ export default function AddTaskForm({ whenType, onAdd, disabled }) {
         enterKeyHint="done"
       />
       <div className="pl-add-row">
-        {whenType === 'time' ? (
-          <TimeSelect
-            value={when}
-            onChange={setWhen}
-            label="Time (optional)"
-            disabled={disabled}
-          />
-        ) : (
+        {whenType === 'date' && (
           <input
             type="date"
             className="pl-when-input"
