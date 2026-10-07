@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react'
 import PlannerIcon from './PlannerIcons.jsx'
+import { TimeSelect } from './TableParts.jsx'
 
 // "Add a task" line under each list: task text + optional time (daily) or
 // target date (mid/long-term). Nothing is written until Add / Enter.
@@ -35,15 +36,24 @@ export default function AddTaskForm({ whenType, onAdd, disabled }) {
         enterKeyHint="done"
       />
       <div className="pl-add-row">
-        <input
-          type={whenType}
-          className="pl-when-input"
-          value={when}
-          onChange={(e) => setWhen(e.target.value)}
-          aria-label={whenType === 'time' ? 'Time (optional)' : 'Target date (optional)'}
-          title={whenType === 'time' ? 'Time (optional)' : 'Target date (optional)'}
-          disabled={disabled}
-        />
+        {whenType === 'time' ? (
+          <TimeSelect
+            value={when}
+            onChange={setWhen}
+            label="Time (optional)"
+            disabled={disabled}
+          />
+        ) : (
+          <input
+            type="date"
+            className="pl-when-input"
+            value={when}
+            onChange={(e) => setWhen(e.target.value)}
+            aria-label="Target date (optional)"
+            title="Target date (optional)"
+            disabled={disabled}
+          />
+        )}
         <button type="submit" className="pl-btn pl-btn-add" disabled={disabled || !task.trim()}>
           Add
         </button>

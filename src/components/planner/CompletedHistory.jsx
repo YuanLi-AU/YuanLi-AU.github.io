@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react'
-import { restoreHistoryItem, subscribeHistory } from '../../lib/plannerData.js'
+import { useEffect, useRef, useState } from 'react'
+import { countHistory, restoreHistoryItem, subscribeHistory } from '../../lib/plannerData.js'
 import { Checkbox, Message, RowAction, TypeLabel } from './TableParts.jsx'
 import { formatStamp, originText, useMessage } from './tableHelpers.js'
 import { restoreWithSync } from './useSyncedItems.js'
-import { useUndo } from './useUndo.js'
 
 const RESTORED_TO = {
   daily: 'Restored to today’s Daily Plan.',
@@ -16,13 +15,32 @@ const ALL = 50 // "View all"
 // Completed tasks (deleted tasks live in the Recycle Bin, not here).
 // Shows the 3 most recent; "View all" lists up to the latest 50. Unticking
 // the checkbox or ↩ Restore puts a task back into its active list.
+//
+// The title shows how many completed rows history holds, and each row is
+// numbered by its place in it: oldest = 1, newest = total. The shown rows
+// are always the newest ones, so row `index` (newest first) is
+// `total - index`. The total is a count query, re-run whenever the shown
+// rows change (complete / restore end in a transaction, so the count already
+// includes them); until it arrives, numbers stay blank rather than wrong.
 export default function CompletedHistory({ flushers }) {
   const [showAll, setShowAll] = useState(false)
   const [entries, setEntries] = useState(undefined) // undefined = loading
+  const [total, setTotal] = useState(null) // null = not known (yet)
   const [error, setError] = useState(false)
   const [restoringId, setRestoringId] = useState(null)
   const [message, setMessage] = useMessage()
-  const undo = useUndo()
+  const countRun = useRef(0) // only the newest count query may set the total
+
+  async function refreshTotal() {
+    const run = ++countRun.current
+    setTotal(null)
+    try {
+      const count = await countHistory()
+      if (run === countRun.current) setTotal(count)
+    } catch {
+      // offline etc.: no total, no numbers; the list itself still shows
+    }
+  }
 
   useEffect(
     () =>
@@ -30,6 +48,7 @@ export default function CompletedHistory({ flushers }) {
         (list) => {
           setEntries(list)
           setError(false)
+          refreshTotal()
         },
         () => {
           setEntries([])
@@ -45,7 +64,6 @@ export default function CompletedHistory({ flushers }) {
     setRestoringId(id)
     try {
       const result = await restoreWithSync(flushers, () => restoreHistoryItem(id))
-      undo.forget(id) // restored by hand: a pending "undo complete" has nothing left to do
       setMessage({
         text: RESTORED_TO[result.destination] ?? 'Already restored.',
       })
@@ -62,7 +80,11 @@ export default function CompletedHistory({ flushers }) {
     <section className="pl-section pl-sec-history" aria-labelledby="pl-history-title">
       <div className="pl-plan-head">
         <h2 id="pl-history-title">
-          <span className="pl-label">{showAll ? 'Completed History' : 'Recent Completed'}</span>
+          <span className="pl-label">
+            {showAll ? 'Completed History' : 'Recent Completed'} ·{' '}
+            <span lang="zh-Hans">{showAll ? '完成记录' : '最近完成'}</span>
+            {total !== null && <span className="pl-count"> ({total})</span>}
+          </span>
         </h2>
         {canToggle && (
           <button
@@ -85,7 +107,7 @@ export default function CompletedHistory({ flushers }) {
             {error ? 'Couldn’t load history. Check your connection.' : 'Nothing completed yet.'}
           </p>
         ) : (
-          <ol className="pl-tasks is-type">
+          <ol className="pl-tasks is-type is-counted">
             {entries.map((entry, index) => (
               <li
                 key={entry.id}
@@ -98,7 +120,7 @@ export default function CompletedHistory({ flushers }) {
                   disabled={restoringId !== null}
                   label="Restore (mark as not completed)"
                 />
-                <span className="pl-num">{index + 1}</span>
+                <span className="pl-num">{total !== null && total - index > 0 ? total - index : ''}</span>
                 <span className="pl-when">
                   <TypeLabel type={entry.type} />
                 </span>

@@ -8,11 +8,11 @@ import {
   subscribeDaily,
 } from '../../lib/plannerData.js'
 import AddTaskForm from './AddTaskForm.jsx'
+import SortableTasks from './SortableTasks.jsx'
 import TaskRow from './TaskRow.jsx'
 import { Message, SaveStatus } from './TableParts.jsx'
-import { useMessage, useTaskActions } from './tableHelpers.js'
+import { sequenceLetter, useMessage, useTaskActions } from './tableHelpers.js'
 import useSyncedItems, { restoreWithSync } from './useSyncedItems.js'
-import { useUndo } from './useUndo.js'
 
 const MIN_ROWS = 3
 
@@ -32,27 +32,25 @@ function EmptySlots({ count }) {
 
 // Daily Plan: the one active Daily list (plans/daily). A task stays until
 // it is completed (checkbox → Completed History) or deleted (🗑 → Recycle
-// Bin) — no dates, no rollover, no expiry.
+// Bin) — no dates, no rollover, no expiry. Rows are labelled A, B, C, … by
+// position and can be reordered by dragging.
 export default function DailyPlanner({ flushers }) {
   const list = useSyncedItems('daily', subscribeDaily, saveDaily, flushers)
   const [message, setMessage] = useMessage()
   const rows = useTaskActions({
     list,
     setMessage,
-    flushers,
     complete: completeDailyItem,
     bin: binDailyItem,
   })
-  const undo = useUndo()
 
   // One-time move of the old per-day Daily data (see migrateLegacyDaily).
   // After it has succeeded once this does nothing (no reads). Runs like a
   // Restore (pending edits saved first, writes wait, rows handed to this
-  // list); not undoable, and Undo waits while it runs.
+  // list).
   useEffect(() => {
     let active = true
     async function migrate() {
-      undo.hold(true)
       try {
         const result = await restoreWithSync(flushers, () => migrateLegacyDaily())
         const n = result.rows.length
@@ -67,8 +65,6 @@ export default function DailyPlanner({ flushers }) {
             text: 'Couldn’t bring over earlier tasks — they’re safe and will be tried again.',
           })
         }
-      } finally {
-        undo.hold(false)
       }
     }
     migrate()
@@ -100,23 +96,27 @@ export default function DailyPlanner({ flushers }) {
           ) : (
             <>
               {list.items.length > 0 && (
-                <ol className="pl-tasks is-time">
+                <SortableTasks
+                  items={list.items}
+                  label={sequenceLetter}
+                  onReorder={rows.reorder}
+                  className="pl-tasks is-time"
+                >
                   {list.items.map((item, index) => (
                     <TaskRow
                       key={item.id}
-                      number={index + 1}
+                      number={sequenceLetter(index)}
                       item={item}
                       whenType="time"
                       done={rows.busy?.id === item.id && rows.busy.kind === 'complete'}
                       busy={rows.busy?.id === item.id}
                       locked={rows.busy !== null}
                       onChange={(patch) => changeItem(item.id, patch)}
-                      onEditDone={(before) => rows.edited(item.id, before)}
                       onComplete={() => rows.complete(item.id)}
                       onDelete={() => rows.remove(item.id)}
                     />
                   ))}
-                </ol>
+                </SortableTasks>
               )}
               {list.loadError && list.items.length === 0 ? (
                 <p className="pl-empty">Couldn’t load today’s plan. Check your connection.</p>

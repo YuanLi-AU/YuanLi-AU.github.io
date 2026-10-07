@@ -122,39 +122,6 @@ body:has(.pl-loading) {
   background: #eef3fb;
 }
 
-/* ↶ Undo last action: a quiet icon beside Portfolio / Lock */
-.pl-undo {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  padding: 0;
-  border: none;
-  border-radius: 8px;
-  background: none;
-  color: var(--pl-muted);
-  cursor: pointer;
-  transition:
-    background-color 0.15s,
-    color 0.15s;
-}
-
-.pl-undo:hover:not(:disabled) {
-  color: #141a3c;
-  background: #eef3fb;
-}
-
-.pl-undo:focus-visible {
-  outline: 2px solid var(--pl-blue);
-  outline-offset: 2px;
-}
-
-.pl-undo:disabled {
-  cursor: default;
-  color: color-mix(in srgb, var(--pl-muted) 40%, var(--pl-bg));
-}
-
 .pl-link:focus-visible {
   outline: 2px solid var(--pl-blue);
   outline-offset: 2px;
@@ -432,6 +399,26 @@ body:has(.pl-loading) {
   height: 8px;
 }
 
+/* English name, Chinese name on a second, smaller line (same 50px tab) */
+.pl-tab-text {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-width: 0;
+}
+
+.pl-tab-zh {
+  font-size: 0.74rem;
+  font-weight: 500;
+  line-height: 1.25;
+  letter-spacing: 0.06em;
+  opacity: 0.85;
+}
+
+.pl-tab[aria-selected='true'] .pl-tab-zh {
+  font-weight: 600;
+}
+
 .pl-tab:hover .pl-tab-dot,
 .pl-tab[aria-selected='true'] .pl-tab-dot {
   background: var(--t);
@@ -555,9 +542,20 @@ body:has(.pl-loading) {
   --when-w: 5.6rem; /* Daily / Mid-term / Long-term label */
 }
 
+/* Completed History: numbers count all of history (e.g. 128), so they are
+   smaller and get a wider column */
+.pl-tasks.is-counted {
+  --num-w: 2.9rem;
+  --num-w-sm: 2.1rem;
+}
+
+.pl-tasks.is-counted .pl-num {
+  font-size: 1.15rem;
+}
+
 .pl-task {
   display: grid;
-  grid-template-columns: 48px 2.1rem var(--when-w) minmax(0, 1fr) auto;
+  grid-template-columns: 48px var(--num-w, 2.1rem) var(--when-w) minmax(0, 1fr) auto;
   grid-template-areas: 'check num when task act';
   align-items: start;
   column-gap: 12px;
@@ -789,9 +787,45 @@ body:has(.pl-loading) {
   text-decoration-color: color-mix(in srgb, var(--pl-muted) 70%, transparent);
 }
 
+.pl-sec-history .pl-task.is-done .pl-task-text {
+  text-decoration-thickness: 2px;
+}
+
 .pl-task.is-done .pl-num,
 .pl-task.is-done .pl-when {
   opacity: 0.55;
+}
+
+/* ⠿ Drag handle: the only place a drag starts, so only it opts out of touch
+   scrolling (set up front: iOS decides on scroll vs. drag at touch start) */
+.pl-grip {
+  touch-action: none;
+  cursor: grab;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.pl-grip[aria-disabled='true'] {
+  opacity: 0.35;
+  cursor: default;
+}
+
+/* The row being dragged lifts slightly; the others slide aside to show
+   where it will land */
+.pl-task.is-dragging {
+  position: relative;
+  z-index: 1;
+  border-radius: 10px;
+  background: var(--pl-card);
+  box-shadow: 0 6px 18px rgba(28, 37, 65, 0.14);
+}
+
+body.pl-dragging,
+body.pl-dragging * {
+  cursor: grabbing;
+  -webkit-user-select: none;
+  user-select: none;
 }
 
 .pl-task.is-binned .pl-task-text {
@@ -865,6 +899,26 @@ body:has(.pl-loading) {
   outline: none;
   border-color: var(--acc, var(--pl-blue));
   box-shadow: 0 0 0 3px color-mix(in srgb, var(--acc, var(--pl-blue)) 16%, transparent);
+}
+
+/* Daily time: native <select> (30-minute steps), styled like the inputs.
+   (Element + both classes so it outranks ".pl-add-row .pl-when-input".) */
+select.pl-when-input.pl-time-select {
+  appearance: none;
+  padding-right: 28px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, var(--pl-muted) 50%),
+    linear-gradient(135deg, var(--pl-muted) 50%, transparent 50%);
+  background-position:
+    calc(100% - 14px) 50%,
+    calc(100% - 9px) 50%;
+  background-size: 5px 5px;
+  background-repeat: no-repeat;
+  cursor: pointer;
+}
+
+.pl-time-select:disabled {
+  cursor: default;
 }
 
 .pl-edit-row {
@@ -982,6 +1036,10 @@ body:has(.pl-loading) {
   .pl-tab,
   .pl-tab-dot {
     transition: none;
+  }
+
+  .pl-tasks .pl-task {
+    transition: none !important; /* overrides the drag library's inline style */
   }
 }
 
@@ -1190,6 +1248,11 @@ body:has(.pl-loading) {
     height: 6px;
   }
 
+  .pl-tab-zh {
+    font-size: 0.68rem;
+    letter-spacing: 0.04em;
+  }
+
   .pl-tab {
     white-space: nowrap;
     line-height: 1.2;
@@ -1198,7 +1261,7 @@ body:has(.pl-loading) {
 
   /* ---- task rows: same structure, narrower number column ---- */
   .pl-task {
-    grid-template-columns: 44px 1.35rem minmax(0, 1fr) auto;
+    grid-template-columns: 44px var(--num-w-sm, 1.35rem) minmax(0, 1fr) auto;
     grid-template-areas:
       'check num task task'
       'check num when act';
@@ -1249,6 +1312,10 @@ body:has(.pl-loading) {
     font-size: 1.15rem;
   }
 
+  .pl-tasks.is-counted .pl-num {
+    font-size: 0.98rem;
+  }
+
   .pl-when {
     align-self: center;
     font-size: 0.88rem;
@@ -1265,11 +1332,6 @@ body:has(.pl-loading) {
   /* ---- 44px touch targets (padding / min sizes; visuals unchanged) ---- */
   .pl-act {
     min-width: 44px;
-    height: 44px;
-  }
-
-  .pl-undo {
-    width: 44px;
     height: 44px;
   }
 

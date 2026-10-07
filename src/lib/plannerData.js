@@ -35,6 +35,7 @@ import {
   collection,
   deleteDoc,
   doc,
+  getCountFromServer,
   getDoc,
   limit,
   onSnapshot,
@@ -66,12 +67,6 @@ const normalize = (items) =>
   items.map(({ id, time = '', task = '', notes = '' }) => ({ id, time, task, notes }))
 const normalizePlan = (items) =>
   items.map(({ id, targetDate = '', task = '', notes = '' }) => ({ id, targetDate, task, notes }))
-
-// `index` puts a row back where it was (Undo); without one it goes last.
-export function insertAt(list, row, index) {
-  if (!Number.isInteger(index) || index < 0 || index > list.length) return [...list, row]
-  return [...list.slice(0, index), row, ...list.slice(index)]
-}
 
 const itemsOf = (snap) => (snap.exists() ? normalize(snap.data().items ?? []) : [])
 const planItemsOf = (snap) => (snap.exists() ? normalizePlan(snap.data().items ?? []) : [])
@@ -253,11 +248,10 @@ const PLAN_IDS = { daily: DAILY, 'mid-term': 'midTerm', 'long-term': 'longTerm' 
 // Puts a completed / deleted row back into its active list and removes the
 // history / bin record, in one transaction (both or neither — a failure
 // leaves the record intact and the active list unchanged). Daily rows go back
-// to the active Daily list (plans/daily). If the active list already has a row with
-// the same id, it is not added again; the record is still removed, so
-// nothing is duplicated. `index` (Undo only) puts the row back at its old
-// position; otherwise it is added last.
-function restoreEntry(entryRef, index) {
+// to the active Daily list (plans/daily), at the end. If the active list
+// already has a row with the same id, it is not added again; the record is
+// still removed, so nothing is duplicated.
+function restoreEntry(entryRef) {
   return runTransaction(db, async (tx) => {
     const entrySnap = await tx.get(entryRef)
     if (!entrySnap.exists()) return { destination: null } // already restored elsewhere
@@ -280,7 +274,7 @@ function restoreEntry(entryRef, index) {
         }
 
     if (!items.some((item) => item.id === entry.id)) {
-      const next = insertAt(items, row, index)
+      const next = [...items, row]
       tx.set(targetRef, {
         items: isDaily ? normalize(next) : normalizePlan(next),
         updatedAt: serverTimestamp(),
@@ -288,18 +282,18 @@ function restoreEntry(entryRef, index) {
     }
     tx.delete(entryRef)
     // `key` matches the list's useSyncedItems key (the plan id).
-    return { destination: planId, key: planId, row, index }
+    return { destination: planId, key: planId, row }
   })
 }
 
-// Completed History ↩ Restore (and Undo complete).
-export function restoreHistoryItem(itemId, index) {
-  return restoreEntry(historyRef(itemId), index)
+// Completed History ↩ Restore.
+export function restoreHistoryItem(itemId) {
+  return restoreEntry(historyRef(itemId))
 }
 
-// Recycle Bin Restore (and Undo delete).
-export function restoreBinItem(itemId, index) {
-  return restoreEntry(binRef(itemId), index)
+// Recycle Bin Restore.
+export function restoreBinItem(itemId) {
+  return restoreEntry(binRef(itemId))
 }
 
 // ---------- Completed history ----------
@@ -317,6 +311,13 @@ export function subscribeHistory(onEntries, onError, max = 50) {
     (snap) => onEntries(snap.docs.map((d) => d.data({ serverTimestamps: 'estimate' }))),
     onError,
   )
+}
+
+// How many completed rows history holds right now (Firestore count
+// aggregation: 1 read per 1000 rows counted; nothing is stored).
+export async function countHistory() {
+  const snap = await getCountFromServer(collection(db, ...userPath(), 'completedHistory'))
+  return snap.data().count
 }
 
 // ---------- Recycle Bin ----------

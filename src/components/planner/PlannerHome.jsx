@@ -8,18 +8,17 @@ import DailyPlanner from './DailyPlanner.jsx'
 import ImportantDate from './ImportantDate.jsx'
 import PlanTable from './PlanTable.jsx'
 import RecycleBin from './RecycleBin.jsx'
-import { UndoButton } from './TableParts.jsx'
 import useTodayKey from './useTodayKey.js'
-import { UndoProvider, useUndoStore } from './useUndo.js'
 
 // Planner tabs. Daily / Mid-term / Long-term stay mounted while hidden
 // (their live data, pending edits and Restore hand-off keep working); the
-// Recycle Bin only loads while its tab is open.
+// Recycle Bin only loads while its tab is open. Each tab shows its English
+// name (" Plan" hidden on phones) with the Chinese name on a second line.
 const TABS = [
-  { id: 'daily', label: 'Daily', rest: ' Plan' },
-  { id: 'midTerm', label: 'Mid-term', rest: ' Plan' },
-  { id: 'longTerm', label: 'Long-term', rest: ' Plan' },
-  { id: 'bin', label: 'Recycle Bin', rest: '' },
+  { id: 'daily', label: 'Daily', rest: ' Plan', zh: '每日计划' },
+  { id: 'midTerm', label: 'Mid-term', rest: ' Plan', zh: '中期计划' },
+  { id: 'longTerm', label: 'Long-term', rest: ' Plan', zh: '长期计划' },
+  { id: 'bin', label: 'Recycle Bin', rest: '', zh: '回收站' },
 ]
 
 function PlannerTabs({ tab, onChange }) {
@@ -50,9 +49,14 @@ function PlannerTabs({ tab, onChange }) {
           onClick={() => onChange(t.id)}
         >
           <span className="pl-tab-dot" aria-hidden="true" />
-          <span>
-            {t.label}
-            {t.rest && <span className="pl-hide-sm">{t.rest}</span>}
+          <span className="pl-tab-text">
+            <span>
+              {t.label}
+              {t.rest && <span className="pl-hide-sm">{t.rest}</span>}
+            </span>
+            <span className="pl-tab-zh" lang="zh-Hans">
+              {t.zh}
+            </span>
           </span>
         </button>
       ))}
@@ -80,7 +84,6 @@ export default function PlannerHome() {
   const todayKey = useTodayKey() // header date follows the calendar day
   const lunar = lunarDate(todayKey)
   const [flushers] = useState(() => new Set()) // each table registers its save-now function
-  const undo = useUndoStore() // one-level Undo, this session only
   const [locking, setLocking] = useState(false)
 
   // Save pending edits in every table before signing out (give up after 3s if offline).
@@ -92,60 +95,57 @@ export default function PlannerHome() {
   }
 
   return (
-    <UndoProvider value={undo}>
-      <main className="pl-page">
-        {/* Site identity bar: same YL brand as the Portfolio */}
-        <nav className="pl-topbar" aria-label="Site">
-          <span className="pl-brand">
-            <BrandMark />
-            <span>
-              <span className="pl-hide-sm">Personal </span>Planner
-            </span>
+    <main className="pl-page">
+      {/* Site identity bar: same YL brand as the Portfolio */}
+      <nav className="pl-topbar" aria-label="Site">
+        <span className="pl-brand">
+          <BrandMark />
+          <span>
+            <span className="pl-hide-sm">Personal </span>Planner
           </span>
-          <div className="pl-topbar-actions">
-            <UndoButton />
-            <Link to="/" className="pl-link pl-site-link">
-              Portfolio
-            </Link>
-            <button type="button" className="pl-btn" onClick={handleLock} disabled={locking}>
-              Lock
-            </button>
-          </div>
-        </nav>
+        </span>
+        <div className="pl-topbar-actions">
+          <Link to="/" className="pl-link pl-site-link">
+            Portfolio
+          </Link>
+          <button type="button" className="pl-btn" onClick={handleLock} disabled={locking}>
+            Lock
+          </button>
+        </div>
+      </nav>
 
-        {/* Desktop: greeting + date on the left, countdown on the right */}
-        <header className="pl-header">
-          <div className="pl-greeting">
-            <h1>Hi, Yuan</h1>
-            <p className="pl-date">
-              {formatLongDate(todayKey)}
-              {lunar && (
-                <span className="pl-lunar" lang="zh-Hans">
-                  {' '}
-                  · {lunar}
-                </span>
-              )}
-            </p>
-          </div>
-          <ImportantDate />
-        </header>
+      {/* Desktop: greeting + date on the left, countdown on the right */}
+      <header className="pl-header">
+        <div className="pl-greeting">
+          <h1>Hi, Yuan</h1>
+          <p className="pl-date">
+            {formatLongDate(todayKey)}
+            {lunar && (
+              <span className="pl-lunar" lang="zh-Hans">
+                {' '}
+                · {lunar}
+              </span>
+            )}
+          </p>
+        </div>
+        <ImportantDate />
+      </header>
 
-        <PlannerTabs tab={tab} onChange={setTab} />
+      <PlannerTabs tab={tab} onChange={setTab} />
 
-        <Panel id="daily" tab={tab}>
-          <DailyPlanner flushers={flushers} />
-          <CompletedHistory flushers={flushers} />
-        </Panel>
-        <Panel id="midTerm" tab={tab}>
-          <PlanTable planId="midTerm" title="Mid-term Plan" flushers={flushers} />
-        </Panel>
-        <Panel id="longTerm" tab={tab}>
-          <PlanTable planId="longTerm" title="Long-term Plan" flushers={flushers} />
-        </Panel>
-        <Panel id="bin" tab={tab}>
-          {tab === 'bin' && <RecycleBin flushers={flushers} />}
-        </Panel>
-      </main>
-    </UndoProvider>
+      <Panel id="daily" tab={tab}>
+        <DailyPlanner flushers={flushers} />
+        <CompletedHistory flushers={flushers} />
+      </Panel>
+      <Panel id="midTerm" tab={tab}>
+        <PlanTable planId="midTerm" title="Mid-term Plan" flushers={flushers} />
+      </Panel>
+      <Panel id="longTerm" tab={tab}>
+        <PlanTable planId="longTerm" title="Long-term Plan" flushers={flushers} />
+      </Panel>
+      <Panel id="bin" tab={tab}>
+        {tab === 'bin' && <RecycleBin flushers={flushers} />}
+      </Panel>
+    </main>
   )
 }

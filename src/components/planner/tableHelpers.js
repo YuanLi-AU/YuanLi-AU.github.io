@@ -1,10 +1,8 @@
+import { arrayMove } from '@dnd-kit/sortable'
 import { useEffect, useRef, useState } from 'react'
 import { formatShortDate } from '../../lib/dates.js'
-import { insertAt, restoreBinItem, restoreHistoryItem } from '../../lib/plannerData.js'
-import { useUndo } from './useUndo.js'
-import { restoreWithSync } from './useSyncedItems.js'
 
-// Status message under a list ({ text, undoId? }); hides after 6 seconds.
+// Status message under a list ({ text }); hides after 6 seconds.
 export function useMessage() {
   const [message, setMessage] = useState(null)
   useEffect(() => {
@@ -15,107 +13,37 @@ export function useMessage() {
   return [message, setMessage]
 }
 
-// Task actions for one list (Daily / Mid-term / Long-term), each registering
-// a one-level Undo once it has succeeded (see useUndo.js). Nothing here
-// bypasses the existing safety:
-//   complete / delete run as Firestore transactions via removeVia —
-//     the row only leaves the list once its transaction has succeeded;
-//   their undos run through restoreWithSync (save everything, pause writes,
-//     one transaction, hand the row back) — the same path as ↩ Restore;
-//   add / edit / their undos are ordinary edits saved by the list's auto-save.
-// Row transactions and undos never overlap (undo.hold / undo.isRunning).
+// Task actions for one list (Daily / Mid-term / Long-term).
+//   complete / delete run as Firestore transactions via removeVia — the row
+//     only leaves the list once its transaction has succeeded (it is then in
+//     Completed History / the Recycle Bin, where Restore brings it back);
+//   add / reorder are ordinary edits saved by the list's auto-save.
+// Only one row transaction runs at a time per list.
 //
-// Options: list (from useSyncedItems), setMessage, flushers,
+// Options: list (from useSyncedItems), setMessage,
 //   complete(item, remaining) / bin(item, remaining) — the list's transactions.
-export function useTaskActions({ list, setMessage, flushers, complete, bin }) {
-  const undo = useUndo()
+export function useTaskActions({ list, setMessage, complete, bin }) {
   const [busy, setBusy] = useState(null) // { id, kind } of the running row
   const running = useRef(false)
-  const listRef = useRef(list)
-  useEffect(() => {
-    listRef.current = list
-  })
 
-  // Undo helper: shows the outcome in this list's message line; a failure
-  // is re-thrown so the undo stays available to retry.
-  const undoing = (fn) => async () => {
-    setMessage(null)
-    try {
-      setMessage({ text: await fn() })
-    } catch (err) {
-      setMessage({ text: 'Couldn’t undo. Check your connection and try again.' })
-      throw err
-    }
-  }
-
-  async function runRow(id, kind, transaction, onSuccess, failText) {
-    if (running.current || undo.isRunning()) return
-    const before = list.latest.current
-    const index = before.items.findIndex((row) => row.id === id)
-    const item = before.items[index]
-    if (!item) return
+  async function runRow(id, kind, transaction, doneText, failText) {
+    if (running.current) return
+    if (!list.latest.current.items.some((row) => row.id === id)) return
     running.current = true
-    undo.hold(true)
     setBusy({ id, kind })
     try {
-      const result = await list.removeVia(id, transaction)
-      setMessage(onSuccess(result, { item, index, key: before.key }))
+      await list.removeVia(id, transaction)
+      setMessage({ text: doneText })
     } catch {
-      setMessage({ text: failText }) // nothing was written, so nothing to undo
+      setMessage({ text: failText }) // nothing was written
     } finally {
       running.current = false
-      undo.hold(false)
       setBusy(null)
     }
   }
 
-  // Edits made through the list (auto-saved); undo only if the row is still
-  // in the same list.
-  function localUndo(key, id, apply, doneText) {
-    return undoing(async () => {
-      const current = listRef.current.latest.current
-      if (current.key !== key) return 'Nothing to undo — this task has changed since.'
-      const next = apply(current.items)
-      if (!next) return 'Nothing to undo — this task has changed since.'
-      listRef.current.update(next)
-      return doneText
-    })
-  }
-
   function add(row) {
-    const key = list.latest.current.key
     list.update([...list.latest.current.items, row])
-    undo.register(
-      `added “${row.task}”`,
-      row.id,
-      localUndo(
-        key,
-        row.id,
-        (items) =>
-          items.some((r) => r.id === row.id) ? items.filter((r) => r.id !== row.id) : null,
-        'Undone — task removed.',
-      ),
-    )
-  }
-
-  // `before` = the row's fields when editing started.
-  function edited(id, before) {
-    const { key, items } = list.latest.current
-    const now = items.find((r) => r.id === id)
-    if (!now || Object.keys(before).every((field) => now[field] === before[field])) return
-    undo.register(
-      `edited “${before.task || now.task}”`,
-      id,
-      localUndo(
-        key,
-        id,
-        (rows) =>
-          rows.some((r) => r.id === id)
-            ? rows.map((r) => (r.id === id ? { ...r, ...before } : r))
-            : null,
-        'Undone — edit reverted.',
-      ),
-    )
   }
 
   function completeRow(id) {
@@ -123,66 +51,53 @@ export function useTaskActions({ list, setMessage, flushers, complete, bin }) {
       id,
       'complete',
       complete,
-      (_result, { item, index }) => {
-        undo.register(
-          `completed “${item.task}”`,
-          id,
-          undoing(async () => {
-            const back = await restoreWithSync(flushers, () => restoreHistoryItem(id, index))
-            return back.destination
-              ? 'Undone — task is active again.'
-              : 'Nothing to undo — it was already restored.'
-          }),
-        )
-        return { text: 'Completed — saved to history.' }
-      },
+      'Completed — saved to history.',
       'Couldn’t complete this task. Check your connection and try again.',
     )
   }
 
   // Delete = move to the Recycle Bin (one transaction). A blank row has
-  // nothing worth keeping, so it is simply removed (undo puts it back).
+  // nothing worth keeping, so it is simply removed.
   function removeRow(id) {
-    const { key, items } = list.latest.current
-    const index = items.findIndex((row) => row.id === id)
-    const item = items[index]
+    const { items } = list.latest.current
+    const item = items.find((row) => row.id === id)
     if (!item) return
     if (!item.task.trim()) {
       list.update(items.filter((row) => row.id !== id))
-      undo.register(
-        'deleted an empty task',
-        id,
-        localUndo(
-          key,
-          id,
-          (rows) => (rows.some((r) => r.id === id) ? null : insertAt(rows, item, index)),
-          'Undone — task put back.',
-        ),
-      )
       return
     }
     runRow(
       id,
       'delete',
       bin,
-      (_result, ctx) => {
-        const undoId = undo.register(
-          `deleted “${ctx.item.task}”`,
-          id,
-          undoing(async () => {
-            const back = await restoreWithSync(flushers, () => restoreBinItem(id, ctx.index))
-            return back.destination
-              ? 'Undone — restored from the Recycle Bin.'
-              : 'Nothing to undo — it is no longer in the Recycle Bin.'
-          }),
-        )
-        return { text: 'Moved to Recycle Bin.', undoId }
-      },
+      'Moved to Recycle Bin.',
       'Couldn’t delete this task. Check your connection and try again.',
     )
   }
 
-  return { busy, add, edited, complete: completeRow, remove: removeRow }
+  // Drag & drop: move `activeId` to where `overId` is. Positions come from
+  // the newest list (it may have changed during the drag); no change, no save.
+  function reorder(activeId, overId) {
+    const { items } = list.latest.current
+    const from = items.findIndex((row) => row.id === activeId)
+    const to = items.findIndex((row) => row.id === overId)
+    if (from < 0 || to < 0 || from === to) return
+    list.update(arrayMove(items, from, to))
+  }
+
+  return { busy, add, reorder, complete: completeRow, remove: removeRow }
+}
+
+// Row labels: A, B, … Z, AA, AB, … (Daily) — display only, from the position.
+export function sequenceLetter(index) {
+  let n = index + 1
+  let label = ''
+  while (n > 0) {
+    n -= 1
+    label = String.fromCharCode(65 + (n % 26)) + label
+    n = Math.floor(n / 26)
+  }
+  return label
 }
 
 // "6 Oct, 3:40 pm" for completed / deleted timestamps.

@@ -1,6 +1,5 @@
 // Small components shared by the planner lists.
 import PlannerIcon from './PlannerIcons.jsx'
-import { useUndo } from './useUndo.js'
 
 export function SaveStatus({ state, onRetry }) {
   if (state === 'saving') return <span className="pl-save">Saving…</span>
@@ -38,7 +37,7 @@ export function Checkbox({ checked, onClick, disabled, label }) {
   )
 }
 
-// Quiet icon button for row actions (edit / move / delete).
+// Quiet icon button for row actions (edit / delete).
 export function RowAction({ icon, label, text, onClick, disabled, danger }) {
   return (
     <button
@@ -55,41 +54,41 @@ export function RowAction({ icon, label, text, onClick, disabled, danger }) {
   )
 }
 
-// Short status line under a list (e.g. "Moved to Recycle Bin. Undo").
-// "Undo" is the same one-level undo as the top ↶ button, shown only while
-// this message's action is still the latest undoable one.
+// Short status line under a list (e.g. "Moved to Recycle Bin.").
 export function Message({ message }) {
-  const undo = useUndo()
-  const canUndo = message?.undoId && undo?.entry?.id === message.undoId
   return (
     <p className="pl-message" role="status">
       {message?.text}
-      {canUndo && (
-        <button type="button" className="pl-link" onClick={undo.undo} disabled={undo.busy}>
-          Undo
-        </button>
-      )}
     </p>
   )
 }
 
-// ↶ Undo last action (top bar). Muted and disabled when there is nothing to undo.
-export function UndoButton() {
-  const undo = useUndo()
-  const label = undo.entry
-    ? `Undo last action: ${undo.entry.label}`
-    : 'Undo last action (nothing to undo)'
+// Daily time in 30-minute steps (00:00 … 23:30), or none. A saved time off
+// that grid (e.g. an older 08:10) is kept as an extra option in its place,
+// so it still shows and nothing changes unless a new time is picked.
+const HALF_HOURS = Array.from(
+  { length: 48 },
+  (_, i) => `${String(Math.floor(i / 2)).padStart(2, '0')}:${i % 2 ? '30' : '00'}`,
+)
+
+export function TimeSelect({ value, onChange, label, disabled }) {
+  const times = value && !HALF_HOURS.includes(value) ? [...HALF_HOURS, value].sort() : HALF_HOURS
   return (
-    <button
-      type="button"
-      className="pl-undo"
-      onClick={undo.undo}
-      disabled={!undo.entry || undo.busy}
+    <select
+      className="pl-when-input pl-time-select"
+      value={value}
+      onChange={(e) => onChange(e.target.value)}
       aria-label={label}
       title={label}
+      disabled={disabled}
     >
-      <PlannerIcon name="undo" size={18} />
-    </button>
+      <option value="">--:--</option>
+      {times.map((time) => (
+        <option key={time} value={time}>
+          {time}
+        </option>
+      ))}
+    </select>
   )
 }
 

@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from 'react'
-import { insertAt } from '../../lib/plannerData.js'
 
 const SAVE_DELAY = 700 // ms after the last edit before writing to Firestore
 
@@ -14,7 +13,7 @@ const SAVE_DELAY = 700 // ms after the last edit before writing to Firestore
 //      restored row is added to the matching table's local list as an edit,
 //      so every later write includes it.
 let savesPaused = null // Promise while a restore transaction is running
-let pauses = 0 // nested pauses (e.g. a rollover and a restore at once)
+let pauses = 0 // nested pauses (e.g. the migration and a restore at once)
 let releasePause = null
 const adopters = new Set()
 
@@ -42,26 +41,26 @@ async function waitForSaves() {
   while (savesPaused) await savesPaused
 }
 
-export function adoptRestoredRow(key, row, index) {
-  adopters.forEach((adopt) => adopt(key, row, index))
+export function adoptRestoredRow(key, row) {
+  adopters.forEach((adopt) => adopt(key, row))
 }
 
-// Runs a restore transaction (history ↩ Restore, Recycle Bin Restore, Undo
-// delete) safely:
+// Runs a restore transaction (history ↩ Restore, Recycle Bin Restore, the
+// one-time Daily migration) safely:
 //  1. save pending edits in every table;
 //  2. pause table writes while the transaction runs, so no stale list can be
 //     written meanwhile;
 //  3. on success, hand the restored row to its table before writes resume,
 //     so later auto-saves include it.
-// `run()` returns { destination, key, row, index? } (or several `rows`) from
+// `run()` returns { destination, key, row } (or several `rows`) from
 // plannerData.js.
 export async function restoreWithSync(flushers, run) {
   if (flushers) await Promise.all([...flushers].map((flush) => flush()))
   const resume = pauseSaves()
   try {
     const result = await run()
-    if (result.row) adoptRestoredRow(result.key, result.row, result.index)
-    for (const row of result.rows ?? []) adoptRestoredRow(result.key, row) // rollover: appended in order
+    if (result.row) adoptRestoredRow(result.key, result.row)
+    for (const row of result.rows ?? []) adoptRestoredRow(result.key, row) // migration: appended in order
     return result
   } finally {
     resume()
@@ -127,16 +126,15 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
     }
   }
 
-  // A row restored from history into `rowKey`: add it to this table's lists
-  // if missing (at `index` for Undo, the same place the transaction put it;
-  // otherwise last). Treated as an edit (dirty + auto-save), so stale
-  // snapshots are ignored and every later write keeps it. Never adds a
-  // duplicate.
-  function adopt(rowKey, row, index) {
+  // A row restored from history into `rowKey`: add it to the end of this
+  // table's lists if missing (the same place the transaction put it).
+  // Treated as an edit (dirty + auto-save), so stale snapshots are ignored
+  // and every later write keeps it. Never adds a duplicate.
+  function adopt(rowKey, row) {
     const missing = (list) => !list.some((item) => item.id === row.id)
     for (const target of waiting.current) {
       if (target.key === rowKey && missing(target.items)) {
-        target.items = insertAt(target.items, row, index)
+        target.items = [...target.items, row]
       }
     }
     // Only into a list that has loaded: a list still waiting for its first
@@ -147,7 +145,7 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
       loadedKey.current === rowKey &&
       missing(latest.current.items)
     ) {
-      update(insertAt(latest.current.items, row, index), rowKey)
+      update([...latest.current.items, row], rowKey)
     }
   }
 
@@ -208,7 +206,7 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
   }
 
   // Removes one row via a Firestore transaction `run(item, remaining)` that
-  // also writes this list without the row (move to tomorrow / complete).
+  // also writes this list without the row (complete / delete).
   // The row only leaves the screen after the transaction succeeds; if it
   // fails nothing was written and the row stays. Returns the transaction's
   // result, or throws.

@@ -3,7 +3,6 @@ import { deleteBinItem, restoreBinItem, subscribeBin } from '../../lib/plannerDa
 import { Message, RowAction, TypeLabel } from './TableParts.jsx'
 import { formatStamp, originText, useMessage } from './tableHelpers.js'
 import { restoreWithSync } from './useSyncedItems.js'
-import { useUndo } from './useUndo.js'
 
 const BIN_LIMIT = 50
 
@@ -38,7 +37,6 @@ function BinList({ flushers }) {
   const [busyId, setBusyId] = useState(null)
   const [confirmId, setConfirmId] = useState(null) // row asking "Delete forever?"
   const [message, setMessage] = useMessage()
-  const undo = useUndo()
 
   useEffect(
     () =>
@@ -62,7 +60,6 @@ function BinList({ flushers }) {
     setConfirmId(null)
     try {
       const result = await restoreWithSync(flushers, () => restoreBinItem(entry.id))
-      undo.forget(entry.id) // restored by hand: a pending "undo delete" has nothing left to do
       setMessage({ text: restoredText(result) })
     } catch {
       setMessage({ text: 'Couldn’t restore this task. Please try again.' })
@@ -71,13 +68,12 @@ function BinList({ flushers }) {
     }
   }
 
-  // Permanent: never registers an Undo (and drops one that pointed at this task).
+  // Permanent (after "Delete forever?" is confirmed).
   async function deleteForever(id) {
     if (busyId) return
     setBusyId(id)
     try {
       await deleteBinItem(id)
-      undo.forget(id)
       setConfirmId(null)
       setMessage({ text: 'Deleted permanently.' })
     } catch {

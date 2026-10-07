@@ -3,12 +3,6 @@
 const PATHS = {
   check: <path d="M5 12.5l4.5 4.5L19 7.5" />,
   plus: <path d="M12 5v14M5 12h14" />,
-  undo: (
-    <>
-      <path d="M9 14L4 9l5-5" />
-      <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
-    </>
-  ),
   edit: (
     <>
       <path d="M4 20h4L19 9l-4-4L4 16v4z" />
@@ -21,6 +15,17 @@ const PATHS = {
       <path d="M9 7V4.5h6V7" />
       <path d="M6.5 7l1 13h9l1-13" />
     </>
+  ),
+  // ⠿ drag handle: two columns of three dots
+  grip: (
+    <g fill="currentColor" stroke="none">
+      <circle cx="9" cy="6" r="1.6" />
+      <circle cx="15" cy="6" r="1.6" />
+      <circle cx="9" cy="12" r="1.6" />
+      <circle cx="15" cy="12" r="1.6" />
+      <circle cx="9" cy="18" r="1.6" />
+      <circle cx="15" cy="18" r="1.6" />
+    </g>
   ),
   restore: (
     <>

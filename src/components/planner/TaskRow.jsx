@@ -1,6 +1,9 @@
+import { useSortable } from '@dnd-kit/sortable'
+import { CSS } from '@dnd-kit/utilities'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { formatShortDate, fromDateKey } from '../../lib/dates.js'
-import { Checkbox, RowAction } from './TableParts.jsx'
+import PlannerIcon from './PlannerIcons.jsx'
+import { Checkbox, RowAction, TimeSelect } from './TableParts.jsx'
 
 // Enter / Escape finish editing — but not while an IME (e.g. Chinese
 // input) is still composing, where Enter only confirms the characters.
@@ -19,11 +22,14 @@ function compactDate(dateKey) {
 
 // One task in Daily / Mid-term / Long-term, on one line (desktop):
 //
-//   ( )  1   09:00    Task text (wraps naturally)               ✎  🗑
+//   ( )  A   09:00    Task text (wraps naturally)            ⠿  ✎  🗑
 //
+// `number` is the row's label (A, B, … for Daily; 1, 2, … otherwise).
 // `whenType` is "time" (daily) or "date" (mid/long-term target). `done`
 // shows the completed look while the complete transaction runs; the row then
 // moves to Completed History. Edits are saved by the list's auto-save.
+// Only the ⠿ handle starts a drag (see SortableTasks.jsx); not while editing
+// or while a row transaction runs.
 export default function TaskRow({
   number,
   item,
@@ -32,42 +38,26 @@ export default function TaskRow({
   busy,
   locked,
   onChange,
-  onEditDone,
   onComplete,
   onDelete,
 }) {
   const [editing, setEditing] = useState(false)
-  const before = useRef(null) // the row's fields when editing started (for Undo)
+  const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
+    useSortable({ id: item.id, disabled: editing || locked })
   const field = whenType === 'time' ? 'time' : 'targetDate'
   const when = item[field]
   const blank = !item.task.trim()
 
-  // The edit becomes undoable as soon as it changes something (edits are
-  // auto-saved while typing), so ↶ works even before Done is pressed.
-  const reported = useRef(false)
-
-  function startEdit() {
-    before.current = { task: item.task, [field]: item[field] }
-    reported.current = false
-    setEditing(true)
-  }
-
-  function editChange(patch) {
-    onChange(patch)
-    if (before.current && !reported.current) {
-      reported.current = true
-      onEditDone?.(before.current)
-    }
-  }
-
-  function finishEdit() {
-    setEditing(false)
-    before.current = null
-  }
+  const startEdit = () => setEditing(true)
+  const finishEdit = () => setEditing(false)
 
   return (
     <li
-      className={`pl-task${done ? ' is-done' : ''}${editing ? ' is-editing' : ''}`}
+      ref={setNodeRef}
+      style={{ transform: CSS.Translate.toString(transform), transition }}
+      className={`pl-task${done ? ' is-done' : ''}${editing ? ' is-editing' : ''}${
+        isDragging ? ' is-dragging' : ''
+      }`}
       aria-busy={busy || undefined}
     >
       <Checkbox
@@ -92,17 +82,21 @@ export default function TaskRow({
           <>
             <TaskEditor
               value={item.task}
-              onChange={(task) => editChange({ task })}
+              onChange={(task) => onChange({ task })}
               onDone={finishEdit}
             />
             <div className="pl-edit-row">
-              <input
-                type={whenType}
-                className="pl-when-input"
-                value={when}
-                onChange={(e) => editChange({ [field]: e.target.value })}
-                aria-label={whenType === 'time' ? 'Time' : 'Target date'}
-              />
+              {whenType === 'time' ? (
+                <TimeSelect value={when} onChange={(time) => onChange({ time })} label="Time" />
+              ) : (
+                <input
+                  type="date"
+                  className="pl-when-input"
+                  value={when}
+                  onChange={(e) => onChange({ targetDate: e.target.value })}
+                  aria-label="Target date"
+                />
+              )}
               <button type="button" className="pl-btn pl-btn-sm" onClick={finishEdit}>
                 Done
               </button>
@@ -117,6 +111,17 @@ export default function TaskRow({
 
       {!editing && (
         <div className="pl-task-actions">
+          <button
+            type="button"
+            ref={setActivatorNodeRef}
+            className="pl-act pl-grip"
+            {...attributes}
+            {...listeners}
+            aria-label="Drag to reorder"
+            title="Drag to reorder"
+          >
+            <PlannerIcon name="grip" />
+          </button>
           <RowAction icon="edit" label="Edit" onClick={startEdit} disabled={busy} />
           <RowAction
             icon="trash"
