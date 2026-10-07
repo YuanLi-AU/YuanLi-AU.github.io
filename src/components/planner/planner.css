@@ -162,8 +162,8 @@ body:has(.pl-loading) {
 }
 
 /* ---------- Important date countdown ----------
-     Until 「毕业」 · 12 Dec 2026                                  Edit
-     还有 (remaining)  35 天 (days)  18 小时 (hrs)  26 分钟 (mins)        */
+     距离「毕业」 · 12 Dec 2026  还有 (remaining)                    Edit
+     35 天 (days)   18 小时 (hrs)   26 分钟 (mins)                        */
 .pl-countdown {
   display: inline-flex;
   align-items: flex-start;
@@ -191,11 +191,22 @@ body:has(.pl-loading) {
   padding-left: 0;
 }
 
+/* Line 1: event, date and 还有 (remaining) — wraps by whole pieces if a
+   long event name doesn't fit */
 .pl-cd-label {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  column-gap: 8px;
   margin: 0;
   font-size: 0.92rem;
   font-weight: 500;
   color: var(--pl-note);
+}
+
+.pl-cd-title {
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .pl-cd-date {
@@ -241,13 +252,6 @@ body:has(.pl-loading) {
    if the line is too narrow */
 .pl-cd-part {
   white-space: nowrap;
-}
-
-/* Hours + minutes: one unit when the line wraps */
-.pl-cd-rest {
-  display: inline-flex;
-  align-items: baseline;
-  column-gap: inherit;
 }
 
 /* English gloss in brackets: small and quiet */
@@ -576,28 +580,38 @@ body:has(.pl-loading) {
   --when-gap: 12px;
 }
 
-/* Daily: one line per task, everything vertically centred; text that is
-   too long is cut short with … (the full text shows on hover and when
-   editing). Same 64px row height as the empty slots below. */
+/* Daily: the task text is always shown in full. A short task is one 64px
+   line (same as the empty slots below); a long one wraps onto more lines
+   and the row grows, with the circle, letter and actions on its first line. */
 .pl-tasks.is-daily .pl-task {
-  align-items: center;
   min-height: 64px;
+  padding-top: 18px;
+  padding-bottom: 18px;
+}
+
+/* The tap area of the circle and the action buttons are taller than a text
+   line: they overhang it equally above and below, so a one-line task is
+   18 + 28 + 18 = 64px and longer tasks grow evenly */
+.pl-tasks.is-daily .pl-checkbox {
+  margin-bottom: -10px;
+}
+
+.pl-tasks.is-daily .pl-task-actions {
+  margin-bottom: -3px;
+}
+
+/* Editing: text box and Done side by side, centred in the row */
+.pl-tasks.is-daily .pl-task.is-editing {
+  align-items: center;
   padding-top: 8px;
   padding-bottom: 8px;
 }
 
-.pl-tasks.is-daily .pl-checkbox,
-.pl-tasks.is-daily .pl-task-actions {
+.pl-tasks.is-daily .pl-task.is-editing .pl-checkbox {
   margin-top: 0;
+  margin-bottom: 0;
 }
 
-.pl-tasks.is-daily .pl-task-text {
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* Editing a Daily task: text box and Done side by side */
 .pl-tasks.is-daily .pl-task.is-editing .pl-task-body {
   display: flex;
   align-items: center;
@@ -1383,14 +1397,38 @@ body.pl-dragging * {
     font-size: 1.1rem;
   }
 
-  /* Daily stays one line: ( ) A   Task…  ⠿ ✎ 🗑 */
+  /* Daily: actions stay beside the task ( ) A  Task text  ⠿ ✎ 🗑 ;
+     long text wraps under itself. The actions take less width: 40px-wide
+     buttons (still 44px tall) with 16px icons. */
   .pl-tasks.is-daily .pl-task {
     grid-template-areas: 'check num . task . act';
-    padding: 6px 2px 6px 0;
+    padding: 18px 2px 18px 0;
+  }
+
+  .pl-tasks.is-daily .pl-task.is-editing {
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
+
+  .pl-tasks.is-daily .pl-checkbox {
+    margin-bottom: -8px;
   }
 
   .pl-tasks.is-daily .pl-task-actions {
     gap: 0;
+    margin-top: -8px; /* 44px buttons centred on the first text line */
+    margin-bottom: -8px;
+  }
+
+  .pl-tasks.is-daily .pl-act {
+    min-width: 40px;
+    width: 40px;
+    padding: 0;
+  }
+
+  .pl-tasks.is-daily .pl-act svg {
+    width: 16px;
+    height: 16px;
   }
 
   .pl-when {
@@ -1489,17 +1527,18 @@ body.pl-dragging * {
     position: relative;
   }
 
-  /* Edit sits in the top-right corner, so the countdown line below gets
-     the card's full width (and stays on one line where it fits) */
   .pl-countdown > .pl-link {
     position: absolute;
-    top: 0;
     right: 6px;
+    bottom: 4px;
     margin: 0;
   }
 
-  .pl-countdown:not(.pl-countdown-form) .pl-cd-label {
-    padding-right: 48px;
+  /* Edit sits beside the (short) numbers line, so line 1 keeps the full
+     width. Edit (44px, 6px from the edge) reaches 32px past the card's 18px
+     padding, so that much is kept clear. */
+  .pl-countdown:not(.pl-countdown-form) .pl-cd-value {
+    padding-right: 34px;
   }
 
   .pl-cd-value {

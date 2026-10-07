@@ -41,10 +41,12 @@ const En = ({ children }) => (
 
 // One important date with a live countdown, stored in users/{uid}/settings/planner
 // as { importantDateLabel, importantDate: "YYYY-MM-DD" }. The countdown runs
-// to the start (00:00 local) of that date. One line, Chinese first with the
+// to the start (00:00 local) of that date. Two lines, Chinese first with the
 // English in brackets; the days number leads:
-//   Until 「毕业」 · 12 Dec 2026
-//   还有 (remaining) 35 天 (days) 18 小时 (hrs) 26 分钟 (mins)
+//   距离「毕业」 · 12 Dec 2026  还有 (remaining)
+//   35 天 (days)  18 小时 (hrs)  26 分钟 (mins)
+// Today: 「毕业」 · date / 就是今天 (today)
+// Past:  「毕业」 · date  已经过去 (passed) / 3 天 (days)
 export default function ImportantDate() {
   const [settings, setSettings] = useState(undefined) // undefined = loading
   const [editing, setEditing] = useState(false)
@@ -150,45 +152,50 @@ export default function ImportantDate() {
   const title = settings.importantDateLabel || 'Important date'
   const left = countdownParts(savedDate, now)
 
+  const future = left.daysAgo === undefined
+  const past = left.daysAgo > 0
+
   return (
     <div className="pl-countdown">
       <div>
         <p className="pl-cd-label">
-          {left.daysAgo === undefined && 'Until '}
-          <span lang="zh-Hans">「{title}」</span>
-          <span className="pl-cd-date"> · {formatShortDate(savedDate)}</span>
-        </p>
-        {left.daysAgo === undefined ? (
-          <p className="pl-cd-value" lang="zh-Hans">
-            <span className="pl-cd-part">
+          <span className="pl-cd-title" lang="zh-Hans">
+            {future && '距离'}「{title}」
+          </span>
+          <span className="pl-cd-date">· {formatShortDate(savedDate)}</span>
+          {future && (
+            <span className="pl-cd-part" lang="zh-Hans">
               还有 <En>(remaining)</En>
             </span>
+          )}
+          {past && (
+            <span className="pl-cd-part" lang="zh-Hans">
+              已经过去 <En>(passed)</En>
+            </span>
+          )}
+        </p>
+        {future ? (
+          <p className="pl-cd-value" lang="zh-Hans">
             <span className="pl-cd-part is-days">
               <span className="pl-cd-num">{left.days}</span> 天 <En>({left.days === 1 ? 'day' : 'days'})</En>
             </span>
-            {/* hours + minutes wrap together (narrow phones: days on line 1) */}
-            <span className="pl-cd-rest">
-              <span className="pl-cd-part">
-                <span className="pl-cd-num">{left.hours}</span> 小时 <En>({left.hours === 1 ? 'hr' : 'hrs'})</En>
-              </span>
-              <span className="pl-cd-part">
-                <span className="pl-cd-num">{left.minutes}</span> 分钟 <En>({left.minutes === 1 ? 'min' : 'mins'})</En>
-              </span>
+            <span className="pl-cd-part">
+              <span className="pl-cd-num">{left.hours}</span> 小时 <En>({left.hours === 1 ? 'hr' : 'hrs'})</En>
+            </span>
+            <span className="pl-cd-part">
+              <span className="pl-cd-num">{left.minutes}</span> 分钟 <En>({left.minutes === 1 ? 'min' : 'mins'})</En>
             </span>
           </p>
-        ) : left.daysAgo === 0 ? (
+        ) : past ? (
           <p className="pl-cd-value" lang="zh-Hans">
-            <span className="pl-cd-part">
-              就是今天 <En>(today)</En>
+            <span className="pl-cd-part is-days">
+              <span className="pl-cd-num">{left.daysAgo}</span> 天 <En>({left.daysAgo === 1 ? 'day' : 'days'})</En>
             </span>
           </p>
         ) : (
           <p className="pl-cd-value" lang="zh-Hans">
             <span className="pl-cd-part">
-              已经过去 <En>(passed)</En>
-            </span>
-            <span className="pl-cd-part is-days">
-              <span className="pl-cd-num">{left.daysAgo}</span> 天 <En>({left.daysAgo === 1 ? 'day' : 'days'})</En>
+              就是今天 <En>(today)</En>
             </span>
           </p>
         )}

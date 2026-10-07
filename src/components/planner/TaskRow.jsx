@@ -99,11 +99,7 @@ export default function TaskRow({
             </div>
           </>
         ) : (
-          <p
-            className="pl-task-text"
-            onClick={() => !busy && startEdit()}
-            title={whenType ? undefined : item.task} // Daily text may be cut short (…)
-          >
+          <p className="pl-task-text" onClick={() => !busy && startEdit()}>
             {blank ? <span className="pl-untitled">Untitled task</span> : item.task}
           </p>
         )}
