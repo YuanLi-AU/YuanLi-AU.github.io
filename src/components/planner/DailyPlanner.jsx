@@ -127,7 +127,6 @@ export default function DailyPlanner({ flushers }) {
                       locked={Boolean(rows.busy[item.id])}
                       onChange={(patch) => changeItem(item.id, patch)}
                       onComplete={() => rows.complete(item.id)}
-                      onDelete={() => rows.remove(item.id)}
                     />
                   ))}
                 </SortableTasks>

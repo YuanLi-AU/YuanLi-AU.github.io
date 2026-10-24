@@ -30,7 +30,7 @@ const AUTO_SCROLL = { threshold: { x: 0, y: 0.15 } }
 
 const DRAGGING = 'pl-dragging' // on <body> while a row is held
 
-const TAB_LABELS = { daily: 'Daily', midTerm: 'Mid-term', longTerm: 'Long-term' }
+const TAB_LABELS = { daily: 'Daily', midTerm: 'Mid-term', longTerm: 'Long-term', bin: 'Recycle Bin' }
 
 // The drag preview sits just below and right of the finger / pointer
 // (inside the screen), so the tab being aimed at stays visible.
@@ -67,25 +67,25 @@ function pointerOf({ activatorEvent, delta }) {
 }
 
 // Drag & drop for an active list (`listId`: daily / midTerm / longTerm).
-// Each TaskRow registers itself (useSortable); only its letter / number
+// Each TaskRow registers itself (useSortable); only its letter
 // starts a drag: with the mouse or a finger after moving 4px, or from the
 // keyboard (Space / Enter to pick up, ↑ ↓ to move in the list, ← → to pick
 // another list's tab, Space / Enter to drop, Esc to cancel). A click
 // without moving is not a drag.
 //
 // Dropped on a row: `onReorder(activeId, overId)` — an edit, saved by the
-// list's auto-save. Dropped on another list's tab at the top (Daily /
-// Mid-term / Long-term, never this list's own or the Recycle Bin; tabDrop.js
-// checks the pointer against the tabs' boxes): `onDropTab(activeId,
-// listId)` moves the row there, and nothing is reordered. Cancelled, or
-// released anywhere that is neither: nothing changes.
+// list's auto-save. Dropped on another tab at the top (another list, or the
+// Recycle Bin; never this list's own; tabDrop.js checks the pointer against
+// the tabs' boxes): `onDropTab(activeId, tabId)` moves the row there (to
+// the bin = delete), and nothing is reordered. Cancelled, or released
+// anywhere that is neither: nothing changes.
 //
 // While a row is held, the tab bar stays on screen (CSS: body.pl-dragging),
 // the row shows as a small preview (`preview(id)`) beside the pointer, and
 // the page doesn't auto-scroll while the pointer is on a tab. All of this
 // is local; nothing is read or written while dragging.
 //
-// `label(index)` is the row label (A/B/C or 1/2/3), used in screen reader
+// `label(index)` is the row label (A, B, C, …), used in screen reader
 // announcements.
 export default function SortableTasks({
   listId,
@@ -132,7 +132,7 @@ export default function SortableTasks({
   const at = (over) => label(ids.indexOf(over.id))
   const announcements = {
     onDragStart: ({ active }) =>
-      `Picked up “${taskOf(active.id)}”. Up and down to move it in the list, left and right to choose another list.`,
+      `Picked up “${taskOf(active.id)}”. Up and down to move it in the list, left and right to choose another list or the Recycle Bin.`,
     onDragMove: ({ active }) => {
       const tab = tabDropTarget()
       return tab ? `“${taskOf(active.id)}” over ${TAB_LABELS[tab]}. Drop to move it there.` : undefined

@@ -12,16 +12,18 @@ import AddTaskForm from './AddTaskForm.jsx'
 import SortableTasks from './SortableTasks.jsx'
 import TaskRow, { DragChip } from './TaskRow.jsx'
 import { Message, SaveStatus } from './TableParts.jsx'
-import { useMessage, useTaskActions } from './tableHelpers.js'
+import { sequenceLetter, useMessage, useTaskActions } from './tableHelpers.js'
 import { onDueMoved } from './useDueMove.js'
 import useSyncedItems from './useSyncedItems.js'
 
-// Rows are numbered 1, 2, 3, … by position.
-const rowNumber = (index) => String(index + 1)
+// Rows are labelled A, B, C, … (then AA, AB, …) by position, like Daily —
+// display only; the stored order is the list order.
+const rowLabel = sequenceLetter
 
 // Mid-term / Long-term plan list: same task format as the Daily Plan, with
 // an optional Due date (stored as targetDate), reorderable by dragging the
-// number, or moved by dropping the number on the Daily / other plan tab. A row whose Due date arrives moves to the Daily list (useDueMove).
+// letter, or moved by dropping the letter on the Daily / other plan tab.
+// A row whose Due date arrives moves to the Daily list (useDueMove).
 // `planId` is "midTerm" or "longTerm".
 export default function PlanTable({ planId, title, flushers }) {
   const list = useSyncedItems(planId, subscribePlan, savePlan, flushers)
@@ -48,7 +50,7 @@ export default function PlanTable({ planId, title, flushers }) {
   // While a row is dragged: its number and task beside the pointer.
   function preview(id) {
     const index = list.items.findIndex((item) => item.id === id)
-    return <DragChip number={rowNumber(index)} task={list.items[index]?.task ?? ''} />
+    return <DragChip number={rowLabel(index)} task={list.items[index]?.task ?? ''} />
   }
 
   function addItem(task, targetDate) {
@@ -73,7 +75,7 @@ export default function PlanTable({ planId, title, flushers }) {
             {list.items.length > 0 && (
               <SortableTasks
                 items={list.items}
-                label={rowNumber}
+                label={rowLabel}
                 onReorder={rows.reorder}
                 listId={planId}
                 onDropTab={rows.move}
@@ -83,7 +85,7 @@ export default function PlanTable({ planId, title, flushers }) {
                 {list.items.map((item, index) => (
                   <TaskRow
                     key={item.id}
-                    number={rowNumber(index)}
+                    number={rowLabel(index)}
                     item={item}
                     dueType="date"
                     done={rows.busy[item.id] === 'complete'}
@@ -91,7 +93,6 @@ export default function PlanTable({ planId, title, flushers }) {
                     locked={Boolean(rows.busy[item.id])}
                     onChange={(patch) => changeItem(item.id, patch)}
                     onComplete={() => rows.complete(item.id)}
-                    onDelete={() => rows.remove(item.id)}
                   />
                 ))}
               </SortableTasks>

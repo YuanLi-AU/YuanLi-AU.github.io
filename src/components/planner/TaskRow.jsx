@@ -5,7 +5,7 @@ import { formatShortDate, fromDateKey } from '../../lib/dates.js'
 import { DUE_TIMES, isDueTime } from '../../lib/plannerData.js'
 import { daysLeft, timeLeft, useMinuteClock } from './dueCountdown.js'
 import PlannerIcon from './PlannerIcons.jsx'
-import { Checkbox, RowAction } from './TableParts.jsx'
+import { Checkbox } from './TableParts.jsx'
 
 // Enter / Escape finish editing — but not while an IME (e.g. Chinese
 // input) is still composing, where Enter only confirms the characters.
@@ -23,24 +23,25 @@ function dueDate(dateKey) {
 
 // One task in Daily / Mid-term / Long-term, on one line:
 //
-//   ( )  A   Task text (wraps naturally)          Due 19:00   🗑     Daily
+//   ( )  A   Task text (wraps naturally)          Due 19:00     Daily
 //                                          剩余 3 小时 20 分
-//   ( )  1   Task text (wraps naturally)    Due 15 Nov 2026   🗑     Mid / Long
+//   ( )  B   Task text (wraps naturally)    Due 15 Nov 2026     Mid / Long
 //                                                 剩余 22 天
-// (On phones a set Due, with its countdown, goes under the task text.)
+// (Phones write 小时 as 时.)
 //
-// `number` is the row's label (A, B, … for Daily; 1, 2, … otherwise) and is
-// also the drag handle — to reorder, or onto another list's tab to move the
-// task there (mouse, touch or keyboard; see SortableTasks.jsx); not while
-// editing or while a row transaction runs. Clicking it does nothing else.
+// `number` is the row's label (A, B, … AA, AB, … in every list) and is
+// also the drag handle — to reorder, or onto another tab to move the task
+// there: another list, or the Recycle Bin to delete it (there is no delete
+// button); mouse, touch or keyboard, see SortableTasks.jsx. Not while
+// editing or while a row transaction runs; clicking it does nothing else.
 // Clicking the task text (or Enter / Space on it) edits it.
-// The optional Due sits before 🗑: a time (Daily, `dueType="time"`, every
-// 30 minutes) or a date (Mid / Long, `dueType="date"`, stored as targetDate).
-// Nothing is shown for it until it is set, except a quiet icon to set it.
-// A Daily due time is only shown — it never moves, completes or removes the
-// task. `done` shows the completed look while the complete transaction runs;
-// the row then moves to Completed History. Edits are saved by the list's
-// auto-save. (An older saved Daily `time` is kept untouched.)
+// The optional Due sits at the end: a time (Daily, `dueType="time"`, every
+// hour 09:00–23:00) or a date (Mid / Long, `dueType="date"`, stored as
+// targetDate). Nothing is shown for it until it is set, except a quiet icon
+// to set it. A Daily due time is only shown — it never moves, completes or
+// removes the task. `done` shows the completed look while the complete
+// transaction runs; the row then moves to Completed History. Edits are
+// saved by the list's auto-save. (An older saved Daily `time` is kept.)
 export default function TaskRow({
   number,
   item,
@@ -50,7 +51,6 @@ export default function TaskRow({
   locked,
   onChange,
   onComplete,
-  onDelete,
 }) {
   const [editing, setEditing] = useState(null) // null | 'task' | 'date'
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition, isDragging } =
@@ -78,7 +78,7 @@ export default function TaskRow({
       <button
         type="button"
         ref={setActivatorNodeRef}
-        className="pl-num"
+        className={`pl-num${String(number).length > 1 ? ' is-long' : ''}`}
         {...attributes}
         {...listeners}
         aria-label={`${number}. Drag to reorder, or onto another list’s tab to move`}
@@ -136,13 +136,6 @@ export default function TaskRow({
           {dueType === 'date' && (
             <DueDate value={item.targetDate} onClick={() => startEdit('date')} disabled={busy} />
           )}
-          <RowAction
-            icon="trash"
-            label="Delete (move to Recycle Bin)"
-            onClick={onDelete}
-            disabled={locked}
-            danger
-          />
         </div>
       )}
     </li>
@@ -150,6 +143,43 @@ export default function TaskRow({
 }
 
 // "Due" (small, quiet) + the time / date.
+// "9 小时 30 分" may wrap in the narrow Due column, but only between the
+// parts — a number stays with its unit.
+const keepUnits = (text) => text.replace(/(\d+) (?=小时|分|天)/g, '$1\u00a0')
+
+// The countdown, split so only its numbers (and the word 逾期 / 已到期 /
+// 今天到期) take the state's colour; the other words stay grey (CSS).
+// Phones write 小时 as 时 ("逾期 2 时 15 分"): the 小 is hidden there (CSS).
+const COUNTDOWN_PARTS = /(\d+|小时|逾期|已到期|今天到期)/
+
+function countdownParts(text) {
+  return keepUnits(text)
+    .split(COUNTDOWN_PARTS)
+    .flatMap((part, i) => {
+      if (i % 2 === 0) return part ? [part] : []
+      if (/^\d+$/.test(part)) {
+        return [
+          <span key={i} className="pl-digits">
+            {part}
+          </span>,
+        ]
+      }
+      if (part === '小时') {
+        return [
+          <span key={i} className="pl-hours-long">
+            小
+          </span>,
+          '时',
+        ]
+      }
+      return [
+        <span key={i} className="pl-due-key">
+          {part}
+        </span>,
+      ]
+    })
+}
+
 // Under it, smaller and quieter, the time / days left (dueCountdown.js).
 function DueText({ value, left }) {
   return (
@@ -157,7 +187,7 @@ function DueText({ value, left }) {
       <span className="pl-due-text">
         <span className="pl-due-label">Due</span> {value}
       </span>
-      <span className={`pl-due-left is-${left.tone}`}>{left.text}</span>
+      <span className={`pl-due-left is-${left.tone}`}>{countdownParts(left.text)}</span>
     </span>
   )
 }
@@ -167,9 +197,21 @@ function DueTimeText({ value }) {
   return <DueText value={value} left={timeLeft(value, now)} />
 }
 
+// The numbers of a Due date are wrapped so phones can colour just them.
+const digits = (text) =>
+  text.split(/(\d+)/).map((part, i) =>
+    i % 2 ? (
+      <span key={i} className="pl-digits">
+        {part}
+      </span>
+    ) : (
+      part
+    ),
+  )
+
 function DueDateText({ value }) {
-  const now = useMinuteClock()
-  return <DueText value={dueDate(value)} left={daysLeft(value, now)} />
+  const left = daysLeft(value, useMinuteClock())
+  return <DueText value={digits(dueDate(value))} left={left} />
 }
 
 // What is shown under the pointer while a row is dragged: its label and

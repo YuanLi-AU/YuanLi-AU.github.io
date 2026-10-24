@@ -1,14 +1,15 @@
 import { useSyncExternalStore } from 'react'
 
-// Dragging a row onto another list's tab at the top (Daily / Mid-term /
-// Long-term). The tabs are outside each list's drag context, so they are
-// not dnd droppables: while a row is held, the list checks the pointer
-// against the tabs' own on-screen boxes (the same boxes that are
-// highlighted), and the tabs read the result from this small store.
-// The list being dragged from and the Recycle Bin are never targets.
+// Dragging a row onto a tab at the top: another list (Daily / Mid-term /
+// Long-term) moves it there; the Recycle Bin deletes it (moves it to the
+// bin — rows have no delete button). The tabs are outside each list's drag
+// context, so they are not dnd droppables: while a row is held, the list
+// checks the pointer against the tabs' own on-screen boxes (the same boxes
+// that are highlighted), and the tabs read the result from this small
+// store. The list being dragged from is never a target.
 // Browser-only state; nothing here is saved.
 
-export const LIST_TABS = ['daily', 'midTerm', 'longTerm']
+export const DROP_TABS = ['daily', 'midTerm', 'longTerm', 'bin']
 
 // targets: the tabs that accept the held row; target: the one it would land on
 let state = { dragging: false, targets: [], target: null }
@@ -26,7 +27,7 @@ function set(next) {
   listeners.forEach((listener) => listener())
 }
 
-export const targetsFor = (listId) => LIST_TABS.filter((id) => id !== listId)
+export const targetsFor = (listId) => DROP_TABS.filter((id) => id !== listId)
 
 export const startTabDrag = (targets) => set({ dragging: true, targets, target: null })
 export const endTabDrag = () => set({ dragging: false, targets: [], target: null })

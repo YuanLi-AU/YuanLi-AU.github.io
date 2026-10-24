@@ -39,7 +39,8 @@
   /* Due countdown text (small, so darker than --pl-red / --pl-amber:
      ≥ 4.7:1 on the card and on a hovered row) */
   --pl-due-over: #c0343c; /* overdue / due now */
-  --pl-due-soon: #b35400; /* Daily within 2 h, Mid / Long due today */
+  --pl-due-soon: #b35400; /* Daily within 1 h, Mid / Long due today */
+  --pl-due-date: #3a5fa8; /* countdown numbers; Due-date numbers (phones) */
 }
 
 /* Light page background (and light scrollbars) only while the Planner is
@@ -711,6 +712,20 @@ body:has(.pl-loading) {
   transition: transform 0.2s ease;
 }
 
+/* Daily / Mid-term / Long-term: a 16px circle (desktop and phones); its
+   tap area stays as it is */
+.pl-tasks.is-daily .pl-box,
+.pl-tasks.is-plan .pl-box {
+  width: 16px;
+  height: 16px;
+}
+
+.pl-tasks.is-daily .pl-box svg,
+.pl-tasks.is-plan .pl-box svg {
+  width: 11px;
+  height: 11px;
+}
+
 .pl-checkbox:hover:not(:disabled) .pl-box {
   border-color: var(--acc, var(--pl-blue));
   color: color-mix(in srgb, var(--acc, var(--pl-blue)) 45%, transparent);
@@ -963,8 +978,10 @@ button.pl-num[aria-disabled='true'] {
   color: var(--pl-note);
 }
 
-/* countdown: smaller and quieter than the Due; grey normally, orange when
-   close, red when overdue (colour only — no animation) */
+/* countdown: smaller and quieter than the Due; its words stay grey and only
+   its numbers are coloured — quiet blue normally, orange when close (Daily
+   within 1 hour / Mid, Long due today), red when overdue, where 逾期 is red
+   too (colour only — no animation) */
 .pl-due-left {
   font-size: 0.7rem;
   font-weight: 400;
@@ -974,14 +991,19 @@ button.pl-num[aria-disabled='true'] {
   opacity: 0.9;
 }
 
-.pl-due-left.is-soon {
-  color: var(--pl-due-soon);
-  opacity: 1;
+
+.pl-due-left .pl-digits {
+  color: var(--pl-due-date);
 }
 
-.pl-due-left.is-over {
+.pl-due-left.is-soon .pl-digits,
+.pl-due-left.is-soon .pl-due-key {
+  color: var(--pl-due-soon);
+}
+
+.pl-due-left.is-over .pl-digits,
+.pl-due-left.is-over .pl-due-key {
   color: var(--pl-due-over);
-  opacity: 1;
 }
 
 /* "Due" before the value: smaller and quieter */
@@ -1587,6 +1609,37 @@ body.pl-dragging .pl-tabs {
     font-size: 1.3rem;
   }
 
+  /* Daily / Mid-term / Long-term: larger letters (the drag handle) in a
+     column that fits AA, and a smaller circle — 16px; its tap area stays
+     44px */
+  .pl-tasks.is-daily,
+  .pl-tasks.is-plan {
+    --seq-w: 1.75rem;
+  }
+
+  .pl-tasks.is-daily .pl-num,
+  .pl-tasks.is-plan .pl-num {
+    font-size: 1.5rem;
+  }
+
+  .pl-tasks.is-daily .pl-box,
+  .pl-tasks.is-plan .pl-box {
+    width: 16px;
+    height: 16px;
+  }
+
+  .pl-tasks.is-daily .pl-box svg,
+  .pl-tasks.is-plan .pl-box svg {
+    width: 11px;
+    height: 11px;
+  }
+
+  /* task text 6% larger than the phone default (1.06rem), same weight */
+  .pl-tasks.is-daily .pl-task-text,
+  .pl-tasks.is-plan .pl-task-text {
+    font-size: 1.125rem;
+  }
+
   .pl-tasks.is-counted .pl-num {
     font-size: 1.1rem;
   }
@@ -1636,51 +1689,109 @@ body.pl-dragging .pl-tabs {
     padding: 0 4px;
   }
 
-  /* A set Due ("Due 15 Nov 2026" / "Due 19:00", with its countdown) goes
-     under the task, so the task keeps the full width; 🗑 (and the clock /
-     calendar icon while no Due is set) stay on the first line */
+  /* ---- Daily / Mid-term / Long-term rows on phones ----
+     One row, as much room for the task as possible:
+
+        ( ) A  Task text wraps naturally,          Due 20:00
+               in full                        逾期 2 时 15 分
+
+     The circle's 44px tap area, the letter (the drag handle), the task,
+     then Due over its countdown on the right (right-aligned, one line
+     each). No delete button: a task is deleted by dragging its letter onto
+     the Recycle Bin tab. */
   .pl-tasks.is-daily .pl-task,
   .pl-tasks.is-plan .pl-task {
-    grid-template-columns:
-      var(--check-w) var(--seq-w) var(--seq-gap) minmax(0, 1fr) var(--act-gap)
-      auto auto;
-    grid-template-areas:
-      'check num . task . set act'
-      'check num . due due due due';
+    grid-template-columns: 44px 26px 8px minmax(0, 1fr) 8px auto;
+    grid-template-areas: 'check num . task . act';
+    min-height: 0;
+    padding: 8px 8px 8px 0;
   }
 
-  .pl-tasks.is-daily .pl-task-actions,
-  .pl-tasks.is-plan .pl-task-actions {
-    display: contents;
+  .pl-tasks.is-daily .pl-task.is-editing,
+  .pl-tasks.is-plan .pl-task.is-editing {
+    padding-top: 8px;
+    padding-bottom: 8px;
   }
 
-  .pl-tasks.is-daily .pl-task-actions > *,
-  .pl-tasks.is-plan .pl-task-actions > * {
+  /* the circle's tap area overhangs the row padding, level with line 1 */
+  .pl-tasks.is-daily .pl-checkbox,
+  .pl-tasks.is-plan .pl-checkbox {
     margin-top: -8px;
     margin-bottom: -8px;
   }
 
-  .pl-tasks.is-daily .pl-task-actions > .pl-due,
-  .pl-tasks.is-plan .pl-task-actions > .pl-due {
-    grid-area: set;
+  /* letter: size and weight as before (26px, 800), on the first line */
+  .pl-tasks.is-daily button.pl-num,
+  .pl-tasks.is-plan button.pl-num {
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1.75rem;
   }
 
-  .pl-tasks.is-daily .pl-task-actions > .pl-act.is-danger,
-  .pl-tasks.is-plan .pl-task-actions > .pl-act.is-danger {
-    grid-area: act;
+  .pl-tasks.is-daily button.pl-num.is-long,
+  .pl-tasks.is-plan button.pl-num.is-long {
+    font-size: 16px; /* AA, AB … still fit the column */
+    letter-spacing: -0.03em;
+  }
+
+  .pl-tasks.is-daily button.pl-num::after,
+  .pl-tasks.is-plan button.pl-num::after {
+    inset: -8px 0; /* taller to grab, never over the circle's tap area */
+  }
+
+  /* Due over its countdown, at the right end, level with the task's top */
+  .pl-tasks.is-daily .pl-task-actions,
+  .pl-tasks.is-plan .pl-task-actions {
+    align-self: start;
+    margin: 0;
+  }
+
+  .pl-tasks.is-daily .pl-task-actions > .pl-due:not(.has-value),
+  .pl-tasks.is-plan .pl-task-actions > .pl-due:not(.has-value) {
+    margin: -8px -6px -8px 0; /* the clock / calendar icon: 44px tall, on line 1 */
   }
 
   .pl-tasks.is-daily .pl-task-actions > .pl-due.has-value,
   .pl-tasks.is-plan .pl-task-actions > .pl-due.has-value {
-    grid-area: due;
-    justify-self: start;
+    width: auto;
+    height: auto;
     min-height: 0;
-    margin: 4px 0 -6px -4px;
-    padding: 2px 4px;
+    margin: 0;
+    padding: 2px 0 0 4px;
+    white-space: nowrap;
   }
 
   .pl-tasks .pl-due.has-value .pl-due-stack {
-    align-items: flex-start;
+    align-items: flex-end;
+    text-align: right;
+  }
+
+  .pl-tasks .pl-due.has-value .pl-due-text {
+    line-height: 1rem;
+  }
+
+  .pl-tasks .pl-due.has-value .pl-due-left {
+    font-size: 0.74rem;
+    line-height: 0.95rem;
+    white-space: nowrap;
+  }
+
+  .pl-hours-long {
+    display: none; /* 小时 → 时 */
+  }
+
+  /* Mid / Long: the Due date's numbers in a quiet blue */
+  .pl-tasks.is-plan .pl-due-text .pl-digits {
+    color: var(--pl-due-date);
+  }
+
+  /* Daily's empty row places match the rows */
+  .pl-slot {
+    height: 44px;
+  }
+
+  .pl-workspace {
+    min-height: 134px;
   }
 
   .pl-due-text {

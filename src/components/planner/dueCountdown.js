@@ -65,11 +65,12 @@ function hoursMinutes(total) {
   return `${h} 小时 ${m} 分`
 }
 
-// Each countdown is { text, tone }; tone colours the text only:
-//   'over'  (red)    — due now or overdue
-//   'soon'  (orange) — Daily within 2 hours; Mid / Long due today
-//   'normal' (grey)  — everything else
-const SOON_MINUTES = 120
+// Each countdown is { text, tone }; the tone colours its numbers (and the
+// word 逾期 / 已到期 / 今天到期) — the other words stay grey (TaskRow / CSS):
+//   'over'   (red)    — due now or overdue
+//   'soon'   (orange) — Daily within 1 hour; Mid / Long due today
+//   'normal' (blue numbers) — everything else
+const SOON_MINUTES = 60
 
 // Daily: due time "HH:MM" today (local time), to the minute.
 //   "剩余 3 小时 20 分" · "已到期" (that minute) · "逾期 1 小时 5 分"

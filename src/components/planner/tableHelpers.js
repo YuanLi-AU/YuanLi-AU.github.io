@@ -106,9 +106,13 @@ export function useTaskActions({ list, setMessage, complete, bin, move }) {
     list.update(arrayMove(items, from, to))
   }
 
-  // Move the row to another list (dropped on its tab): one transaction,
-  // like complete / delete; not a completion.
+  // Dropped on a tab: another list — move it there (one transaction, like
+  // complete / delete; not a completion); the Recycle Bin — delete it.
   function moveRow(id, to) {
+    if (to === 'bin') {
+      removeRow(id)
+      return
+    }
     runRow(
       id,
       'move',
