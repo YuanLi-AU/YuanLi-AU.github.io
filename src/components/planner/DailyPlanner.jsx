@@ -4,12 +4,13 @@ import {
   completeDailyItem,
   createItem,
   migrateLegacyDaily,
+  moveBetween,
   saveDaily,
   subscribeDaily,
 } from '../../lib/plannerData.js'
 import AddTaskForm from './AddTaskForm.jsx'
 import SortableTasks from './SortableTasks.jsx'
-import TaskRow from './TaskRow.jsx'
+import TaskRow, { DragChip } from './TaskRow.jsx'
 import { Message, SaveStatus } from './TableParts.jsx'
 import { sequenceLetter, useMessage, useTaskActions } from './tableHelpers.js'
 import useSyncedItems, { restoreWithSync } from './useSyncedItems.js'
@@ -32,8 +33,11 @@ function EmptySlots({ count }) {
 
 // Daily Plan: the one active Daily list (plans/daily). A task stays until
 // it is completed (checkbox → Completed History) or deleted (🗑 → Recycle
-// Bin) — no dates, no rollover, no expiry. Rows are labelled A, B, C, … by
-// position and can be reordered by dragging.
+// Bin) — no rollover, no expiry; its optional due time is only shown. Rows
+// are labelled A, B, C, … by position and reordered by dragging the letter.
+// Dragging the letter onto the Mid-term / Long-term tab at the top moves
+// the task there (SortableTasks / tabDrop.js).
+// Due Mid/Long-term rows are added at the end (useDueMove).
 export default function DailyPlanner({ flushers }) {
   const list = useSyncedItems('daily', subscribeDaily, saveDaily, flushers)
   const [message, setMessage] = useMessage()
@@ -42,6 +46,7 @@ export default function DailyPlanner({ flushers }) {
     setMessage,
     complete: completeDailyItem,
     bin: binDailyItem,
+    move: (item, remaining, base, to) => moveBetween('daily', to, item, remaining, base),
   })
 
   // One-time move of the old per-day Daily data (see migrateLegacyDaily).
@@ -73,6 +78,12 @@ export default function DailyPlanner({ flushers }) {
     }
   }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
+  // While a row is dragged: its letter and task beside the pointer.
+  function preview(id) {
+    const index = list.items.findIndex((item) => item.id === id)
+    return <DragChip number={sequenceLetter(index)} task={list.items[index]?.task ?? ''} />
+  }
+
   function addItem(task) {
     rows.add({ ...createItem(), task })
   }
@@ -100,6 +111,9 @@ export default function DailyPlanner({ flushers }) {
                   items={list.items}
                   label={sequenceLetter}
                   onReorder={rows.reorder}
+                  listId="daily"
+                  onDropTab={rows.move}
+                  preview={preview}
                   className="pl-tasks is-daily"
                 >
                   {list.items.map((item, index) => (
@@ -107,9 +121,10 @@ export default function DailyPlanner({ flushers }) {
                       key={item.id}
                       number={sequenceLetter(index)}
                       item={item}
-                      done={rows.busy?.id === item.id && rows.busy.kind === 'complete'}
-                      busy={rows.busy?.id === item.id}
-                      locked={rows.busy !== null}
+                      dueType="time"
+                      done={rows.busy[item.id] === 'complete'}
+                      busy={Boolean(rows.busy[item.id])}
+                      locked={Boolean(rows.busy[item.id])}
                       onChange={(patch) => changeItem(item.id, patch)}
                       onComplete={() => rows.complete(item.id)}
                       onDelete={() => rows.remove(item.id)}

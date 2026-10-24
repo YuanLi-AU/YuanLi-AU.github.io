@@ -8,6 +8,8 @@ import DailyPlanner from './DailyPlanner.jsx'
 import ImportantDate from './ImportantDate.jsx'
 import PlanTable from './PlanTable.jsx'
 import RecycleBin from './RecycleBin.jsx'
+import { useTabDrop } from './tabDrop.js'
+import useDueMove from './useDueMove.js'
 import useTodayKey from './useTodayKey.js'
 
 // Planner tabs. Daily / Mid-term / Long-term stay mounted while hidden
@@ -21,7 +23,11 @@ const TABS = [
   { id: 'bin', label: 'Recycle Bin', rest: '', zh: '回收站' },
 ]
 
+// While a row is dragged, the other lists' tabs show they can take it
+// (is-drop-ready) and the one under the pointer lights up (is-drop-over);
+// see tabDrop.js.
 function PlannerTabs({ tab, onChange }) {
+  const drop = useTabDrop()
   // ← / → move between tabs (standard tablist keyboard behaviour)
   function onKeyDown(e) {
     const step = e.key === 'ArrowRight' ? 1 : e.key === 'ArrowLeft' ? -1 : 0
@@ -42,7 +48,9 @@ function PlannerTabs({ tab, onChange }) {
           type="button"
           role="tab"
           id={`pl-tab-${t.id}`}
-          className={`pl-tab pl-tab-${t.id}`}
+          className={`pl-tab pl-tab-${t.id}${
+            drop.dragging && drop.targets.includes(t.id) ? ' is-drop-ready' : ''
+          }${drop.target === t.id ? ' is-drop-over' : ''}`}
           aria-selected={tab === t.id}
           aria-controls={`pl-panel-${t.id}`}
           tabIndex={tab === t.id ? 0 : -1}
@@ -85,6 +93,7 @@ export default function PlannerHome() {
   const lunar = lunarDate(todayKey)
   const [flushers] = useState(() => new Set()) // each table registers its save-now function
   const [locking, setLocking] = useState(false)
+  useDueMove(todayKey, flushers) // Mid/Long-term rows due today or earlier → Daily
 
   // Save pending edits in every table before signing out (give up after 3s if offline).
   async function handleLock() {

@@ -1,6 +1,8 @@
 import { useEffect, useRef, useState } from 'react'
+import { mergeList } from '../../lib/plannerData.js'
 
 const SAVE_DELAY = 700 // ms after the last edit before writing to Firestore
+const RETRY_DELAY = 15000 // ms before a failed save is tried again by itself
 
 // ---------- Restore coordination (shared by all tables) ----------
 // A Restore transaction writes a row straight into a table's Firestore doc.
@@ -77,6 +79,12 @@ export async function restoreWithSync(flushers, run) {
 //   save, so there is no snapshot → save → snapshot loop.
 // - While the list has unsaved edits, incoming snapshots are ignored so they
 //   can't overwrite what is being typed (or wipe it on a network hiccup).
+// - Each save is merged with the stored list (plannerData mergeList): rows
+//   another device (or the due-date move) added or removed meanwhile are
+//   respected. `base` is the stored list the local edits started from.
+//   Saves of one list run one after another, never at the same time.
+// - A failed save keeps the edits and is retried after RETRY_DELAY, when the
+//   browser comes back online, or by the Retry button.
 //
 // `key` identifies the document (e.g. a date). `subscribe(key, onItems, onError)`
 // and `save(key, items)` come from plannerData.js. `flushers` (a Set) lets the
@@ -94,12 +102,26 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
   const version = useRef(0) // bumps on every edit
   const waiting = useRef(new Set()) // lists captured while saves are paused
   const loadedKey = useRef(null) // key whose Firestore data this list has received
+  const base = useRef([]) // stored list the local edits started from
+  const chain = useRef(Promise.resolve()) // the save / row transaction running now
+
+  // Runs `task` after the save or row transaction already running, so two
+  // writes of this list never overlap (each merges against the one before).
+  function serial(task) {
+    const run = chain.current.then(task)
+    chain.current = run.catch(() => {})
+    return run
+  }
 
   // Write any pending edits now. Uses refs only, so it is safe to call from
   // cleanup, from key changes and from the Lock button.
-  async function flush() {
+  function flush() {
     clearTimeout(timer.current)
     timer.current = null
+    return serial(write)
+  }
+
+  async function write() {
     if (!dirtyKey.current) return
     let target = latest.current
     if (savesPaused) {
@@ -115,14 +137,29 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
     const savedVersion = version.current
     setSaveState('saving')
     try {
-      await save(savingKey, toSave)
-      if (savedVersion === version.current) {
-        dirtyKey.current = null
-        setSaveState('saved')
-      }
+      const written = await save(savingKey, toSave, base.current)
+      settle(savingKey, written, toSave, savedVersion)
+      if (savedVersion === version.current) setSaveState('saved')
     } catch {
-      // Keep the edits on screen (still dirty); the user can retry.
+      // Keep the edits on screen (still dirty); try again later.
       setSaveState('error')
+      if (!timer.current && dirtyKey.current) timer.current = setTimeout(flush, RETRY_DELAY)
+    }
+  }
+
+  // After a write: `written` is now stored. Show it — or, if the list was
+  // edited meanwhile, the newer edits applied on top of it.
+  function settle(savedKey, written, sent, savedVersion) {
+    if (latest.current.key !== savedKey) return
+    base.current = written
+    if (savedVersion === version.current) {
+      dirtyKey.current = null
+      latest.current = { key: savedKey, items: written }
+      setItems(written)
+    } else {
+      const next = mergeList(written, latest.current.items, sent)
+      latest.current = { key: savedKey, items: next }
+      setItems(next)
     }
   }
 
@@ -171,6 +208,7 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
         (remote) => {
           loadedKey.current = key
           if (dirtyKey.current === key) return // keep local edits
+          base.current = remote
           latest.current = { key, items: remote }
           setItems(remote)
           setLoading(false)
@@ -187,6 +225,13 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
   // Save anything pending when leaving.
   useEffect(() => () => latestFlush.current(), [])
 
+  // Back online after a failed save: try again now.
+  useEffect(() => {
+    const retry = () => dirtyKey.current && latestFlush.current()
+    window.addEventListener('online', retry)
+    return () => window.removeEventListener('online', retry)
+  }, [])
+
   function update(nextItems, forKey = key) {
     latest.current = { key: forKey, items: nextItems }
     dirtyKey.current = forKey
@@ -200,49 +245,50 @@ export default function useSyncedItems(key, subscribe, save, flushers) {
   // Before switching to another key: save the current one, then clear.
   function switchTo(nextKey) {
     flush()
+    base.current = []
     latest.current = { key: nextKey, items: [] }
     setItems([])
     setLoading(true)
   }
 
-  // Removes one row via a Firestore transaction `run(item, remaining)` that
-  // also writes this list without the row (complete / delete).
+  // Removes one row via a Firestore transaction `run(item, remaining, base)`
+  // that also writes this list without the row (complete / delete), merged
+  // like a save, and returns the list written.
   // The row only leaves the screen after the transaction succeeds; if it
-  // fails nothing was written and the row stays. Returns the transaction's
-  // result, or throws.
-  async function removeVia(id, run) {
-    // Don't build "remaining" from a list that may be missing a row a running
-    // restore is about to add.
-    await waitForSaves()
-    const item = latest.current.items.find((row) => row.id === id)
-    if (!item) return undefined
-
+  // fails nothing was written and the row stays. Returns the written list,
+  // or throws.
+  function removeVia(id, run) {
     // The transaction saves this list (including pending edits), so cancel
-    // the pending auto-save to avoid a stale write racing it.
+    // the pending auto-save; a save already running finishes first.
     clearTimeout(timer.current)
     timer.current = null
-    const startVersion = version.current
-    const runKey = latest.current.key
-    const remaining = latest.current.items.filter((row) => row.id !== id)
+    return serial(async () => {
+      // Don't build "remaining" from a list that may be missing a row a
+      // running restore is about to add.
+      await waitForSaves()
+      const item = latest.current.items.find((row) => row.id === id)
+      if (!item) return undefined
 
-    try {
-      const result = await run(item, remaining)
-      if (version.current === startVersion) {
-        // Nothing edited meanwhile: the transaction saved exactly this list.
-        latest.current = { key: runKey, items: remaining }
-        dirtyKey.current = null
-        setItems(remaining)
-        setSaveState('saved')
-      } else {
-        // Edited during the transaction: drop the row from the newer list.
-        update(latest.current.items.filter((row) => row.id !== id))
+      const startVersion = version.current
+      const runKey = latest.current.key
+      const remaining = latest.current.items.filter((row) => row.id !== id)
+
+      try {
+        const written = await run(item, remaining, base.current)
+        settle(runKey, written, remaining, startVersion)
+        if (version.current === startVersion) {
+          setSaveState('saved')
+        } else {
+          // Edited during the transaction: drop the row from the newer list.
+          update(latest.current.items.filter((row) => row.id !== id))
+        }
+        return written
+      } catch (err) {
+        // Nothing was written; the row stays. Re-arm any pending auto-save.
+        if (dirtyKey.current === runKey) timer.current = setTimeout(flush, SAVE_DELAY)
+        throw err
       }
-      return result
-    } catch (err) {
-      // Nothing was written; the row stays. Re-arm any pending auto-save.
-      if (dirtyKey.current === runKey) timer.current = setTimeout(flush, SAVE_DELAY)
-      throw err
-    }
+    })
   }
 
   return { items, loading, loadError, saveState, latest, flush, update, switchTo, removeVia }

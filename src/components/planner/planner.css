@@ -570,11 +570,6 @@ body:has(.pl-loading) {
   list-style: none;
 }
 
-.pl-tasks.is-date {
-  --when-w: 6.4rem; /* "20 Oct" / "20 Oct 2027" */
-  --when-gap: 12px;
-}
-
 .pl-tasks.is-type {
   --when-w: 5.6rem; /* Daily / Mid-term / Long-term label */
   --when-gap: 12px;
@@ -749,7 +744,7 @@ body:has(.pl-loading) {
 }
 
 /* Sequence (A/B/C or 1/2/3): the visual anchor of each row, centred in its
-   fixed column */
+   fixed column. In the active lists it is also the drag handle (a button). */
 .pl-num {
   grid-area: num;
   font-size: 1.65rem;
@@ -812,14 +807,16 @@ body:has(.pl-loading) {
   transition: opacity 0.15s;
 }
 
-/* With a mouse, actions stay in the background until the row is hovered */
+/* With a mouse, actions stay in the background until the row is hovered
+   (a Due that is set always stays readable) */
 @media (hover: hover) {
-  .pl-task-actions {
+  .pl-task-actions > :not(.pl-due.has-value) {
     opacity: 0.55;
+    transition: opacity 0.15s;
   }
 
-  .pl-task:hover .pl-task-actions,
-  .pl-task:focus-within .pl-task-actions {
+  .pl-task:hover .pl-task-actions > *,
+  .pl-task:focus-within .pl-task-actions > * {
     opacity: 1;
   }
 }
@@ -881,19 +878,106 @@ body:has(.pl-loading) {
   opacity: 0.55;
 }
 
-/* ⠿ Drag handle: the only place a drag starts, so only it opts out of touch
-   scrolling (set up front: iOS decides on scroll vs. drag at touch start) */
-.pl-grip {
+/* Sequence as drag handle: the only place a drag starts, so only it opts
+   out of touch scrolling (set up front: iOS decides on scroll vs. drag at
+   touch start). A soft pill on hover / focus hints that it can be moved;
+   it stays as large as before, and its tap area reaches over the row's
+   padding without taking any width from the task. */
+button.pl-num {
+  position: relative;
+  justify-self: center;
+  min-width: 100%;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 8px;
+  background: none;
+  font-family: inherit;
   touch-action: none;
   cursor: grab;
   -webkit-user-select: none;
   user-select: none;
   -webkit-touch-callout: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: background-color 0.12s;
 }
 
-.pl-grip[aria-disabled='true'] {
-  opacity: 0.35;
+button.pl-num::after {
+  content: '';
+  position: absolute;
+  inset: -8px -4px;
+}
+
+button.pl-num:hover:not([aria-disabled='true']),
+.pl-task.is-dragging button.pl-num {
+  background: color-mix(in srgb, var(--acc, var(--pl-blue)) 10%, var(--pl-card));
+}
+
+button.pl-num:focus-visible {
+  outline: 2px solid var(--acc, var(--pl-blue));
+  outline-offset: 1px;
+}
+
+button.pl-num[aria-disabled='true'] {
   cursor: default;
+}
+
+/* Task text: click (or Enter / Space) to edit */
+.pl-task-text[role='button']:focus-visible {
+  outline: 2px solid var(--acc, var(--pl-blue));
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Due (time on Daily, date on Mid / Long), just before 🗑: the value in
+   quiet tabular figures, or only a small icon while none is set */
+.pl-due {
+  position: relative;
+  padding: 0 6px;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.pl-due-text {
+  font-size: 0.92rem;
+  font-weight: 500;
+  color: var(--pl-note);
+}
+
+/* "Due" before the value: smaller and quieter */
+.pl-due-label {
+  margin-right: 1px;
+  font-size: 0.72rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  color: var(--pl-muted);
+  opacity: 0.85;
+}
+
+.pl-due:hover .pl-due-text {
+  color: var(--pl-text);
+}
+
+/* Daily: the device's own time list, invisible, covering the whole control */
+.pl-due-select {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  font-size: 16px; /* no iOS zoom */
+  cursor: pointer;
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+.pl-due:has(.pl-due-select:focus-visible) {
+  outline: 2px solid var(--acc, var(--pl-blue));
+  outline-offset: 1px;
+}
+
+.pl-due:has(.pl-due-select:disabled) {
+  opacity: 0.35;
 }
 
 /* The row being dragged lifts slightly; the others slide aside to show
@@ -911,6 +995,76 @@ body.pl-dragging * {
   cursor: grabbing;
   -webkit-user-select: none;
   user-select: none;
+}
+
+/* ---------- Dragging a row onto another list's tab ----------
+   While a row is held, the existing tab bar sticks to the top of the screen
+   (it keeps its place in the page, so nothing shifts), the tabs of the other
+   lists show they can take the row, and the one under the pointer lights
+   up. The highlighted box is exactly the box that accepts the drop
+   (tabDrop.js). */
+body.pl-dragging .pl-tabs {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 25;
+  background: var(--pl-bg);
+  box-shadow: 0 6px 12px -8px rgba(28, 37, 65, 0.25);
+}
+
+.pl-tab.is-drop-ready {
+  background: color-mix(in srgb, var(--t) 7%, transparent);
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--t) 45%, transparent);
+  color: color-mix(in srgb, var(--t) 80%, var(--pl-text));
+}
+
+.pl-tab.is-drop-over {
+  background: color-mix(in srgb, var(--t) 22%, var(--pl-card));
+  box-shadow:
+    inset 0 0 0 2px var(--t),
+    inset 0 -3px 0 var(--t);
+  color: color-mix(in srgb, var(--t) 85%, var(--pl-text));
+  font-weight: 600;
+}
+
+/* The held row stays in its list, faded (its place); the preview under the
+   pointer is the small chip below */
+.pl-tasks .pl-task.is-dragging {
+  opacity: 0.4;
+  box-shadow: none;
+}
+
+.pl-drag-chip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  width: max-content;
+  max-width: min(300px, calc(100vw - 16px));
+  padding: 8px 14px 8px 10px;
+  border: 1px solid color-mix(in srgb, var(--acc, var(--pl-blue)) 35%, var(--pl-line));
+  border-radius: 12px;
+  background: var(--pl-card);
+  box-shadow: 0 10px 24px rgba(28, 37, 65, 0.2);
+  color: var(--pl-text);
+  pointer-events: none;
+}
+
+.pl-drag-chip-num {
+  font-size: 1.15rem;
+  font-weight: 700;
+  line-height: 1.5rem;
+  color: color-mix(in srgb, var(--acc, var(--pl-blue)) 70%, var(--pl-text));
+}
+
+/* the chip is only a preview while dragging: at most two lines */
+.pl-drag-chip-text {
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+  overflow-wrap: anywhere;
 }
 
 .pl-task.is-binned .pl-task-text {
@@ -1397,12 +1551,21 @@ body.pl-dragging * {
     font-size: 1.1rem;
   }
 
-  /* Daily: actions stay beside the task ( ) A  Task text  ⠿ ✎ 🗑 ;
-     long text wraps under itself. The actions take less width: 40px-wide
-     buttons (still 44px tall) with 16px icons. */
-  .pl-tasks.is-daily .pl-task {
+  /* Daily / Mid / Long: actions stay beside the task
+     ( ) A  Task text  19:30 🗑 ; long text wraps under itself. The actions
+     take less width: 40px-wide buttons (still 44px tall) with 16px icons. */
+  .pl-tasks.is-daily .pl-task,
+  .pl-tasks.is-plan .pl-task {
     grid-template-areas: 'check num . task . act';
+    --act-gap: 6px;
+  }
+
+  .pl-tasks.is-daily .pl-task {
     padding: 18px 2px 18px 0;
+  }
+
+  .pl-tasks.is-plan .pl-task {
+    padding-bottom: 10px;
   }
 
   .pl-tasks.is-daily .pl-task.is-editing {
@@ -1414,19 +1577,66 @@ body.pl-dragging * {
     margin-bottom: -8px;
   }
 
-  .pl-tasks.is-daily .pl-task-actions {
+  .pl-tasks.is-daily .pl-task-actions,
+  .pl-tasks.is-plan .pl-task-actions {
     gap: 0;
     margin-top: -8px; /* 44px buttons centred on the first text line */
     margin-bottom: -8px;
   }
 
-  .pl-tasks.is-daily .pl-act {
+  .pl-tasks.is-daily .pl-act,
+  .pl-tasks.is-plan .pl-act {
     min-width: 40px;
     width: 40px;
     padding: 0;
   }
 
-  .pl-tasks.is-daily .pl-act svg {
+  .pl-tasks .pl-act.pl-due.has-value {
+    width: auto;
+    padding: 0 4px;
+  }
+
+  /* Mid / Long: a set Due date ("Due 15 Nov 2026") goes on its own short
+     line under the task, so the task keeps the full width; 🗑 (and the
+     calendar icon while no Due is set) stay on the first line */
+  .pl-tasks.is-plan .pl-task {
+    grid-template-columns:
+      var(--check-w) var(--seq-w) var(--seq-gap) minmax(0, 1fr) var(--act-gap)
+      auto auto;
+    grid-template-areas:
+      'check num . task . set act'
+      'check num . due due due due';
+  }
+
+  .pl-tasks.is-plan .pl-task-actions {
+    display: contents;
+  }
+
+  .pl-tasks.is-plan .pl-task-actions > * {
+    margin-top: -8px;
+    margin-bottom: -8px;
+  }
+
+  .pl-tasks.is-plan .pl-task-actions > .pl-due {
+    grid-area: set;
+  }
+
+  .pl-tasks.is-plan .pl-task-actions > .pl-act.is-danger {
+    grid-area: act;
+  }
+
+  .pl-tasks.is-plan .pl-task-actions > .pl-due.has-value {
+    grid-area: due;
+    justify-self: start;
+    margin: -6px 0 -10px -4px;
+  }
+
+  .pl-due-text {
+    font-size: 0.86rem;
+  }
+
+  .pl-tasks.is-daily .pl-act svg,
+  .pl-tasks.is-plan .pl-act svg {
     width: 16px;
     height: 16px;
   }

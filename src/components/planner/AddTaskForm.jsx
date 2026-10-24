@@ -1,9 +1,10 @@
 import { useRef, useState } from 'react'
 import PlannerIcon from './PlannerIcons.jsx'
 
-// "Add a task" line under each list: task text, plus an optional target date
-// for Mid-term / Long-term (`whenType="date"`); Daily has none, so it is
-// a single line: [ Add a task… ] [ Add ]. Nothing is written until Add / Enter.
+// "Add a task" line under each list: task text, plus an optional Due date
+// for Mid-term / Long-term (`whenType="date"`); Daily has none (its due time
+// is set on the row), so it is a single line: [ Add a task… ] [ Add ].
+// Nothing is written until Add / Enter.
 export default function AddTaskForm({ whenType, onAdd, disabled }) {
   const [task, setTask] = useState('')
   const [when, setWhen] = useState('')
@@ -42,8 +43,8 @@ export default function AddTaskForm({ whenType, onAdd, disabled }) {
             className="pl-when-input"
             value={when}
             onChange={(e) => setWhen(e.target.value)}
-            aria-label="Target date (optional)"
-            title="Target date (optional)"
+            aria-label="Due date (optional)"
+            title="Due date (optional)"
             disabled={disabled}
           />
         )}
