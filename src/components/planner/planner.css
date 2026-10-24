@@ -35,6 +35,11 @@
   --pl-muted: #6b7489;
   --pl-primary: #1f2a6b; /* Unlock / Save buttons */
   --pl-shadow: 0 1px 2px rgba(28, 37, 65, 0.04), 0 1px 1px rgba(28, 37, 65, 0.02);
+
+  /* Due countdown text (small, so darker than --pl-red / --pl-amber:
+     ≥ 4.7:1 on the card and on a hovered row) */
+  --pl-due-over: #c0343c; /* overdue / due now */
+  --pl-due-soon: #b35400; /* Daily within 2 h, Mid / Long due today */
 }
 
 /* Light page background (and light scrollbars) only while the Planner is
@@ -938,10 +943,45 @@ button.pl-num[aria-disabled='true'] {
   white-space: nowrap;
 }
 
+.pl-due.has-value {
+  height: auto;
+  min-height: 34px;
+  padding: 1px 6px;
+}
+
+/* "Due 19:00" with the countdown under it, as one group */
+.pl-due-stack {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
 .pl-due-text {
   font-size: 0.92rem;
   font-weight: 500;
+  line-height: 1.15rem;
   color: var(--pl-note);
+}
+
+/* countdown: smaller and quieter than the Due; grey normally, orange when
+   close, red when overdue (colour only — no animation) */
+.pl-due-left {
+  font-size: 0.7rem;
+  font-weight: 400;
+  line-height: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--pl-muted);
+  opacity: 0.9;
+}
+
+.pl-due-left.is-soon {
+  color: var(--pl-due-soon);
+  opacity: 1;
+}
+
+.pl-due-left.is-over {
+  color: var(--pl-due-over);
+  opacity: 1;
 }
 
 /* "Due" before the value: smaller and quieter */
@@ -1596,9 +1636,10 @@ body.pl-dragging .pl-tabs {
     padding: 0 4px;
   }
 
-  /* Mid / Long: a set Due date ("Due 15 Nov 2026") goes on its own short
-     line under the task, so the task keeps the full width; 🗑 (and the
+  /* A set Due ("Due 15 Nov 2026" / "Due 19:00", with its countdown) goes
+     under the task, so the task keeps the full width; 🗑 (and the clock /
      calendar icon while no Due is set) stay on the first line */
+  .pl-tasks.is-daily .pl-task,
   .pl-tasks.is-plan .pl-task {
     grid-template-columns:
       var(--check-w) var(--seq-w) var(--seq-gap) minmax(0, 1fr) var(--act-gap)
@@ -1608,27 +1649,38 @@ body.pl-dragging .pl-tabs {
       'check num . due due due due';
   }
 
+  .pl-tasks.is-daily .pl-task-actions,
   .pl-tasks.is-plan .pl-task-actions {
     display: contents;
   }
 
+  .pl-tasks.is-daily .pl-task-actions > *,
   .pl-tasks.is-plan .pl-task-actions > * {
     margin-top: -8px;
     margin-bottom: -8px;
   }
 
+  .pl-tasks.is-daily .pl-task-actions > .pl-due,
   .pl-tasks.is-plan .pl-task-actions > .pl-due {
     grid-area: set;
   }
 
+  .pl-tasks.is-daily .pl-task-actions > .pl-act.is-danger,
   .pl-tasks.is-plan .pl-task-actions > .pl-act.is-danger {
     grid-area: act;
   }
 
+  .pl-tasks.is-daily .pl-task-actions > .pl-due.has-value,
   .pl-tasks.is-plan .pl-task-actions > .pl-due.has-value {
     grid-area: due;
     justify-self: start;
-    margin: -6px 0 -10px -4px;
+    min-height: 0;
+    margin: 4px 0 -6px -4px;
+    padding: 2px 4px;
+  }
+
+  .pl-tasks .pl-due.has-value .pl-due-stack {
+    align-items: flex-start;
   }
 
   .pl-due-text {

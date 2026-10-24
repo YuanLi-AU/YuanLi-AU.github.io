@@ -3,6 +3,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { formatShortDate, fromDateKey } from '../../lib/dates.js'
 import { DUE_TIMES, isDueTime } from '../../lib/plannerData.js'
+import { daysLeft, timeLeft, useMinuteClock } from './dueCountdown.js'
 import PlannerIcon from './PlannerIcons.jsx'
 import { Checkbox, RowAction } from './TableParts.jsx'
 
@@ -22,8 +23,11 @@ function dueDate(dateKey) {
 
 // One task in Daily / Mid-term / Long-term, on one line:
 //
-//   ( )  A   Task text (wraps naturally)          Due 19:30   🗑     Daily
+//   ( )  A   Task text (wraps naturally)          Due 19:00   🗑     Daily
+//                                          剩余 3 小时 20 分
 //   ( )  1   Task text (wraps naturally)    Due 15 Nov 2026   🗑     Mid / Long
+//                                                 剩余 22 天
+// (On phones a set Due, with its countdown, goes under the task text.)
 //
 // `number` is the row's label (A, B, … for Daily; 1, 2, … otherwise) and is
 // also the drag handle — to reorder, or onto another list's tab to move the
@@ -146,12 +150,26 @@ export default function TaskRow({
 }
 
 // "Due" (small, quiet) + the time / date.
-function DueText({ value }) {
+// Under it, smaller and quieter, the time / days left (dueCountdown.js).
+function DueText({ value, left }) {
   return (
-    <span className="pl-due-text">
-      <span className="pl-due-label">Due</span> {value}
+    <span className="pl-due-stack">
+      <span className="pl-due-text">
+        <span className="pl-due-label">Due</span> {value}
+      </span>
+      <span className={`pl-due-left is-${left.tone}`}>{left.text}</span>
     </span>
   )
+}
+
+function DueTimeText({ value }) {
+  const now = useMinuteClock()
+  return <DueText value={value} left={timeLeft(value, now)} />
+}
+
+function DueDateText({ value }) {
+  const now = useMinuteClock()
+  return <DueText value={dueDate(value)} left={daysLeft(value, now)} />
 }
 
 // What is shown under the pointer while a row is dragged: its label and
@@ -165,14 +183,17 @@ export function DragChip({ number, task }) {
   )
 }
 
-// Daily due time: the time ("19:30"), or a quiet clock icon when none is
-// set. A native list sits invisibly on top, so a click / tap opens the
-// device's own picker: "No due time" (clears it), 00:00, 00:30 … 23:30.
+// Daily due time: the time ("19:00") with the time left under it, or a
+// quiet clock icon when none is set. A native list sits invisibly on top,
+// so a click / tap opens the device's own picker: "No due time" (clears
+// it), 09:00, 10:00 … 23:00. A time saved before (e.g. 08:30) that is no
+// longer offered stays in the list, in its place, until another is chosen.
 function DueTime({ value, onChange, disabled }) {
   const set = isDueTime(value)
+  const times = set && !DUE_TIMES.includes(value) ? [...DUE_TIMES, value].sort() : DUE_TIMES
   return (
     <span className={`pl-act pl-due${set ? ' has-value' : ''}`} title={set ? `Due ${value}` : 'Set due time'}>
-      {set ? <DueText value={value} /> : <PlannerIcon name="clock" size={16} />}
+      {set ? <DueTimeText value={value} /> : <PlannerIcon name="clock" size={16} />}
       <select
         className="pl-due-select"
         value={set ? value : ''}
@@ -181,7 +202,7 @@ function DueTime({ value, onChange, disabled }) {
         aria-label={set ? `Due time ${value}. Change or clear` : 'Set due time'}
       >
         <option value="">No due time</option>
-        {DUE_TIMES.map((time) => (
+        {times.map((time) => (
           <option key={time} value={time}>
             {time}
           </option>
@@ -191,8 +212,8 @@ function DueTime({ value, onChange, disabled }) {
   )
 }
 
-// Mid / Long due date: the date ("15 Nov"), or a quiet calendar icon when
-// none is set. A click opens the row's editor on the date, with Clear.
+// Mid / Long due date: the date ("15 Nov 2026") with the days left under
+// it, or a quiet calendar icon when none is set. A click opens the row's editor on the date, with Clear.
 function DueDate({ value, onClick, disabled }) {
   const set = isDateKey(value)
   const label = set ? `Due ${formatShortDate(value)}` : 'Set due date'
@@ -205,7 +226,7 @@ function DueDate({ value, onClick, disabled }) {
       aria-label={set ? `${label}. Change or clear` : label}
       title={label}
     >
-      {set ? <DueText value={dueDate(value)} /> : <PlannerIcon name="calendar" size={16} />}
+      {set ? <DueDateText value={value} /> : <PlannerIcon name="calendar" size={16} />}
     </button>
   )
 }

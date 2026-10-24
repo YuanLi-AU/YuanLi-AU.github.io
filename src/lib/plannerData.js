@@ -2,7 +2,8 @@
 //
 //   users/{uid}/plans/daily                    THE active Daily list
 //     items:     [{ id, dueTime, time, task, notes }]
-//                // dueTime: optional due time "HH:00" / "HH:30" or "".
+//                // dueTime: optional due time "HH:MM" or "" (new choices are
+//                // 09:00 … 23:00 on the hour; older values are kept).
 //                // time: the old plan time — no longer shown or asked for,
 //                // but older values are kept (as are notes).
 //                // Rows moved in from Mid/Long-term also keep
@@ -190,12 +191,13 @@ export function createItem() {
   return { id: crypto.randomUUID(), dueTime: '', time: '', task: '', notes: '' }
 }
 
-// Daily due times: every 30 minutes, 00:00 … 23:30 (24-hour clock).
-export const DUE_TIMES = Array.from(
-  { length: 48 },
-  (_, i) => `${String(Math.floor(i / 2)).padStart(2, '0')}:${i % 2 ? '30' : '00'}`,
-)
-export const isDueTime = (value) => DUE_TIMES.includes(value)
+// Daily due times to choose from: every hour, 09:00 … 23:00 (24-hour clock).
+export const DUE_TIMES = Array.from({ length: 15 }, (_, i) => `${String(9 + i).padStart(2, '0')}:00`)
+
+// A saved due time: any "HH:MM". Older rows may hold a time that is no
+// longer offered (e.g. 08:30, 19:30); it is shown and kept as it is until
+// another time is chosen.
+export const isDueTime = (value) => /^([01]\d|2[0-3]):[0-5]\d$/.test(value ?? '')
 
 // Live updates across devices. Returns the unsubscribe function. (The key
 // argument is the list key from useSyncedItems; Daily has only one list.)
