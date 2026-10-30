@@ -1,4 +1,5 @@
 import { education } from '../../data/resume.js'
+import Icon from './Icon.jsx'
 import Section from './Section.jsx'
 
 export default function Education() {
@@ -20,6 +21,15 @@ export default function Education() {
               {item.school} <span className="muted">· {item.location}</span>
             </p>
             {item.notes && <p className="muted small">{item.notes}</p>}
+            {item.awards?.length > 0 && (
+              <ul className="edu-awards">
+                {item.awards.map((award) => (
+                  <li key={award}>
+                    <Icon name="award" size={16} /> {award}
+                  </li>
+                ))}
+              </ul>
+            )}
           </article>
         ))}
       </div>

@@ -161,6 +161,8 @@ export const experience = [
       'Check staff handwritten timesheets and leave records',
       'Prepare weekly Excel summaries of verified hours',
       'Check leave balances and follow up discrepancies with staff and the Finance Officer',
+      'Check leave categories against the applicable leave rules, and review overtime and back-pay records',
+      'Report missing, inactive or incorrectly numbered staff records to the Finance Officer',
       'Enter verified timesheets into TechnologyOne CiAnywhere',
       'Complete two final checks after data entry to help ensure staff are paid accurately',
     ],
@@ -329,6 +331,20 @@ export const experience = [
     media: [],
   },
   {
+    role: 'Tmall Store Operations',
+    org: 'Hengmei Oil Painting (Tmall store)',
+    location: 'China',
+    period: 'Aug 2015 – Mar 2016',
+    area: 'Business · E-commerce',
+    accent: 'coral',
+    points: [
+      'Ran the day-to-day operations of a Tmall online store selling oil paintings, managing them independently',
+      'Designed product images and visual content, and handled customer service and order processing',
+      'The store averaged approximately RMB 300,000 in monthly sales',
+    ],
+    media: [],
+  },
+  {
     role: 'Taobao Store Owner',
     org: 'Self-employed',
     location: 'China',
@@ -336,15 +352,77 @@ export const experience = [
     area: 'Business · E-commerce',
     accent: 'coral',
     points: [
-      'Compared suppliers, purchased products and fulfilled customer orders',
-      'Completed more than 10,000 real customer transactions',
+      'Ran my own online store independently',
+      'Compared suppliers, purchased products, fulfilled customer orders and handled customer communication',
+      'Completed approximately 12,000 transactions in total',
     ],
     media: [],
   },
 ]
 
-export const earlierExperience =
-  'Other casual and seasonal roles, including Station Hand (YK Australia Brother, 2023).'
+// Shorter roles, shown as a compact list under the main timeline.
+// org / location are optional; media works the same as above.
+export const earlierExperience = [
+  {
+    role: 'Shed Machine Operator',
+    org: 'Australian Ilmenite Resources',
+    location: 'Darwin, NT',
+    period: 'Dec 2023 – Feb 2024',
+    points: [
+      'Worked in a mineral products shed associated with Darwin Port',
+      'Helped with forklift container loading and on-site materials handling',
+    ],
+    media: [],
+  },
+  {
+    role: 'Station Hand',
+    org: 'YK Australia Brother · Florina Station',
+    location: 'Katherine region, NT',
+    period: 'Oct 2023 – Dec 2023',
+    points: [
+      'Livestock care and general station duties',
+      'Supported fencing and equipment maintenance',
+      'Kept livestock records and basic operational documentation',
+    ],
+    media: [],
+  },
+  {
+    role: 'General Factory Hand',
+    org: 'Arcadia Architectural Pty Ltd',
+    location: 'Welshpool, WA',
+    period: 'Aug 2018 – Oct 2018',
+    points: [
+      'General factory work at a manufacturer of architectural building products',
+      'Took part in day-to-day production floor work in line with workplace safety requirements',
+    ],
+    media: [],
+  },
+  {
+    role: 'Farm Hand',
+    org: 'Hanwood Service · Sandalwood plantation',
+    location: 'Katherine, NT',
+    period: 'Dec 2017 – Apr 2018',
+    points: ['General plantation work, including spraying, fencing and irrigation repairs'],
+    media: [],
+  },
+  {
+    role: 'Online Customer Service Representative',
+    org: 'Taobao Cloud Customer Service',
+    location: 'China',
+    period: 'Apr 2013 – Nov 2013',
+    points: [
+      'Handled after-sales issues and transaction disputes between Taobao buyers and sellers through the online customer service system',
+      'Responded to approximately 12–20 customer enquiries per hour',
+    ],
+    media: [],
+  },
+]
+
+// Short note shown below the Earlier Experience list
+export const careerBackground = {
+  heading: 'Career Background',
+  text: 'During my early years working in Australia on a Working Holiday visa, I gained hands-on experience across agriculture, construction, production and site operations. Some roles were short-term or undertaken concurrently, including a mix of full-time and part-time work.',
+}
 
 // studied: true marks skills from Master's study rather than work experience
 export const skills = [
@@ -374,6 +452,7 @@ export const skills = [
       'Excel',
       'VBA',
       'Data analysis',
+      'Data verification & record reconciliation',
     ],
   },
   {
@@ -398,6 +477,9 @@ export const skills = [
       'Construction support: external wall framing & interior refurbishment',
       'Basic drip-irrigation pipe repairs',
       'Hand & power tools',
+      'Workplace safety awareness',
+      'General manufacturing & site operations',
+      'Basic inventory & materials handling',
       'Materials Forming & Control Engineering',
     ],
   },
@@ -411,6 +493,16 @@ export const skills = [
       'Print production',
       'Video production',
       'Content creation',
+    ],
+  },
+  {
+    group: 'Business / E-commerce',
+    accent: 'coral',
+    items: [
+      'E-commerce operations',
+      'Online customer service',
+      'Order fulfilment',
+      'Product listing & visual content',
     ],
   },
   {
@@ -429,8 +521,7 @@ export const education = [
     location: 'Darwin, NT',
     period: 'Mar 2025 – Nov 2026 · Coursework completed; results pending (Nov 2026)',
     notes:
-      'Key areas: software engineering, security, machine learning & AI, IT service management, project management, risk and reliability',
-  },
+      'Key areas: software engineering, security, machine learning & AI, IT service management, project management, risk and reliability',  },
   {
     degree: 'Bachelor of Engineering — Material Forming and Control Engineering',
     school: 'Yantai Nanshan University',
@@ -438,6 +529,8 @@ export const education = [
     period: 'Sep 2011 – Jun 2015',
     notes:
       'Core areas: engineering mechanics, mechanical design, materials science, CAD/CAM, stamping & die design, hydraulics & pneumatics',
+    // Award year not shown until confirmed from the certificate
+    awards: ['Second Prize — Shandong Provincial Electromechanical Product Design Competition'],
   },
 ]
 
