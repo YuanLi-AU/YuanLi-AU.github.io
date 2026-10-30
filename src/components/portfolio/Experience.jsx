@@ -1,4 +1,5 @@
 import { experience, earlierExperience } from '../../data/resume.js'
+import ExperienceMedia from './ExperienceMedia.jsx'
 import FeaturedExperience from './FeaturedExperience.jsx'
 import Section from './Section.jsx'
 
@@ -28,6 +29,7 @@ export default function Experience() {
                     <li key={point}>{point}</li>
                   ))}
                 </ul>
+                <ExperienceMedia items={job.media} />
               </>
             )}
           </li>

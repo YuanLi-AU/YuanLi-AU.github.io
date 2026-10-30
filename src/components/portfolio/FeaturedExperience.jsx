@@ -1,3 +1,4 @@
+import ExperienceMedia from './ExperienceMedia.jsx'
 import MediaSlot from './MediaSlot.jsx'
 
 // Larger presentation for roles with real work evidence: logo, publication
@@ -41,6 +42,7 @@ export default function FeaturedExperience({ job }) {
               ))}
             </ul>
           )}
+          <ExperienceMedia items={job.media} />
         </div>
 
         {job.gallery && (

@@ -18,7 +18,8 @@ export default function Hero() {
 
       <div className="container hero-grid">
         <div className="hero-text">
-          <p className="hero-title">{profile.title}</p>
+          {/* Non-breaking space keeps each "·" at the end of a line when the title wraps */}
+          <p className="hero-title">{profile.title.replaceAll(' · ', ' · ')}</p>
           <h1 className="hero-name">{profile.name}</h1>
           <p className="hero-subtitle">
             {profile.subtitle}

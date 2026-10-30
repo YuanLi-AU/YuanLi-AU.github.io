@@ -156,13 +156,32 @@
   gap: 48px;
 }
 
+.hero-text {
+  container-type: inline-size; /* lets the title scale to the column width */
+}
+
+/* One line: the font shrinks with the column (the full title is ~57em
+   wide), capped at 0.85rem. Narrow columns switch to two balanced lines
+   rather than an unreadably small font. */
 .hero-title {
   margin: 0;
   color: var(--purple);
   font-weight: 600;
-  letter-spacing: 0.16em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
+  font-size: min(0.85rem, calc(100cqi / 58));
+  white-space: nowrap;
+}
+
+@container (max-width: 580px) {
+  .hero-title {
+    font-size: 0.75rem;
+    letter-spacing: 0.1em;
+    line-height: 1.7;
+    white-space: normal;
+    text-wrap: balance;
+  }
 }
 
 .hero-name {
@@ -1023,6 +1042,34 @@
   border-radius: 8px;
   color: #ffffff;
   background: rgba(15, 23, 42, 0.7);
+}
+
+/* ---------- Role photos / certificates (optional, per role) ---------- */
+.exp-media {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 180px));
+  gap: 12px;
+  margin: 16px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.exp-media .media {
+  height: auto;
+  aspect-ratio: 4 / 3;
+}
+
+.exp-media-caption {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+@media (max-width: 600px) {
+  .exp-media {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* ---------- Work highlights ---------- */

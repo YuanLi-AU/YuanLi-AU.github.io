@@ -11,7 +11,7 @@ export default function Projects() {
         {projects.map((project) => (
           <article
             key={project.title}
-            className={`card accent-${project.accent}${project.showcase ? ' card-wide' : ''}`}
+            className={`card accent-${project.accent}${project.showcase?.image ? ' card-wide' : ''}`}
           >
             {project.image && (
               <img src={project.image} alt={`${project.title} screenshot`} className="card-image" />
@@ -46,12 +46,13 @@ export default function Projects() {
               </p>
             )}
             {project.showcase && (
-              // Compact preview at the bottom of the card (opens the lightbox)
+              // Compact preview at the bottom of the card (opens the lightbox);
+              // without an image it shows a quiet placeholder for a future photo
               <div className="card-preview">
-                <MediaSlot {...project.showcase} className="card-preview-img" />
+                <MediaSlot {...project.showcase} label={undefined} className="card-preview-img" />
                 <p>
                   <span className="card-preview-label">{project.showcase.label}</span>
-                  <span className="muted">yuanli-au.github.io</span>
+                  <span className="muted">{project.showcase.note}</span>
                 </p>
               </div>
             )}
