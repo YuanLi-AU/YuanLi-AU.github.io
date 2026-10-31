@@ -12,8 +12,8 @@ export default function Projects() {
         {projects.map((project) => (
           <article
             key={project.title}
-            className={`card accent-${project.accent}${project.showcase?.image ? ' card-wide' : ''}${
-              project.mobilePreviews ? ' has-mobile-previews' : ''
+            className={`card accent-${project.accent}${
+              project.showcase?.image || project.previews ? ' card-wide' : ''
             }`}
           >
             {project.image && (
@@ -38,10 +38,10 @@ export default function Projects() {
                 <li key={point}>{point}</li>
               ))}
             </ul>
-            {project.mobilePreviews && (
-              // Shown on phones only (see .card-mobile-previews)
-              <div className="card-mobile-previews">
-                {project.mobilePreviews.map((item) => (
+            {project.previews && (
+              // Two main images side by side (e.g. desktop site + phone screen)
+              <div className="card-previews">
+                {project.previews.map((item) => (
                   <figure key={item.label}>
                     <MediaSlot {...item} />
                     <figcaption>{item.label}</figcaption>

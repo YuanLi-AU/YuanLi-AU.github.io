@@ -40,14 +40,9 @@ import raafPassThumb from '../assets/work/regina/raaf-pass-800.jpg'
 import raafPassFull from '../assets/work/regina/raaf-pass-1600.jpg'
 import lpcMaterialsThumb from '../assets/publications/lpc/lpc-materials-800.jpg'
 import lpcMaterialsFull from '../assets/publications/lpc/lpc-materials-1600.jpg'
-import websiteShowcaseThumb from '../assets/projects/website/website-showcase-800.jpg'
 import websiteShowcaseFull from '../assets/projects/website/website-showcase-1600.jpg'
 import plannerDailyThumb from '../assets/projects/website/planner-daily-400.jpg'
 import plannerDailyFull from '../assets/projects/website/planner-daily-1170.jpg'
-import plannerMidThumb from '../assets/projects/website/planner-mid-400.jpg'
-import plannerMidFull from '../assets/projects/website/planner-mid-1170.jpg'
-import plannerLongThumb from '../assets/projects/website/planner-long-400.jpg'
-import plannerLongFull from '../assets/projects/website/planner-long-1170.jpg'
 
 export const profile = {
   name: 'Yuan Li',
@@ -66,12 +61,12 @@ export const about = [
   {
     heading: 'Engineering & operations background',
     accent: 'orange',
-    text: 'I hold a Bachelor of Engineering in Material Forming and Control Engineering, and my qualifications have been assessed by Engineers Australia. In the Northern Territory I have supervised labour-hire teams on sandalwood plantations, assisted on construction and refurbishment projects, and worked as a cleaning subcontractor to Regina Cleaning Service, trading under my own business name, NT Cleaning & Maintenance Services.',
+    text: 'I hold a Bachelor of Engineering in Material Forming and Control Engineering, and my qualifications have been assessed by Engineers Australia. In Australia I have gained hands-on experience across labour-hire team supervision, farm and plantation operations, construction sites and commercial cleaning, including delivering cleaning services as a subcontractor. This work has built my skills in team coordination, site management and problem-solving, and my ability to run work independently.',
   },
   {
-    heading: 'Current direction: IT, software & data',
+    heading: 'Technology, data & business skills',
     accent: 'teal',
-    text: 'I have completed the coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University; results will be released in November 2026. I continue to work part-time for the Finance Office at OLSH Thamarrurr Catholic College in Wadeye, remotely since February 2026, and until February 2026 I worked in publishing and design at the school’s Literature Production Centre. I build Power BI and Power Apps solutions for data analysis and reporting.',
+    text: 'I have completed all coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026. My skills cover data analysis, Power BI reporting and visualisation, Power Apps development and software development, and I have worked on a real-world business data analytics project. I also bring experience in finance-related work, book editing and publishing, e-commerce operations, digital content production and social media channel management, and I apply technical knowledge to practical business needs.',
   },
 ]
 
@@ -81,6 +76,9 @@ export const about = [
 // showcase: optional preview at the bottom of the card: { label, note, image,
 //   imageFull, alt, caption, icon }. With an image it opens the lightbox and
 //   the card spans the full row; without one it shows a small placeholder.
+// previews: optional pair of main images shown side by side, each with a
+//   label: [{ label, image, imageFull, alt, caption, tall }]; the card spans
+//   the full row.
 // media: optional screenshots (same format as Experience media below)
 // links: optional [{ label, url }]
 export const projects = [
@@ -159,20 +157,13 @@ export const projects = [
       'GitHub Pages',
       'GitHub Actions',
     ],
-    showcase: {
-      label: 'Live site',
-      image: websiteShowcaseThumb,
-      imageFull: websiteShowcaseFull,
-      alt: 'Screenshots of this website: the portfolio home page on desktop and the unlocked Planner (sample data) on mobile',
-      caption: 'Personal Portfolio & Planner Website — yuanli-au.github.io',
-      note: 'yuanli-au.github.io',
-    },
-    // Phones only: two compact previews shown first (the Live site row is
-    // hidden there and the Planner screenshots below become small thumbnails)
-    mobilePreviews: [
+    links: [{ label: 'Visit Website', url: 'https://yuanli-au.github.io/' }],
+    // Planner screenshot is from an isolated demo build with sample data.
+    // tall: the lightbox shows the long screenshot at phone width and scrolls.
+    previews: [
       {
         label: 'Desktop Website',
-        image: websiteShowcaseThumb,
+        image: websiteShowcaseFull,
         imageFull: websiteShowcaseFull,
         alt: 'Screenshots of this website: the portfolio home page on desktop and the unlocked Planner (sample data) on mobile',
         caption: 'Personal Portfolio & Planner Website — yuanli-au.github.io',
@@ -183,35 +174,6 @@ export const projects = [
         imageFull: plannerDailyFull,
         alt: 'Full-page mobile screenshot of the unlocked Planner showing the Daily plan with sample data',
         caption: 'Daily Planner · sample data',
-        tall: true,
-      },
-    ],
-    // Captured from an isolated demo build with sample data (no real tasks).
-    // tall: the lightbox shows the long screenshot at phone width and scrolls.
-    // shortCaption: thumbnail label on phones (the lightbox keeps caption).
-    media: [
-      {
-        image: plannerDailyThumb,
-        imageFull: plannerDailyFull,
-        alt: 'Full-page mobile screenshot of the unlocked Planner showing the Daily plan with sample data',
-        caption: 'Daily Planner · sample data',
-        shortCaption: 'Daily',
-        tall: true,
-      },
-      {
-        image: plannerMidThumb,
-        imageFull: plannerMidFull,
-        alt: 'Full-page mobile screenshot of the unlocked Planner showing the Mid-term plan with sample data',
-        caption: 'Mid-term Planner · sample data',
-        shortCaption: 'Mid-term',
-        tall: true,
-      },
-      {
-        image: plannerLongThumb,
-        imageFull: plannerLongFull,
-        alt: 'Full-page mobile screenshot of the unlocked Planner showing the Long-term plan with sample data',
-        caption: 'Long-term Planner · sample data',
-        shortCaption: 'Long-term',
         tall: true,
       },
     ],
