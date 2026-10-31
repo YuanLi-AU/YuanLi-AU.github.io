@@ -5,7 +5,18 @@ import ImageLightbox from './ImageLightbox.jsx'
 // One image area: a real image (click to enlarge) or a quiet placeholder
 // reserved for a future, confirmed image.
 // tall: a long screenshot, shown at phone width in a scrolling lightbox.
-export default function MediaSlot({ image, imageFull, alt, caption, label, icon = 'book', className = '', tall = false }) {
+// objectPosition: which part of a wide image the cropped thumbnail shows.
+export default function MediaSlot({
+  image,
+  imageFull,
+  alt,
+  caption,
+  label,
+  icon = 'book',
+  className = '',
+  tall = false,
+  objectPosition,
+}) {
   const [open, setOpen] = useState(false)
 
   if (!image) {
@@ -25,7 +36,7 @@ export default function MediaSlot({ image, imageFull, alt, caption, label, icon 
         onClick={() => setOpen(true)}
         aria-label={`View larger: ${alt}`}
       >
-        <img src={image} alt={alt} loading="lazy" />
+        <img src={image} alt={alt} loading="lazy" style={objectPosition ? { objectPosition } : undefined} />
         <span className="media-expand" aria-hidden="true">
           <Icon name="expand" size={16} />
         </span>

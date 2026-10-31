@@ -1084,6 +1084,15 @@
   aspect-ratio: 4 / 3;
 }
 
+/* Portrait work video at its own 9:16 ratio */
+.exp-media .media-video {
+  display: block;
+  aspect-ratio: 9 / 16;
+  object-fit: contain;
+  background: #000000;
+  border: 1px solid var(--border);
+}
+
 /* Dashboard screenshots in a project card: two per row, wide ratio */
 .exp-media.exp-media-screens {
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1108,6 +1117,68 @@
 .card-wide .exp-media-screens .media img {
   height: auto;
   aspect-ratio: auto;
+}
+
+/* Phones: the website card shows two compact previews first; the long
+   Planner screenshots become a row of small thumbnails (full image on tap) */
+.card-mobile-previews {
+  display: none;
+}
+
+@media (max-width: 600px) {
+  .card-mobile-previews {
+    display: grid;
+    /* Phone-width Planner tile: header bar through the first tasks fit in 120px */
+    grid-template-columns: minmax(0, 1fr) 100px;
+    gap: 10px;
+    margin-top: 16px;
+  }
+
+  .card-mobile-previews figure {
+    margin: 0;
+  }
+
+  .card-mobile-previews .media {
+    height: 120px;
+  }
+
+  .card-mobile-previews figure + figure .media img {
+    object-position: top center;
+  }
+
+  .card-mobile-previews figure + figure .media-expand {
+    display: none; /* would cover the task rows; the tile still opens on tap */
+  }
+
+  .card-mobile-previews figcaption {
+    margin-top: 6px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-h);
+  }
+
+  .has-mobile-previews .card-preview {
+    display: none;
+  }
+
+  .has-mobile-previews .exp-media.exp-media-screens {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .has-mobile-previews .exp-media-screens .media {
+    height: 72px;
+    aspect-ratio: auto;
+  }
+
+  .has-mobile-previews .exp-media-screens .media img {
+    height: 100%;
+    object-position: 50% 35%;
+  }
+
+  .has-mobile-previews .exp-media-screens .media-expand {
+    display: none;
+  }
 }
 
 .exp-media-caption {
@@ -1217,9 +1288,10 @@
   border-top: 1px solid var(--border);
 }
 
+/* Three per row: the three photo items share the first row */
 .highlight-grid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 24px;
   margin: 0;
   padding: 0;
@@ -1368,7 +1440,17 @@
   }
 
   .highlight-grid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px 12px;
+  }
+
+  .highlight h5 {
+    font-size: 0.92rem;
+    overflow-wrap: anywhere;
+  }
+
+  .highlight p {
+    font-size: 0.82rem;
   }
 }
 

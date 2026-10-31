@@ -32,6 +32,12 @@ import plantationTeamThumb from '../assets/work/plantation/plantation-team-800.j
 import plantationTeamFull from '../assets/work/plantation/plantation-team-1600.jpg'
 import whiteCardThumb from '../assets/work/builder-clean/white-card-800.jpg'
 import whiteCardFull from '../assets/work/builder-clean/white-card-1600.jpg'
+import ntsVideo from '../assets/work/nts/nts-site-framing.mp4'
+import ntsVideoPoster from '../assets/work/nts/nts-site-framing-poster.jpg'
+import youtubeChannelThumb from '../assets/work/youtube/youtube-channel-800.jpg'
+import youtubeChannelFull from '../assets/work/youtube/youtube-channel-1338.jpg'
+import raafPassThumb from '../assets/work/regina/raaf-pass-800.jpg'
+import raafPassFull from '../assets/work/regina/raaf-pass-1600.jpg'
 import lpcMaterialsThumb from '../assets/publications/lpc/lpc-materials-800.jpg'
 import lpcMaterialsFull from '../assets/publications/lpc/lpc-materials-1600.jpg'
 import websiteShowcaseThumb from '../assets/projects/website/website-showcase-800.jpg'
@@ -161,6 +167,25 @@ export const projects = [
       caption: 'Personal Portfolio & Planner Website — yuanli-au.github.io',
       note: 'yuanli-au.github.io',
     },
+    // Phones only: two compact previews shown first (the Live site row is
+    // hidden there and the Planner screenshots below become small thumbnails)
+    mobilePreviews: [
+      {
+        label: 'Desktop Website',
+        image: websiteShowcaseThumb,
+        imageFull: websiteShowcaseFull,
+        alt: 'Screenshots of this website: the portfolio home page on desktop and the unlocked Planner (sample data) on mobile',
+        caption: 'Personal Portfolio & Planner Website — yuanli-au.github.io',
+      },
+      {
+        label: 'Mobile Planner',
+        image: plannerDailyThumb,
+        imageFull: plannerDailyFull,
+        alt: 'Full-page mobile screenshot of the unlocked Planner showing the Daily plan with sample data',
+        caption: 'Daily Planner · sample data',
+        tall: true,
+      },
+    ],
     // Captured from an isolated demo build with sample data (no real tasks).
     // tall: the lightbox shows the long screenshot at phone width and scrolls.
     // shortCaption: thumbnail label on phones (the lightbox keeps caption).
@@ -260,6 +285,15 @@ export const experience = [
       'Work locations included multiple construction sites, some RAAF facilities and Darwin Port',
     ],
     highlights: [
+      // Full pass shown with Yuan's confirmed permission from the relevant parties
+      {
+        title: 'Defence Pass · RAAF Darwin',
+        text: 'Site access pass issued for subcontracted cleaning work at RAAF Darwin.',
+        image: raafPassThumb,
+        imageFull: raafPassFull,
+        alt: 'RAAF Darwin site access pass issued to Yuan Li for subcontracted work',
+        caption: 'RAAF Darwin site access pass — issued for subcontracted work',
+      },
       {
         title: 'Pitch Black 2024 · Darwin',
         text: 'Cleaning work during Exercise Pitch Black 2024 as part of the Regina subcontract. Received a Certificate of Appreciation.',
@@ -347,7 +381,14 @@ export const experience = [
       'Assisted on a 138-room refurbishment at a Defence accommodation precinct: removing adhesive and residue, and laying ceiling acoustic insulation',
       'On site for approximately two to three months',
     ],
-    media: [],
+    media: [
+      {
+        video: ntsVideo,
+        image: ntsVideoPoster,
+        alt: 'Short site video of external wall framing work from an elevated work platform on a Darwin construction site',
+        caption: 'On-site construction work · External wall framing at Berrimah Farm',
+      },
+    ],
   },
   {
     role: 'Labour-hire Supervisor',
@@ -378,10 +419,18 @@ export const experience = [
     accent: 'coral',
     points: [
       'Ran content planning, filming, editing and audience engagement end to end',
-      'Reached approximately 27,000 subscribers at its peak; approximately 22.4K subscribers currently, with no new content for more than three years',
+      'Reached approximately 27,000 subscribers at its peak; approximately 22.4K subscribers currently, with no new content for approximately four years',
     ],
     links: [{ label: 'YouTube channel', url: 'https://www.youtube.com/@qingganrexian' }],
-    media: [],
+    media: [
+      {
+        image: youtubeChannelThumb,
+        imageFull: youtubeChannelFull,
+        alt: 'Header of the YouTube channel 情感热线 (@qingganrexian), showing the channel banner, about 22.4K subscribers and 30 videos',
+        caption: 'YouTube channel home page · approx. 22.4K subscribers, 30 videos',
+        objectPosition: '12% center',
+      },
+    ],
   },
   {
     role: 'Labour-hire Supervisor',
