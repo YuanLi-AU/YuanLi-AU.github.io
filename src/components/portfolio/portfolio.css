@@ -1084,6 +1084,32 @@
   aspect-ratio: 4 / 3;
 }
 
+/* Dashboard screenshots in a project card: two per row, wide ratio */
+.exp-media.exp-media-screens {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-bottom: 16px;
+}
+
+.exp-media-screens .media {
+  aspect-ratio: 2 / 1;
+}
+
+.exp-media-screens .media img {
+  object-position: top left;
+}
+
+/* Wide card: three uncropped phone screenshots at their natural ratio */
+.card-wide .exp-media-screens {
+  grid-template-columns: repeat(3, minmax(0, 200px));
+  align-items: start;
+}
+
+.card-wide .exp-media-screens .media,
+.card-wide .exp-media-screens .media img {
+  height: auto;
+  aspect-ratio: auto;
+}
+
 .exp-media-caption {
   display: block;
   margin-top: 6px;
@@ -1091,9 +1117,21 @@
   color: var(--text-muted);
 }
 
+.caption-short {
+  display: none;
+}
+
 @media (max-width: 600px) {
   .exp-media {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .caption-full {
+    display: none;
+  }
+
+  .caption-short {
+    display: inline;
   }
 }
 
@@ -1248,6 +1286,23 @@
   max-height: calc(100dvh - 140px);
   object-fit: contain;
   border-radius: 8px;
+}
+
+/* Long phone screenshots: full phone width, scroll down to read */
+.lightbox-tall {
+  overflow-y: auto;
+}
+
+.lightbox-tall .lightbox-figure {
+  height: auto;
+  min-height: 100%;
+  justify-content: flex-start;
+}
+
+.lightbox-tall .lightbox-figure img {
+  width: min(100%, 430px);
+  max-width: none;
+  max-height: none;
 }
 
 .lightbox-figure figcaption {

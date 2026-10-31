@@ -1,4 +1,5 @@
 import { projects } from '../../data/resume.js'
+import ExperienceMedia from './ExperienceMedia.jsx'
 import Icon from './Icon.jsx'
 import MediaSlot from './MediaSlot.jsx'
 import Section from './Section.jsx'
@@ -35,6 +36,7 @@ export default function Projects() {
                 <li key={point}>{point}</li>
               ))}
             </ul>
+            <ExperienceMedia items={project.media} className="exp-media-screens" />
             <Tags items={project.tags} />
             {project.links?.length > 0 && (
               <p className="card-links">

@@ -29,6 +29,15 @@ export default function Experience() {
                     <li key={point}>{point}</li>
                   ))}
                 </ul>
+                {job.links?.length > 0 && (
+                  <p className="card-links">
+                    {job.links.map((link) => (
+                      <a key={link.url} href={link.url} target="_blank" rel="noreferrer">
+                        {link.label} ↗
+                      </a>
+                    ))}
+                  </p>
+                )}
                 <ExperienceMedia items={job.media} />
               </>
             )}

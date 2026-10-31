@@ -4,7 +4,8 @@ import ImageLightbox from './ImageLightbox.jsx'
 
 // One image area: a real image (click to enlarge) or a quiet placeholder
 // reserved for a future, confirmed image.
-export default function MediaSlot({ image, imageFull, alt, caption, label, icon = 'book', className = '' }) {
+// tall: a long screenshot, shown at phone width in a scrolling lightbox.
+export default function MediaSlot({ image, imageFull, alt, caption, label, icon = 'book', className = '', tall = false }) {
   const [open, setOpen] = useState(false)
 
   if (!image) {
@@ -34,6 +35,7 @@ export default function MediaSlot({ image, imageFull, alt, caption, label, icon 
         src={imageFull ?? image}
         alt={alt}
         caption={caption}
+        tall={tall}
         onClose={() => setOpen(false)}
       />
     </>

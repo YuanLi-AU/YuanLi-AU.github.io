@@ -22,12 +22,26 @@ import lpcWorkplaceThumb from '../assets/publications/lpc/lpc-workplace-800.jpg'
 import lpcWorkplaceFull from '../assets/publications/lpc/lpc-workplace-1800.jpg'
 import tcassTeamThumb from '../assets/projects/tcass/tcass-team-400.jpg'
 import tcassTeamFull from '../assets/projects/tcass/tcass-team-1600.jpg'
+import tcassOverviewThumb from '../assets/projects/tcass/tcass-overview-800.jpg'
+import tcassOverviewFull from '../assets/projects/tcass/tcass-overview-1600.jpg'
+import tcassOperationsThumb from '../assets/projects/tcass/tcass-operations-800.jpg'
+import tcassOperationsFull from '../assets/projects/tcass/tcass-operations-1600.jpg'
+import gfhTractorThumb from '../assets/work/plantation/gfh-tractor-800.jpg'
+import gfhTractorFull from '../assets/work/plantation/gfh-tractor-1440.jpg'
+import plantationTeamThumb from '../assets/work/plantation/plantation-team-800.jpg'
+import plantationTeamFull from '../assets/work/plantation/plantation-team-1600.jpg'
 import whiteCardThumb from '../assets/work/builder-clean/white-card-800.jpg'
 import whiteCardFull from '../assets/work/builder-clean/white-card-1600.jpg'
 import lpcMaterialsThumb from '../assets/publications/lpc/lpc-materials-800.jpg'
 import lpcMaterialsFull from '../assets/publications/lpc/lpc-materials-1600.jpg'
 import websiteShowcaseThumb from '../assets/projects/website/website-showcase-800.jpg'
 import websiteShowcaseFull from '../assets/projects/website/website-showcase-1600.jpg'
+import plannerDailyThumb from '../assets/projects/website/planner-daily-400.jpg'
+import plannerDailyFull from '../assets/projects/website/planner-daily-1170.jpg'
+import plannerMidThumb from '../assets/projects/website/planner-mid-400.jpg'
+import plannerMidFull from '../assets/projects/website/planner-mid-1170.jpg'
+import plannerLongThumb from '../assets/projects/website/planner-long-400.jpg'
+import plannerLongFull from '../assets/projects/website/planner-long-1170.jpg'
 
 export const profile = {
   name: 'Yuan Li',
@@ -61,6 +75,7 @@ export const about = [
 // showcase: optional preview at the bottom of the card: { label, note, image,
 //   imageFull, alt, caption, icon }. With an image it opens the lightbox and
 //   the card spans the full row; without one it shows a small placeholder.
+// media: optional screenshots (same format as Experience media below)
 // links: optional [{ label, url }]
 export const projects = [
   {
@@ -83,6 +98,21 @@ export const projects = [
       alt: 'Yuan Li with team members during the TCASS client project',
       caption: 'TCASS Project Team',
     },
+    // Staff names obscured in the screenshots
+    media: [
+      {
+        image: tcassOverviewThumb,
+        imageFull: tcassOverviewFull,
+        alt: 'Power BI Overview page of the TCASS manual handling report, showing task totals, difficulty and pain rates, equipment usage, task trends and common transfer paths, with staff names obscured',
+        caption: 'Overview dashboard (staff names obscured)',
+      },
+      {
+        image: tcassOperationsThumb,
+        imageFull: tcassOperationsFull,
+        alt: 'Power BI Operations & Risk Analysis page showing task frequency by hour, tasks by day, difficulty by task type and patient movement flow',
+        caption: 'Operations & Risk Analysis dashboard',
+      },
+    ],
   },
   // Only confirmed facts so far. To add once Yuan confirms: project outcomes,
   // other tools used, and real photos (set showcase.image / imageFull / alt).
@@ -127,10 +157,39 @@ export const projects = [
       label: 'Live site',
       image: websiteShowcaseThumb,
       imageFull: websiteShowcaseFull,
-      alt: 'Screenshots of this website: the portfolio home page on desktop and the Planner unlock screen on mobile',
+      alt: 'Screenshots of this website: the portfolio home page on desktop and the unlocked Planner (sample data) on mobile',
       caption: 'Personal Portfolio & Planner Website — yuanli-au.github.io',
       note: 'yuanli-au.github.io',
     },
+    // Captured from an isolated demo build with sample data (no real tasks).
+    // tall: the lightbox shows the long screenshot at phone width and scrolls.
+    // shortCaption: thumbnail label on phones (the lightbox keeps caption).
+    media: [
+      {
+        image: plannerDailyThumb,
+        imageFull: plannerDailyFull,
+        alt: 'Full-page mobile screenshot of the unlocked Planner showing the Daily plan with sample data',
+        caption: 'Daily Planner · sample data',
+        shortCaption: 'Daily',
+        tall: true,
+      },
+      {
+        image: plannerMidThumb,
+        imageFull: plannerMidFull,
+        alt: 'Full-page mobile screenshot of the unlocked Planner showing the Mid-term plan with sample data',
+        caption: 'Mid-term Planner · sample data',
+        shortCaption: 'Mid-term',
+        tall: true,
+      },
+      {
+        image: plannerLongThumb,
+        imageFull: plannerLongFull,
+        alt: 'Full-page mobile screenshot of the unlocked Planner showing the Long-term plan with sample data',
+        caption: 'Long-term Planner · sample data',
+        shortCaption: 'Long-term',
+        tall: true,
+      },
+    ],
   },
 ]
 
@@ -139,6 +198,7 @@ const plantationTeamWork =
   'Led the team in drip-irrigation pipe repairs, tree pruning, weeding and vine removal, pesticide spraying of trees, planting new trees, and manual removal of unwanted trees as directed by the farm'
 
 // area: short label showing which part of the background this role covers
+// links: optional [{ label, url }] shown under the points (opens in a new tab)
 // media: work photos or certificates for any role, shown as small click-to-
 //   enlarge thumbnails: [{ image, imageFull, alt, caption }]. An empty list
 //   shows nothing. Obscure card numbers, signatures and internal data first.
@@ -300,7 +360,14 @@ export const experience = [
       'Supervised a labour-hire team on a sandalwood plantation, allocating tasks according to the host farm’s work plans',
       plantationTeamWork,
     ],
-    media: [],
+    media: [
+      {
+        image: gfhTractorThumb,
+        imageFull: gfhTractorFull,
+        alt: 'Yuan Li with two co-workers in front of a tractor on a GFH sandalwood plantation',
+        caption: 'On site at a GFH sandalwood plantation',
+      },
+    ],
   },
   {
     role: 'YouTube Content Creator',
@@ -311,8 +378,9 @@ export const experience = [
     accent: 'coral',
     points: [
       'Ran content planning, filming, editing and audience engagement end to end',
-      'Reached approximately 27,000 subscribers at its peak; around 24,000 remain after more than three years of inactivity',
+      'Reached approximately 27,000 subscribers at its peak; approximately 22.4K subscribers currently, with no new content for more than three years',
     ],
+    links: [{ label: 'YouTube channel', url: 'https://www.youtube.com/@qingganrexian' }],
     media: [],
   },
   {
@@ -328,7 +396,14 @@ export const experience = [
       'Carried out simple repairs and routine oil changes on team vehicles; sourced and purchased parts and replaced faulty components',
       'Organised drinking water and rest breaks for work in high heat, and promptly reported injuries and safety hazards',
     ],
-    media: [],
+    media: [
+      {
+        image: plantationTeamThumb,
+        imageFull: plantationTeamFull,
+        alt: 'Yuan Li with members of the plantation work team in high-visibility workwear, Douglas Daly',
+        caption: 'Plantation work team · Douglas Daly',
+      },
+    ],
   },
   {
     role: 'Tmall Store Operations',
