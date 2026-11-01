@@ -14,7 +14,7 @@ export default function Projects() {
             key={project.title}
             className={`card accent-${project.accent}${
               project.showcase?.image || project.previews ? ' card-wide' : ''
-            }`}
+            }${project.certificate ? ' has-cert' : ''}`}
           >
             {project.image && (
               <img src={project.image} alt={`${project.title} screenshot`} className="card-image" />
@@ -50,6 +50,24 @@ export default function Projects() {
               </div>
             )}
             <ExperienceMedia items={project.media} className="exp-media-screens" />
+            {project.certificate && (
+              // Proof of the project, shown large: full A4 preview (click to
+              // enlarge) with the issuer, date and the original PDF
+              <figure className="card-cert">
+                <MediaSlot
+                  {...project.certificate}
+                  image={project.certificate.imageFull}
+                  className="card-cert-img"
+                />
+                <figcaption>
+                  <span className="card-cert-title">{project.certificate.issuer}</span>
+                  <span className="muted">{project.certificate.issued}</span>
+                  <a href={project.certificate.pdf} target="_blank" rel="noreferrer">
+                    View PDF ↗
+                  </a>
+                </figcaption>
+              </figure>
+            )}
             <Tags items={project.tags} />
             {project.links?.length > 0 && (
               <p className="card-links">

@@ -32,6 +32,8 @@ import plantationTeamThumb from '../assets/work/plantation/plantation-team-800.j
 import plantationTeamFull from '../assets/work/plantation/plantation-team-1600.jpg'
 import whiteCardThumb from '../assets/work/builder-clean/white-card-800.jpg'
 import whiteCardFull from '../assets/work/builder-clean/white-card-1600.jpg'
+import treescapeCertThumb from '../assets/projects/treescape/internship-certificate-600.jpg'
+import treescapeCertFull from '../assets/projects/treescape/internship-certificate-1400.jpg'
 import ntsVideo from '../assets/work/nts/nts-site-framing.mp4'
 import ntsVideoPoster from '../assets/work/nts/nts-site-framing-poster.jpg'
 import youtubeChannelThumb from '../assets/work/youtube/youtube-channel-800.jpg'
@@ -61,11 +63,13 @@ export const about = [
   {
     heading: 'Engineering & operations background',
     accent: 'orange',
+    map: 'china', // background outline (components/portfolio/mapOutlines.js)
     text: 'I hold a Bachelor of Engineering in Material Forming and Control Engineering, and my qualifications have been assessed by Engineers Australia. In Australia I have gained hands-on experience across labour-hire team supervision, farm and plantation operations, construction sites and commercial cleaning, including delivering cleaning services as a subcontractor. This work has built my skills in team coordination, site management and problem-solving, and my ability to run work independently.',
   },
   {
     heading: 'Technology, data & business skills',
     accent: 'teal',
+    map: 'australia',
     text: 'I have completed all coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026. My skills cover data analysis, Power BI reporting and visualisation, Power Apps development and software development, and I have worked on a real-world business data analytics project. I also bring experience in finance-related work, book editing and publishing, e-commerce operations, digital content production and social media channel management, and I apply technical knowledge to practical business needs.',
   },
 ]
@@ -80,6 +84,8 @@ export const about = [
 //   label: [{ label, image, imageFull, alt, caption, tall }]; the card spans
 //   the full row.
 // media: optional screenshots (same format as Experience media below)
+// certificate: optional proof document { title, image, imageFull, alt, caption,
+//   issuer, issued, pdf }, shown large under the points
 // links: optional [{ label, url }]
 export const projects = [
   {
@@ -118,8 +124,6 @@ export const projects = [
       },
     ],
   },
-  // Only confirmed facts so far. To add once Yuan confirms: project outcomes,
-  // other tools used, and real photos (set showcase.image / imageFull / alt).
   {
     title: 'Singapore Internship Project — SS 724 Bilingual Training Content',
     accent: 'teal',
@@ -131,10 +135,16 @@ export const projects = [
       'Produced training videos and built quizzes in WP Courseware',
     ],
     tags: ['WP Courseware', 'WordPress', 'Training content', 'Video production', 'English / Chinese'],
-    showcase: {
-      label: 'Project photos',
-      note: 'Coming soon',
-      icon: 'book',
+    // Issued by Treescape; shown in full with Yuan's permission
+    certificate: {
+      title: 'Internship Certificate',
+      image: treescapeCertThumb,
+      imageFull: treescapeCertFull,
+      alt: 'Treescape Power Pte Ltd Internship Certificate issued to Yuan Li, 21 April 2026',
+      caption: 'Internship Certificate — Treescape Power Pte Ltd, 21 April 2026',
+      issuer: 'Treescape Power Pte Ltd',
+      issued: 'Issued 21 April 2026',
+      pdf: `${import.meta.env.BASE_URL}certificates/treescape-internship-certificate.pdf`,
     },
   },
   {
@@ -185,6 +195,10 @@ const plantationTeamWork =
   'Led the team in drip-irrigation pipe repairs, tree pruning, weeding and vine removal, pesticide spraying of trees, planting new trees, and manual removal of unwanted trees as directed by the farm'
 
 // area: short label showing which part of the background this role covers
+// brief: one-sentence summary shown on the collapsed card
+// cover: picture on the collapsed card — an existing image { image, position?,
+//   video? } (it stays in the details too) or, without a suitable photo, a
+//   simple graphic { icon, lines } using facts from the role itself
 // links: optional [{ label, url }] shown under the points (opens in a new tab)
 // positions: optional, in place of points — separate roles grouped under one
 //   entry, each kept with its own details: [{ title, org, location, period, points }]
@@ -201,6 +215,8 @@ const plantationTeamWork =
 export const experience = [
   {
     role: 'Finance Assistant — Timesheet Verification',
+    brief: 'Verifying staff timesheets and leave records before entry into TechnologyOne CiAnywhere.',
+    cover: { icon: 'document', lines: ['Timesheet verification', 'TechnologyOne CiAnywhere'] },
     org: 'OLSH Thamarrurr Catholic College',
     location: 'Wadeye, NT · Remote since Feb 2026',
     period: 'Oct 2025 – Present (part-time)',
@@ -218,20 +234,9 @@ export const experience = [
     media: [],
   },
   {
-    role: 'Intern — Content Development & LMS',
-    org: 'Treescape Power Pte Ltd',
-    location: 'Singapore (remote)',
-    period: 'Jan 2026 – Apr 2026',
-    area: 'Content · LMS',
-    accent: 'purple',
-    points: [
-      'Developed English and Chinese training content for all 8 modules of Singapore Standard SS 724',
-      'Produced training videos and built quizzes in WP Courseware',
-    ],
-    media: [],
-  },
-  {
     role: 'Cleaning Subcontractor — Regina Cleaning Service',
+    brief: 'Subcontracted cleaning across Wadeye and Darwin sites, including RAAF facilities and Darwin Port.',
+    cover: { image: pitchBlackCertThumb },
     org: 'NT Cleaning & Maintenance Services (own business)',
     location: 'Wadeye & Darwin, NT',
     period: '2024 – 2026',
@@ -289,6 +294,8 @@ export const experience = [
   },
   {
     role: 'LPC Assistant — Publishing & Design',
+    brief: 'Desktop publishing of primary-school reading books with local Aboriginal colleagues.',
+    cover: { image: lpcPublicationsThumb },
     org: 'Literature Production Centre (LPC), OLSH Thamarrurr Catholic College',
     location: 'Wadeye, NT',
     period: 'Jun 2024 – Feb 2026',
@@ -335,6 +342,8 @@ export const experience = [
   },
   {
     role: 'Construction Labourer',
+    brief: 'Assisted with external wall framing and a 138-room refurbishment in Darwin.',
+    cover: { image: ntsVideoPoster, video: true, position: 'center 40%' },
     org: 'Northern Trade Solutions',
     location: 'Berrimah Farm & Defence Accommodation Precinct, Darwin, NT',
     period: 'Late 2023 – Early 2024',
@@ -357,6 +366,8 @@ export const experience = [
   // Two separate labour-hire roles, each with its own employer, place and dates
   {
     role: 'Farm & Plantation Operations — Katherine & Douglas Daly',
+    brief: 'Worked across sandalwood plantation operations in Katherine and Douglas Daly, including team supervision and field operations.',
+    cover: { image: plantationTeamThumb, position: 'center 35%' },
     org: 'GFH Enterprises Pty Ltd · Big Plantation Pty Ltd',
     location: 'Northern Territory',
     period: 'Apr 2023 – Oct 2023 · Jun 2019 – Feb 2020',
@@ -403,6 +414,8 @@ export const experience = [
   },
   {
     role: 'YouTube Content Creator',
+    brief: 'Built a Chinese-language channel to about 27,000 subscribers at its peak.',
+    cover: { image: youtubeChannelThumb, position: '12% center' },
     org: 'Self-employed',
     location: 'China',
     period: 'Jun 2022 – Sep 2022 (main activity)',
@@ -426,6 +439,8 @@ export const experience = [
   // Two stages: own Taobao store (2012 – 2016) and a Tmall store role (2015 – 2016)
   {
     role: 'E-commerce Operations — Taobao & Tmall',
+    brief: 'Ran my own Taobao store and operated a Tmall store selling oil paintings.',
+    cover: { icon: 'chart', lines: ['≈12,000 transactions', '≈RMB 300,000 avg. monthly store sales'] },
     org: 'Own Taobao store · Hengmei Oil Painting (Tmall store)',
     location: 'China',
     period: '2012 – 2016',

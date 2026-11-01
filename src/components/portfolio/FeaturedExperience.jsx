@@ -3,26 +3,37 @@ import MediaSlot from './MediaSlot.jsx'
 
 // Larger presentation for roles with real work evidence: logo, publication
 // gallery and/or numbered work highlights. Content comes from resume.js.
-export default function FeaturedExperience({ job }) {
+// headless: details only (inside an Experience card whose summary already
+// shows the role, organisation and dates); the logo is kept.
+export default function FeaturedExperience({ job, headless = false }) {
+  const Root = headless ? 'div' : 'article'
+
   return (
-    <article className="featured">
-      <header className="featured-head">
-        <div>
-          <div className="timeline-meta">
-            <span className="timeline-area">{job.area}</span>
-            {job.period && <span className="timeline-period">{job.period}</span>}
-          </div>
-          <h3>{job.role}</h3>
-          <p className="timeline-org">
-            {job.org} <span className="muted">· {job.location}</span>
-          </p>
+    <Root className={headless ? 'featured featured-headless' : 'featured'}>
+      {headless && job.logo && (
+        <div className="logo-tile logo-tile-lg featured-logo">
+          <img src={job.logo} alt={job.logoAlt} />
         </div>
-        {job.logo && (
-          <div className="logo-tile logo-tile-lg">
-            <img src={job.logo} alt={job.logoAlt} />
+      )}
+      {!headless && (
+        <header className="featured-head">
+          <div>
+            <div className="timeline-meta">
+              <span className="timeline-area">{job.area}</span>
+              {job.period && <span className="timeline-period">{job.period}</span>}
+            </div>
+            <h3>{job.role}</h3>
+            <p className="timeline-org">
+              {job.org} <span className="muted">· {job.location}</span>
+            </p>
           </div>
-        )}
-      </header>
+          {job.logo && (
+            <div className="logo-tile logo-tile-lg">
+              <img src={job.logo} alt={job.logoAlt} />
+            </div>
+          )}
+        </header>
+      )}
 
       <div
         className={
@@ -75,6 +86,6 @@ export default function FeaturedExperience({ job }) {
           </ol>
         </div>
       )}
-    </article>
+    </Root>
   )
 }
