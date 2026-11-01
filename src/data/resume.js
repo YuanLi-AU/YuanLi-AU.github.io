@@ -186,6 +186,8 @@ const plantationTeamWork =
 
 // area: short label showing which part of the background this role covers
 // links: optional [{ label, url }] shown under the points (opens in a new tab)
+// positions: optional, in place of points — separate roles grouped under one
+//   entry, each kept with its own details: [{ title, org, location, period, points }]
 // media: work photos or certificates for any role, shown as small click-to-
 //   enlarge thumbnails: [{ image, imageFull, alt, caption }]. An empty list
 //   shows nothing. Obscure card numbers, signatures and internal data first.
@@ -352,16 +354,37 @@ export const experience = [
       },
     ],
   },
+  // Two separate labour-hire roles, each with its own employer, place and dates
   {
-    role: 'Labour-hire Supervisor',
-    org: 'GFH Enterprises Pty Ltd',
-    location: 'Katherine, NT',
-    period: 'Apr 2023 – Oct 2023',
+    role: 'Farm & Plantation Operations — Katherine & Douglas Daly',
+    org: 'GFH Enterprises Pty Ltd · Big Plantation Pty Ltd',
+    location: 'Northern Territory',
+    period: 'Apr 2023 – Oct 2023 · Jun 2019 – Feb 2020',
     area: 'Site Supervision · Agriculture',
     accent: 'orange',
-    points: [
-      'Supervised a labour-hire team on a sandalwood plantation, allocating tasks according to the host farm’s work plans',
-      plantationTeamWork,
+    positions: [
+      {
+        title: 'Labour-hire Supervisor',
+        org: 'GFH Enterprises Pty Ltd',
+        location: 'Katherine, NT',
+        period: 'Apr 2023 – Oct 2023',
+        points: [
+          'Supervised a labour-hire team on a sandalwood plantation, allocating tasks according to the host farm’s work plans',
+          plantationTeamWork,
+        ],
+      },
+      {
+        title: 'Labour-hire Supervisor',
+        org: 'Big Plantation Pty Ltd',
+        location: 'Douglas Daly, NT',
+        period: 'Jun 2019 – Feb 2020',
+        points: [
+          'Supervised a labour-hire team of up to 20 workers on a sandalwood plantation, allocating tasks according to the host farm’s instructions',
+          plantationTeamWork,
+          'Carried out simple repairs and routine oil changes on team vehicles; sourced and purchased parts and replaced faulty components',
+          'Organised drinking water and rest breaks for work in high heat, and promptly reported injuries and safety hazards',
+        ],
+      },
     ],
     media: [
       {
@@ -369,6 +392,12 @@ export const experience = [
         imageFull: gfhTractorFull,
         alt: 'Yuan Li with two co-workers in front of a tractor on a GFH sandalwood plantation',
         caption: 'On site at a GFH sandalwood plantation',
+      },
+      {
+        image: plantationTeamThumb,
+        imageFull: plantationTeamFull,
+        alt: 'Yuan Li with members of the plantation work team in high-visibility workwear, Douglas Daly',
+        caption: 'Plantation work team · Douglas Daly',
       },
     ],
   },
@@ -394,60 +423,43 @@ export const experience = [
       },
     ],
   },
+  // Two stages: own Taobao store (2012 – 2016) and a Tmall store role (2015 – 2016)
   {
-    role: 'Labour-hire Supervisor',
-    org: 'Big Plantation Pty Ltd',
-    location: 'Douglas Daly, NT',
-    period: 'Jun 2019 – Feb 2020',
-    area: 'Site Supervision · Agriculture',
-    accent: 'orange',
-    points: [
-      'Supervised a labour-hire team of up to 20 workers on a sandalwood plantation, allocating tasks according to the host farm’s instructions',
-      plantationTeamWork,
-      'Carried out simple repairs and routine oil changes on team vehicles; sourced and purchased parts and replaced faulty components',
-      'Organised drinking water and rest breaks for work in high heat, and promptly reported injuries and safety hazards',
-    ],
-    media: [
-      {
-        image: plantationTeamThumb,
-        imageFull: plantationTeamFull,
-        alt: 'Yuan Li with members of the plantation work team in high-visibility workwear, Douglas Daly',
-        caption: 'Plantation work team · Douglas Daly',
-      },
-    ],
-  },
-  {
-    role: 'Tmall Store Operations',
-    org: 'Hengmei Oil Painting (Tmall store)',
-    location: 'China',
-    period: 'Aug 2015 – Mar 2016',
-    area: 'Business · E-commerce',
-    accent: 'coral',
-    points: [
-      'Ran the day-to-day operations of a Tmall online store selling oil paintings, managing them independently',
-      'Designed product images and visual content, and handled customer service and order processing',
-      'The store averaged approximately RMB 300,000 in monthly sales',
-    ],
-    media: [],
-  },
-  {
-    role: 'Taobao Store Owner',
-    org: 'Self-employed',
+    role: 'E-commerce Operations — Taobao & Tmall',
+    org: 'Own Taobao store · Hengmei Oil Painting (Tmall store)',
     location: 'China',
     period: '2012 – 2016',
     area: 'Business · E-commerce',
     accent: 'coral',
-    points: [
-      'Ran my own online store independently',
-      'Compared suppliers, purchased products, fulfilled customer orders and handled customer communication',
-      'Completed approximately 12,000 transactions in total',
+    positions: [
+      {
+        title: 'Taobao Store Owner',
+        org: 'Self-employed',
+        location: 'China',
+        period: '2012 – 2016',
+        points: [
+          'Ran my own online store independently',
+          'Compared suppliers, purchased products, fulfilled customer orders and handled customer communication',
+          'Completed approximately 12,000 transactions in total',
+        ],
+      },
+      {
+        title: 'Tmall Store Operations',
+        org: 'Hengmei Oil Painting (Tmall store)',
+        location: 'China',
+        period: 'Aug 2015 – Mar 2016',
+        points: [
+          'Ran the day-to-day operations of a Tmall online store selling oil paintings, managing them independently',
+          'Designed product images and visual content, and handled customer service and order processing',
+          'The store averaged approximately RMB 300,000 in monthly sales',
+        ],
+      },
     ],
     media: [],
   },
 ]
 
-// Shorter roles, shown as a compact list under the main timeline.
-// org / location are optional; media works the same as above.
+// Earlier and shorter roles. Not shown on the page (kept for reference).
 export const earlierExperience = [
   {
     role: 'Shed Machine Operator',
@@ -504,7 +516,7 @@ export const earlierExperience = [
   },
 ]
 
-// Short note shown below the Earlier Experience list
+// Not shown on the page (kept for reference)
 export const careerBackground = {
   heading: 'Career Background',
   text: 'During my early years working in Australia on a Working Holiday visa, I gained hands-on experience across agriculture, construction, production and site operations. Some roles were short-term or undertaken concurrently, including a mix of full-time and part-time work.',

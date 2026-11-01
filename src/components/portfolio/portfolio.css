@@ -1188,79 +1188,42 @@
   }
 }
 
-/* ---------- Earlier experience (compact list under the timeline) ---------- */
-.earlier {
-  margin-top: 8px;
-  padding: 24px 28px;
-  background: var(--surface);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+/* ---------- Grouped positions inside one timeline entry ---------- */
+.positions {
+  margin-top: 14px;
 }
 
-.earlier-list {
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.position + .position {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px dashed var(--border);
 }
 
-.earlier-item + .earlier-item {
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid var(--border);
-}
-
-.earlier-head {
+.position-head {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
-  justify-content: space-between;
-  gap: 4px 16px;
+  gap: 2px 12px;
 }
 
-.section .earlier-head h3 {
+.position-head h4 {
+  margin: 0;
   font-size: 1rem;
+  color: var(--text-h);
 }
 
-.earlier-head .timeline-period {
+.position-head .timeline-period {
   font-size: 0.85rem;
 }
 
-.earlier-org {
+.position-org {
   margin: 2px 0 0;
   font-size: 0.92rem;
   color: var(--text-muted);
 }
 
-.earlier .points {
+.position .points {
   margin-top: 8px;
-  font-size: 0.95rem;
-}
-
-.career-note {
-  margin-top: 22px;
-  padding-top: 18px;
-  border-top: 1px solid var(--border);
-}
-
-.career-note .mini-heading {
-  margin-bottom: 8px;
-}
-
-.career-note p {
-  margin: 0;
-  max-width: 80ch;
-  font-size: 0.92rem;
-  color: var(--text-muted);
-}
-
-@media (max-width: 600px) {
-  .earlier {
-    padding: 20px;
-  }
-
-  .earlier-head {
-    flex-direction: column;
-  }
 }
 
 /* ---------- Work highlights ---------- */
