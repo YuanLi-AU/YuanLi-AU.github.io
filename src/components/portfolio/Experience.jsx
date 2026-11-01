@@ -2,12 +2,12 @@ import { useState } from 'react'
 import { experience } from '../../data/resume.js'
 import ExperienceMedia from './ExperienceMedia.jsx'
 import FeaturedExperience from './FeaturedExperience.jsx'
-import Icon from './Icon.jsx'
 import Section from './Section.jsx'
 import useReveal from './useReveal.js'
 
-// Full details of a regular role (shown when its card is expanded)
-function JobDetails({ job }) {
+// Full details of a regular role (shown when its card is expanded).
+// withMedia=false: the media is shown beside the text instead (layout 'side').
+function JobDetails({ job, withMedia = true }) {
   return (
     <>
       {job.points && (
@@ -47,39 +47,8 @@ function JobDetails({ job }) {
           ))}
         </p>
       )}
-      <ExperienceMedia items={job.media} />
+      {withMedia && <ExperienceMedia items={job.media} />}
     </>
-  )
-}
-
-// Picture on the collapsed card. It is part of the toggle button (decorative,
-// no zoom); the same images stay zoomable inside the expanded details.
-function Cover({ cover }) {
-  if (cover.image) {
-    return (
-      <span className="xp-cover">
-        <img
-          src={cover.image}
-          alt=""
-          loading="lazy"
-          decoding="async"
-          style={cover.position ? { objectPosition: cover.position } : undefined}
-        />
-        {cover.video && <span className="xp-cover-video">Video</span>}
-      </span>
-    )
-  }
-  return (
-    <span className="xp-cover xp-cover-graphic">
-      <span className="xp-cover-icon">
-        <Icon name={cover.icon} size={30} />
-      </span>
-      {cover.lines.map((line) => (
-        <span key={line} className="xp-cover-line">
-          {line}
-        </span>
-      ))}
-    </span>
   )
 }
 
@@ -88,9 +57,9 @@ export default function Experience() {
   // All roles open at first; each can be collapsed / reopened
   const [open, setOpen] = useState(() => new Set(experience.map((job) => `${job.role}-${job.org}`)))
 
-  const toggle = (key, bodyId) => {
+  const toggle = (key, card) => {
     const closing = open.has(key)
-    if (closing) document.getElementById(bodyId)?.querySelectorAll('video').forEach((v) => v.pause())
+    if (closing) card.querySelectorAll('video').forEach((v) => v.pause())
     setOpen((prev) => {
       const next = new Set(prev)
       if (closing) next.delete(key)
@@ -107,6 +76,7 @@ export default function Experience() {
             const key = `${job.role}-${job.org}`
             const isOpen = open.has(key)
             const id = `xp-${i}`
+            const side = job.layout === 'side'
             return (
               // The li's class must stay constant: useReveal adds is-visible to it
               <li key={key} className={`timeline-item accent-${job.accent}`}>
@@ -115,39 +85,48 @@ export default function Experience() {
                   {job.period}
                 </span>
                 <span className="xp-node" aria-hidden="true" />
-                <div className={isOpen ? 'xp-card is-open' : 'xp-card'}>
+                <div className={`xp-card${isOpen ? ' is-open' : ''}${side ? ' xp-side' : ''}${job.logo ? ' has-logo' : ''}`}>
                   <h3 className="xp-head">
                     <button
                       type="button"
                       className="xp-toggle"
                       id={`${id}-toggle`}
                       aria-expanded={isOpen}
-                      aria-controls={`${id}-body`}
-                      onClick={() => toggle(key, `${id}-body`)}
+                      aria-controls={side ? `${id}-body ${id}-media` : `${id}-body`}
+                      onClick={(e) => toggle(key, e.currentTarget.closest('.xp-card'))}
                     >
-                      {job.cover && <Cover cover={job.cover} />}
-                      <span className="xp-summary">
-                        <span className="xp-meta">
-                          <span className="timeline-area">{job.area}</span>
-                          <span className="timeline-period">{job.period}</span>
-                        </span>
-                        <span className="xp-role">{job.role}</span>
-                        <span className="xp-org">
-                          {job.org} · {job.location}
-                        </span>
-                        <span className="xp-brief">{job.brief}</span>
+                      {/* Phones: date on top of the card (desktop: left column) */}
+                      <span className="xp-period">{job.period}</span>
+                      <span className="xp-role">{job.role}</span>
+                      <span className="xp-org">
+                        {job.org} · {job.location}
                       </span>
                       <span className="xp-chevron" aria-hidden="true" />
                     </button>
                   </h3>
+                  {job.logo && (
+                    <span className="logo-tile xp-logo">
+                      <img src={job.logo} alt={job.logoAlt} />
+                    </span>
+                  )}
                   {/* Collapsed details stay in the page but are inert (no focus) */}
                   <div className="xp-body" id={`${id}-body`} inert={!isOpen}>
                     <div className="xp-body-inner">
                       <div className="xp-details">
-                        {job.featured ? <FeaturedExperience job={job} headless /> : <JobDetails job={job} />}
+                        {job.featured ? (
+                          <FeaturedExperience job={job} headless />
+                        ) : (
+                          <JobDetails job={job} withMedia={!side} />
+                        )}
                       </div>
                     </div>
                   </div>
+                  {side && (
+                    // Desktop: beside the text; phones: below it
+                    <div className="xp-side-media" id={`${id}-media`} inert={!isOpen}>
+                      <ExperienceMedia items={job.media} />
+                    </div>
+                  )}
                 </div>
               </li>
             )

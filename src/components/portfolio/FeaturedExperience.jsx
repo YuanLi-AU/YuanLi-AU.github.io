@@ -3,18 +3,13 @@ import MediaSlot from './MediaSlot.jsx'
 
 // Larger presentation for roles with real work evidence: logo, publication
 // gallery and/or numbered work highlights. Content comes from resume.js.
-// headless: details only (inside an Experience card whose summary already
-// shows the role, organisation and dates); the logo is kept.
+// headless: details only (inside an Experience card, which shows the role,
+// organisation, dates and logo itself).
 export default function FeaturedExperience({ job, headless = false }) {
   const Root = headless ? 'div' : 'article'
 
   return (
     <Root className={headless ? 'featured featured-headless' : 'featured'}>
-      {headless && job.logo && (
-        <div className="logo-tile logo-tile-lg featured-logo">
-          <img src={job.logo} alt={job.logoAlt} />
-        </div>
-      )}
       {!headless && (
         <header className="featured-head">
           <div>

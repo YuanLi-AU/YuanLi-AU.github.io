@@ -61,13 +61,13 @@ export const profile = {
 
 export const about = [
   {
-    heading: 'Engineering & operations background',
+    heading: 'Engineering & Operations Background',
     accent: 'orange',
     map: 'china', // background outline (components/portfolio/mapOutlines.js)
     text: 'I hold a Bachelor of Engineering in Material Forming and Control Engineering, and my qualifications have been assessed by Engineers Australia. In Australia I have gained hands-on experience across labour-hire team supervision, farm and plantation operations, construction sites and commercial cleaning, including delivering cleaning services as a subcontractor. This work has built my skills in team coordination, site management and problem-solving, and my ability to run work independently.',
   },
   {
-    heading: 'Technology, data & business skills',
+    heading: 'Technology, Data & Business Skills',
     accent: 'teal',
     map: 'australia',
     text: 'I have completed all coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026. My skills cover data analysis, Power BI reporting and visualisation, Power Apps development and software development, and I have worked on a real-world business data analytics project. I also bring experience in finance-related work, book editing and publishing, e-commerce operations, digital content production and social media channel management, and I apply technical knowledge to practical business needs.',
@@ -190,16 +190,13 @@ export const projects = [
   },
 ]
 
-// Shared by both plantation roles (team work led on the host farm's instructions)
+// Field work led on the host farm's instructions (Katherine role)
 const plantationTeamWork =
-  'Led the team in drip-irrigation pipe repairs, tree pruning, weeding and vine removal, pesticide spraying of trees, planting new trees, and manual removal of unwanted trees as directed by the farm'
+  'Led the team in drip-irrigation pipe repairs, tree pruning, weeding and vine removal, pesticide spraying, planting new trees and manual removal of unwanted trees'
 
 // area: short label showing which part of the background this role covers
-// brief: one-sentence summary shown on the collapsed card
-// cover: picture on the collapsed card — an existing image { image, position?,
-//   video? } (it stays in the details too) or, without a suitable photo, a
-//   simple graphic { icon, lines } using facts from the role itself
 // links: optional [{ label, url }] shown under the points (opens in a new tab)
+// layout: 'side' puts the role's media beside the text on desktop
 // positions: optional, in place of points — separate roles grouped under one
 //   entry, each kept with its own details: [{ title, org, location, period, points }]
 // media: work photos or certificates for any role, shown as small click-to-
@@ -215,28 +212,20 @@ const plantationTeamWork =
 export const experience = [
   {
     role: 'Finance Assistant — Timesheet Verification',
-    brief: 'Verifying staff timesheets and leave records before entry into TechnologyOne CiAnywhere.',
-    cover: { icon: 'document', lines: ['Timesheet verification', 'TechnologyOne CiAnywhere'] },
     org: 'OLSH Thamarrurr Catholic College',
     location: 'Wadeye, NT · Remote since Feb 2026',
     period: 'Oct 2025 – Present (part-time)',
     area: 'Finance · Administration',
     accent: 'teal',
     points: [
-      'Check staff handwritten timesheets and leave records',
-      'Prepare weekly Excel summaries of verified hours',
-      'Check leave balances and follow up discrepancies with staff and the Finance Officer',
-      'Check leave categories against the applicable leave rules, and review overtime and back-pay records',
-      'Report missing, inactive or incorrectly numbered staff records to the Finance Officer',
-      'Enter verified timesheets into TechnologyOne CiAnywhere',
-      'Complete two final checks after data entry to help ensure staff are paid accurately',
+      'Verify handwritten timesheets, leave records and balances, checking leave categories, overtime and back pay against the applicable rules',
+      'Prepare weekly Excel summaries and enter verified timesheets into TechnologyOne CiAnywhere, with two final checks to help ensure staff are paid accurately',
+      'Follow up discrepancies, and missing, inactive or incorrectly numbered staff records, with staff and the Finance Officer',
     ],
     media: [],
   },
   {
     role: 'Cleaning Subcontractor — Regina Cleaning Service',
-    brief: 'Subcontracted cleaning across Wadeye and Darwin sites, including RAAF facilities and Darwin Port.',
-    cover: { image: pitchBlackCertThumb },
     org: 'NT Cleaning & Maintenance Services (own business)',
     location: 'Wadeye & Darwin, NT',
     period: '2024 – 2026',
@@ -245,13 +234,10 @@ export const experience = [
     featured: true,
     logo: ntcmsLogo,
     logoAlt: 'NT Cleaning & Maintenance Services logo',
-    summary:
-      'Worked as a subcontractor to Regina Cleaning Service, trading under my own business name, NT Cleaning & Maintenance Services.',
     points: [
-      'Led a cleaning team of 4–5 people in Darwin',
-      'Trained new cleaners on site routines and workflows',
+      'Led a cleaning team of 4–5 people in Darwin and trained new cleaners on site routines',
+      'Cleaned construction sites, some RAAF facilities and Darwin Port (including vessel interiors), and the OLSH campus after school in Wadeye',
       'Prepared cleaning-supply order lists for the school facilities team in Wadeye',
-      'Work locations included multiple construction sites, some RAAF facilities and Darwin Port',
     ],
     highlights: [
       // Full pass shown with Yuan's confirmed permission from the relevant parties
@@ -279,23 +265,11 @@ export const experience = [
         alt: 'Western Australia Construction Induction (White Card) issued to Yuan Li, with the card number obscured',
         caption: 'Construction Induction (White Card) — card number obscured',
       },
-      {
-        title: 'After-school Campus Cleaning · Wadeye',
-        text: 'After-school campus cleaning at OLSH Thamarrurr Catholic College.',
-        icon: 'school',
-      },
-      {
-        title: 'Darwin Port & Vessel Cleaning',
-        text: 'Site cleaning at Darwin Port, including interior cleaning of vessels.',
-        icon: 'anchor',
-      },
     ],
     media: [],
   },
   {
     role: 'LPC Assistant — Publishing & Design',
-    brief: 'Desktop publishing of primary-school reading books with local Aboriginal colleagues.',
-    cover: { image: lpcPublicationsThumb },
     org: 'Literature Production Centre (LPC), OLSH Thamarrurr Catholic College',
     location: 'Wadeye, NT',
     period: 'Jun 2024 – Feb 2026',
@@ -303,13 +277,9 @@ export const experience = [
     accent: 'blue',
     featured: true,
     points: [
-      'Worked with local Aboriginal colleagues to produce reading books for primary school students',
-      'Page design and desktop publishing in Adobe InDesign and Photoshop',
-      'Laid out language text supplied by colleagues together with scanned children’s drawings',
-      'Handled typesetting, print production and binding',
-      'Main desktop publisher for 3 newly published books; updated and corrected nearly 20 existing titles',
-      'Built good rapport with local children during book production, and good, respectful working relationships with colleagues Cecil and Francella',
-      'Also gave colleagues day-to-day help with basic hardware, software and connectivity issues',
+      'Main desktop publisher, with local Aboriginal colleagues, for 3 newly published primary-school reading books; updated and corrected nearly 20 existing titles',
+      'Laid out language text and scanned children’s drawings in Adobe InDesign and Photoshop, through to print production and binding',
+      'Gave colleagues day-to-day help with basic hardware, software and connectivity issues',
       'Contributed as a volunteer before taking up the paid role',
     ],
     // Add only publication images confirmed suitable to publish
@@ -342,8 +312,7 @@ export const experience = [
   },
   {
     role: 'Construction Labourer',
-    brief: 'Assisted with external wall framing and a 138-room refurbishment in Darwin.',
-    cover: { image: ntsVideoPoster, video: true, position: 'center 40%' },
+    layout: 'side', // desktop: text left, the video right
     org: 'Northern Trade Solutions',
     location: 'Berrimah Farm & Defence Accommodation Precinct, Darwin, NT',
     period: 'Late 2023 – Early 2024',
@@ -352,7 +321,6 @@ export const experience = [
     points: [
       'Assisted with external wall framing at Berrimah Farm',
       'Assisted on a 138-room refurbishment at a Defence accommodation precinct: removing adhesive and residue, and laying ceiling acoustic insulation',
-      'On site for approximately two to three months',
     ],
     media: [
       {
@@ -366,8 +334,6 @@ export const experience = [
   // Two separate labour-hire roles, each with its own employer, place and dates
   {
     role: 'Farm & Plantation Operations — Katherine & Douglas Daly',
-    brief: 'Worked across sandalwood plantation operations in Katherine and Douglas Daly, including team supervision and field operations.',
-    cover: { image: plantationTeamThumb, position: 'center 35%' },
     org: 'GFH Enterprises Pty Ltd · Big Plantation Pty Ltd',
     location: 'Northern Territory',
     period: 'Apr 2023 – Oct 2023 · Jun 2019 – Feb 2020',
@@ -390,10 +356,9 @@ export const experience = [
         location: 'Douglas Daly, NT',
         period: 'Jun 2019 – Feb 2020',
         points: [
-          'Supervised a labour-hire team of up to 20 workers on a sandalwood plantation, allocating tasks according to the host farm’s instructions',
-          plantationTeamWork,
-          'Carried out simple repairs and routine oil changes on team vehicles; sourced and purchased parts and replaced faulty components',
-          'Organised drinking water and rest breaks for work in high heat, and promptly reported injuries and safety hazards',
+          'Supervised a labour-hire team of up to 20 workers on a sandalwood plantation, leading the same range of field work as directed by the farm',
+          'Carried out simple repairs and routine oil changes on team vehicles, and sourced and replaced faulty parts',
+          'Organised water and rest breaks for work in high heat, and promptly reported injuries and safety hazards',
         ],
       },
     ],
@@ -414,8 +379,7 @@ export const experience = [
   },
   {
     role: 'YouTube Content Creator',
-    brief: 'Built a Chinese-language channel to about 27,000 subscribers at its peak.',
-    cover: { image: youtubeChannelThumb, position: '12% center' },
+    layout: 'side', // desktop: text left, the screenshot right
     org: 'Self-employed',
     location: 'China',
     period: 'Jun 2022 – Sep 2022 (main activity)',
@@ -423,7 +387,7 @@ export const experience = [
     accent: 'coral',
     points: [
       'Ran content planning, filming, editing and audience engagement end to end',
-      'Reached approximately 27,000 subscribers at its peak; approximately 22.4K subscribers currently, with no new content for approximately four years',
+      'Reached approximately 27,000 subscribers at its peak; about 22.4K today, with no new content for about four years',
     ],
     links: [{ label: 'YouTube channel', url: 'https://www.youtube.com/@qingganrexian' }],
     media: [
@@ -431,7 +395,7 @@ export const experience = [
         image: youtubeChannelThumb,
         imageFull: youtubeChannelFull,
         alt: 'Header of the YouTube channel 情感热线 (@qingganrexian), showing the channel banner, about 22.4K subscribers and 30 videos',
-        caption: 'YouTube channel home page · approx. 22.4K subscribers, 30 videos',
+        caption: 'YouTube channel home page',
         objectPosition: '12% center',
       },
     ],
@@ -439,8 +403,6 @@ export const experience = [
   // Two stages: own Taobao store (2012 – 2016) and a Tmall store role (2015 – 2016)
   {
     role: 'E-commerce Operations — Taobao & Tmall',
-    brief: 'Ran my own Taobao store and operated a Tmall store selling oil paintings.',
-    cover: { icon: 'chart', lines: ['≈12,000 transactions', '≈RMB 300,000 avg. monthly store sales'] },
     org: 'Own Taobao store · Hengmei Oil Painting (Tmall store)',
     location: 'China',
     period: '2012 – 2016',
@@ -453,8 +415,7 @@ export const experience = [
         location: 'China',
         period: '2012 – 2016',
         points: [
-          'Ran my own online store independently',
-          'Compared suppliers, purchased products, fulfilled customer orders and handled customer communication',
+          'Ran my own online store: compared suppliers, purchased products, fulfilled orders and handled customer communication',
           'Completed approximately 12,000 transactions in total',
         ],
       },
@@ -464,8 +425,7 @@ export const experience = [
         location: 'China',
         period: 'Aug 2015 – Mar 2016',
         points: [
-          'Ran the day-to-day operations of a Tmall online store selling oil paintings, managing them independently',
-          'Designed product images and visual content, and handled customer service and order processing',
+          'Ran day-to-day operations of a Tmall store selling oil paintings, including product images, customer service and order processing',
           'The store averaged approximately RMB 300,000 in monthly sales',
         ],
       },

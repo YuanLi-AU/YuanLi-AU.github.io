@@ -9,7 +9,6 @@
 //   same outline. The map is drawn at width × height px; each row is
 //   lineHeight px tall and holds [left, right] — the widest span (px) inside
 //   the outline for that whole row, with a 6px inner margin — or null.
-// label: [x%, y%] point inside the outline for the heading on small screens
 
 export const MAP_OUTLINES = {
   china: {
@@ -31,7 +30,6 @@ export const MAP_OUTLINES = {
         rows: [null, null, [516, 594], [509, 623], [521, 668], [485, 634], [433, 635], [422, 602], [71, 339], [20, 487], [21, 485], [32, 501], [58, 504], [67, 512], [68, 510], [101, 517], [127, 528], [286, 518], [286, 507], [282, 490], [374, 438], null, null, null],
       },
     ],
-    label: [47.1, 44],
   },
   australia: {
     viewBox: '0 0 200 179.7',
@@ -52,6 +50,5 @@ export const MAP_OUTLINES = {
         rows: [null, null, [233, 293], [228, 292], [156, 321], [128, 348], [118, 438], [82, 469], [35, 480], [14, 498], [17, 513], [20, 525], [20, 529], [29, 532], [34, 527], [282, 521], [338, 503], [345, 497], [361, 488], [368, 481], null, null, null, null],
       },
     ],
-    label: [50.1, 48.7],
   },
 }

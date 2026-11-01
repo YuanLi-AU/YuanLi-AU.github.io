@@ -476,7 +476,6 @@
 
 .about-frame {
   position: relative;
-  container-type: inline-size;
 }
 
 .about-map {
@@ -493,19 +492,13 @@
   stroke-linejoin: round;
 }
 
-/* Heading placed on the map at a point inside the outline */
+/* Heading above its map (outside the outline) */
 .about-block h3 {
-  position: absolute;
-  top: calc(100cqw * var(--map-ratio) * var(--ly));
-  left: calc(100% * var(--lx));
-  max-width: 62%;
-  margin: 0;
-  transform: translate(-50%, -50%);
-  font-size: 0.8rem;
+  margin: 0 0 12px;
+  font-size: 15px;
+  font-weight: 700;
   line-height: 1.4;
-  letter-spacing: 0.08em;
-  text-align: center;
-  text-transform: uppercase;
+  letter-spacing: 0.01em;
   color: color-mix(in srgb, var(--c) 78%, var(--text-h));
 }
 
@@ -561,7 +554,6 @@
 .is-inmap .about-frame {
   width: var(--map-w);
   height: var(--map-h);
-  container-type: normal;
 }
 
 .is-inmap .about-map {
@@ -574,8 +566,7 @@
   stroke-width: 0.45;
 }
 
-/* The real heading and text stay readable by assistive tech only */
-.is-inmap .about-block h3,
+/* The real text stays readable by assistive tech only */
 .is-inmap .about-block p {
   position: absolute;
   width: 1px;
@@ -589,20 +580,9 @@
 .about-line {
   position: absolute;
   height: 20px;
+  font-size: 13px;
   line-height: 20px;
   white-space: nowrap;
-}
-
-.about-line-head {
-  font-size: 12px;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: color-mix(in srgb, var(--c) 78%, var(--text-h));
-}
-
-.about-line-text {
-  font-size: 13px;
   color: var(--text-h);
 }
 
@@ -748,7 +728,7 @@
 }
 
 /* The date is in the left column on desktop, so not repeated in the card */
-.xp-meta .timeline-period {
+.xp-period {
   display: none;
 }
 
@@ -768,6 +748,7 @@
 }
 
 .xp-card {
+  position: relative;
   background: var(--surface);
   border: 1px solid var(--border);
   border-radius: 20px;
@@ -788,14 +769,13 @@
   font-weight: 400; /* only the role line is bold */
 }
 
-/* The whole summary (cover + text) is the toggle button */
+/* The card header (role + employer) is the toggle button */
 .xp-toggle {
   position: relative;
   display: grid;
-  grid-template-columns: clamp(200px, 30%, 300px) minmax(0, 1fr);
-  align-items: center;
+  gap: 4px;
   width: 100%;
-  padding: 0;
+  padding: 20px 68px 16px 26px;
   font: inherit;
   color: inherit;
   text-align: left;
@@ -808,108 +788,6 @@
 .xp-toggle:focus-visible {
   outline: 3px solid var(--blue);
   outline-offset: 2px;
-}
-
-.xp-summary {
-  display: grid;
-  gap: 3px;
-  padding: 22px 68px 22px 26px;
-}
-
-/* Cover: a real photo/screenshot, or a simple graphic with the role's facts */
-.xp-cover {
-  position: relative;
-  display: block;
-  align-self: stretch;
-  aspect-ratio: 4 / 3;
-  overflow: hidden;
-  border-radius: 19px 0 0 19px;
-  background: var(--surface-alt);
-}
-
-.xp-card.is-open .xp-cover {
-  border-bottom-left-radius: 0;
-}
-
-.xp-cover img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transition: transform 0.5s ease;
-}
-
-.xp-toggle:hover .xp-cover img {
-  transform: scale(1.03);
-}
-
-.xp-cover-graphic {
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: 2px;
-  padding: 22px 24px;
-  background: linear-gradient(
-    145deg,
-    color-mix(in srgb, var(--c) 16%, var(--surface)),
-    color-mix(in srgb, var(--c) 4%, var(--surface))
-  );
-}
-
-.xp-cover-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 52px;
-  height: 52px;
-  margin-bottom: 12px;
-  border-radius: 14px;
-  color: color-mix(in srgb, var(--c) 82%, var(--text-h));
-  background: color-mix(in srgb, var(--surface) 70%, transparent);
-  box-shadow: 0 1px 2px rgba(20, 26, 60, 0.06);
-}
-
-.xp-cover-line {
-  font-size: 0.85rem;
-  line-height: 1.4;
-  color: var(--text-muted);
-}
-
-.xp-cover-icon + .xp-cover-line {
-  font-size: 1rem;
-  font-weight: 700;
-  color: var(--text-h);
-}
-
-/* Small marker on the video frame used as a cover */
-.xp-cover-video {
-  position: absolute;
-  left: 12px;
-  bottom: 12px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px 4px 9px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: #ffffff;
-  background: rgba(15, 23, 42, 0.72);
-}
-
-.xp-cover-video::before {
-  content: '';
-  border-left: 8px solid currentColor;
-  border-top: 5px solid transparent;
-  border-bottom: 5px solid transparent;
-}
-
-.xp-meta {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 4px 12px;
-  font-size: 0.85rem;
 }
 
 .xp-role {
@@ -929,16 +807,68 @@
   color: var(--text);
 }
 
-.xp-brief {
-  margin-top: 4px;
-  font-size: 0.95rem;
-  color: var(--text-muted);
+/* Organisation logo in the card's top-right corner, left of the chevron */
+.logo-tile.xp-logo {
+  position: absolute;
+  top: 14px;
+  right: 64px;
+  width: 66px;
+  height: 66px;
+  margin: 0;
+  padding: 6px;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.logo-tile.xp-logo img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.has-logo .xp-toggle {
+  min-height: 94px;
+  padding-right: 148px;
+}
+
+/* layout 'side': text on the left, the role's single photo / video on the
+   right (desktop); below the text on phones. Hidden when collapsed. */
+.xp-card.xp-side {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto 1fr; /* a tall video adds space below the text */
+  grid-template-areas:
+    'head media'
+    'body media';
+  align-items: start;
+}
+
+.xp-side .xp-head {
+  grid-area: head;
+}
+
+.xp-side .xp-body {
+  grid-area: body;
+}
+
+.xp-side-media {
+  grid-area: media;
+  padding: 20px 26px 24px 0;
+}
+
+.xp-side-media .exp-media {
+  grid-template-columns: 180px;
+  margin: 0;
+}
+
+.xp-card:not(.is-open) .xp-side-media {
+  display: none;
 }
 
 /* Round chevron button: points down when closed, up when open */
 .xp-chevron {
   position: absolute;
-  top: 24px;
+  top: 18px;
   right: 22px;
   width: 30px;
   height: 30px;
@@ -981,8 +911,12 @@
 
 .xp-details {
   margin: 0 26px;
-  padding: 4px 0 26px;
-  border-top: 1px solid var(--border);
+  padding: 0 0 24px;
+}
+
+.xp-details > .points:first-child,
+.xp-details > .positions:first-child {
+  margin-top: 0;
 }
 
 /* Before a role scrolls into view: card slightly lower and faded, node dim */
@@ -1298,15 +1232,15 @@
 /* ---------- Featured experience ---------- */
 /* Inside an expanded card: no second card frame; logo on the right */
 .featured.featured-headless {
-  padding: 18px 0 0;
+  padding: 0;
   background: none;
   border: 0;
   border-radius: 0;
   box-shadow: none;
 }
 
-.featured-logo {
-  margin: 0 0 8px auto;
+.featured-headless .featured-body {
+  padding-top: 0;
 }
 
 .featured {
@@ -1778,8 +1712,12 @@
     display: none;
   }
 
-  .xp-meta .timeline-period {
-    display: inline;
+  .xp-period {
+    display: block;
+    margin-bottom: 2px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-muted);
   }
 
   .timeline-item {
@@ -1799,35 +1737,31 @@
   }
 
   .xp-toggle {
-    grid-template-columns: minmax(0, 1fr);
+    padding: 16px 48px 12px 16px;
   }
 
-  .xp-summary {
-    padding: 14px 48px 16px 16px;
+  .logo-tile.xp-logo {
+    top: 12px;
+    right: 48px;
+    width: 52px;
+    height: 52px;
   }
 
-  .xp-cover {
-    aspect-ratio: 16 / 9;
-    border-radius: 19px 19px 0 0;
+  .has-logo .xp-toggle {
+    min-height: 76px;
+    padding-right: 108px;
   }
 
-  .xp-card.is-open .xp-cover {
-    border-bottom-left-radius: 0;
+  .xp-card.xp-side {
+    display: block;
   }
 
-  .xp-cover-graphic {
-    padding: 16px 18px;
-  }
-
-  .xp-cover-icon {
-    width: 44px;
-    height: 44px;
-    margin-bottom: 8px;
+  .xp-side-media {
+    padding: 0 16px 18px;
   }
 
   .xp-chevron {
-    top: auto;
-    bottom: 16px;
+    top: 14px;
     right: 14px;
     width: 26px;
     height: 26px;
@@ -1844,6 +1778,17 @@
 
   .about-maps {
     grid-template-columns: 1fr;
+  }
+
+  .card-cert {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    text-align: center;
+  }
+
+  .card-cert figcaption {
+    align-items: center;
   }
 
   .featured {
@@ -1882,9 +1827,19 @@
   margin-top: 16px;
 }
 
+/* Certificate and its issuer / date / PDF link side by side, centred as a
+   pair (stacked and centred on phones) */
 .card-cert {
-  max-width: 440px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 18px;
   margin: 18px 0 0;
+}
+
+.card-cert .media.card-cert-img {
+  flex: none;
+  width: min(100%, 262px);
 }
 
 /* Full A4 page, never cropped */
@@ -1903,8 +1858,9 @@
 .card-cert figcaption {
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  margin-top: 12px;
+  align-items: flex-start;
+  gap: 0;
+  margin: 0;
   font-size: 0.9rem;
   line-height: 1.45;
 }
@@ -1915,7 +1871,7 @@
 }
 
 .card-cert a {
-  margin-top: 6px;
+  margin-top: 4px;
   font-weight: 600;
 }
 
@@ -1985,11 +1941,6 @@
     grid-column: 1 / -1;
   }
 
-  /* Cards sharing a row stay top-aligned but keep their own content height,
-     so no empty space is stretched into the shorter one */
-  .card:not(.card-wide) {
-    align-self: start;
-  }
 }
 
 /* ---------- Reduced motion: show everything, animate nothing ---------- */
@@ -2003,7 +1954,6 @@
   .xp-node,
   .xp-body,
   .xp-chevron::before,
-  .xp-cover img,
   .reveal-on .about-map path {
     transition: none;
   }

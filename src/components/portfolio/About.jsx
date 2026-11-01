@@ -6,8 +6,9 @@ import useReveal from './useReveal.js'
 
 // Wide screens: the two maps sit side by side and each text is set line by
 // line inside its country outline (rows from mapOutlines.js, words measured
-// in the visitor's real font). The real h3 / p stay in the page for screen
-// readers and search engines; the drawn lines are aria-hidden.
+// in the visitor's real font); each heading sits above its map. The real p
+// stays in the page for screen readers and search engines; the drawn lines
+// are aria-hidden.
 // Narrow screens, or if anything does not fit: map on top, full text below.
 const WIDE = '(min-width: 1200px)'
 
@@ -15,17 +16,13 @@ const WIDE = '(min-width: 1200px)'
 const sizeFor = (map) => map.lines.filter((size) => window.innerWidth >= size.minWidth).at(-1)
 
 // Greedy line filling: returns the lines, or null if the words run out of
-// rows. A row too narrow for the next word is skipped (left empty), unless
-// `strict` (the heading must use consecutive rows).
-function fill(words, measure, slots, strict = false) {
+// rows. A row too narrow for the next word is skipped (left empty).
+function fill(words, measure, slots) {
   const lines = []
   let i = 0
   for (const slot of slots) {
     if (i >= words.length) break
-    if (measure(words[i]) > slot.width) {
-      if (strict) return null
-      continue
-    }
+    if (measure(words[i]) > slot.width) continue
     let text = words[i++]
     while (i < words.length && measure(`${text} ${words[i]}`) <= slot.width) text += ` ${words[i++]}`
     lines.push({ ...slot, text })
@@ -40,52 +37,41 @@ function layoutBlock(block) {
   block.style.setProperty('--map-w', `${size.width}px`)
   block.style.setProperty('--map-h', `${size.height}px`)
   const layer = block.querySelector('.about-lines')
-  const heading = block.querySelector('h3').textContent.split(' ')
   const words = block.querySelector('p').textContent.split(' ')
 
-  // Measure in the same classes (font, size, letter-spacing) as the drawn lines
-  const probe = (cls) => {
-    const el = document.createElement('span')
-    el.className = `about-line ${cls}`
-    el.style.visibility = 'hidden'
-    layer.append(el)
-    return (text) => {
-      el.textContent = text
-      return el.getBoundingClientRect().width
-    }
+  // Measure in the same class (font, size) as the drawn lines
+  const probe = document.createElement('span')
+  probe.className = 'about-line'
+  probe.style.visibility = 'hidden'
+  layer.append(probe)
+  const measure = (text) => {
+    probe.textContent = text
+    return probe.getBoundingClientRect().width
   }
-  const measureHead = probe('about-line-head')
-  const measureText = probe('about-line-text')
 
   const slots = rows.flatMap((r, row) => (r ? [{ row, left: r[0], width: r[1] - r[0] }] : []))
   const fits = []
   for (let start = 0; start < slots.length; start++) {
-    // Heading: one line, or two lines in the same part of the country
-    const head = fill(heading, measureHead, slots.slice(start, start + 2), true)
-    if (!head) continue
-    if (head.length === 2 && (head[1].row !== head[0].row + 1 || Math.abs(head[1].left - head[0].left) > 80)) continue
-    const text = fill(words, measureText, slots.slice(start + head.length))
-    if (text) fits.push({ head, text })
+    const lines = fill(words, measure, slots.slice(start))
+    if (lines) fits.push(lines)
   }
   layer.replaceChildren()
   if (!fits.length) return false
 
-  // Prefer a one-line heading; of those positions, use the middle one
-  const oneLine = fits.filter((f) => f.head.length === 1)
-  const pool = oneLine.length ? oneLine : fits
-  const { head, text } = pool[Math.floor((pool.length - 1) / 2)]
-  for (const [lines, cls] of [
-    [head, 'about-line-head'],
-    [text, 'about-line-text'],
-  ]) {
-    for (const line of lines) {
-      const el = document.createElement('span')
-      el.className = `about-line ${cls}`
-      el.textContent = line.text
-      el.style.left = `${line.left}px`
-      el.style.top = `${line.row * lineHeight}px`
-      layer.append(el)
-    }
+  // Keep reading order natural: each line should overlap the one above it by
+  // at least half its width (no jumps between distant parts of the country).
+  // Of those layouts, use the middle start row (text sits centrally).
+  const overlaps = (a, b) =>
+    Math.min(a.left + a.width, b.left + b.width) - Math.max(a.left, b.left) >= Math.min(a.width, b.width) / 2
+  const flowing = fits.filter((lines) => lines.every((line, i) => i === 0 || overlaps(lines[i - 1], line)))
+  const pool = flowing.length ? flowing : fits
+  for (const line of pool[Math.floor((pool.length - 1) / 2)]) {
+    const el = document.createElement('span')
+    el.className = 'about-line'
+    el.textContent = line.text
+    el.style.left = `${line.left}px`
+    el.style.top = `${line.row * lineHeight}px`
+    layer.append(el)
   }
   return true
 }
@@ -119,26 +105,22 @@ export default function About() {
       <div className="about-maps" ref={mapsRef}>
         {about.map((block) => {
           const map = MAP_OUTLINES[block.map]
-          const [, , w, h] = map.viewBox.split(' ').map(Number)
           return (
             <article
               key={block.heading}
               data-map={block.map}
               className={`about-block about-${block.map} accent-${block.accent}`}
               style={{
-                '--map-ratio': h / w,
-                '--lx': map.label[0] / 100,
-                '--ly': map.label[1] / 100,
               }}
             >
+              <h3>{block.heading}</h3>
               <div className="about-frame">
                 {/* Decorative outline; drawn once when it comes into view */}
                 <svg className="about-map" viewBox={map.viewBox} aria-hidden="true" focusable="false">
                   <path d={map.d} pathLength="1" />
                 </svg>
-                <h3>{block.heading}</h3>
                 <p>{block.text}</p>
-                {/* Wide screens: the same heading and text, drawn line by line */}
+                {/* Wide screens: the same text, drawn line by line */}
                 <div className="about-lines" aria-hidden="true" />
               </div>
             </article>
