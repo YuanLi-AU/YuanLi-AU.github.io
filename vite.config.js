@@ -41,6 +41,8 @@ export default defineConfig({
         globIgnores: ['**/Planner-*', 'planner.html', '404.html'],
         // Any page navigation gets the app shell; React Router picks the route.
         navigateFallback: '/index.html',
+        // …except files opened directly (resume, certificate PDFs)
+        navigateFallbackDenylist: [/\.pdf$/],
         cleanupOutdatedCaches: true,
         runtimeCaching: [
           {

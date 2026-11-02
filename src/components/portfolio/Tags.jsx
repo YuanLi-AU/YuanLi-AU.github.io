@@ -1,6 +1,6 @@
-export default function Tags({ items, muted = false }) {
+export default function Tags({ items }) {
   return (
-    <ul className={muted ? 'tags tags-muted' : 'tags'}>
+    <ul className="tags">
       {items.map((item) => (
         <li key={item}>{item}</li>
       ))}

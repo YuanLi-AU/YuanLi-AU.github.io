@@ -7,12 +7,9 @@ export default function Skills() {
     <Section id="skills" title="Skills" accent="purple">
       <div className="skill-groups">
         {skills.map((group) => (
-          <div
-            key={group.group}
-            className={group.studied ? 'skill-group studied' : `skill-group accent-${group.accent}`}
-          >
+          <div key={group.group} className={`skill-group accent-${group.accent}`}>
             <h3>{group.group}</h3>
-            <Tags items={group.items} muted={group.studied} />
+            <Tags items={group.items} />
           </div>
         ))}
       </div>

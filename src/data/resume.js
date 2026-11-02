@@ -56,20 +56,19 @@ export const profile = {
     'My background spans engineering, IT support, Power BI and Power Apps data work, school-based publishing and finance administration, and supervising labour-hire teams in the Northern Territory. I have completed the coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026.',
   email: 'svip.leo@gmail.com',
   linkedin: 'https://www.linkedin.com/in/yuan-li-a982533b5/',
-  resumeUrl: '', // e.g. '/Yuan_Li_Resume_Public.pdf' once the public version is in public/
+  // Public resume (phone number removed from the header)
+  resumeUrl: `${import.meta.env.BASE_URL}resume/Yuan_Li_Resume.pdf`,
 }
 
 export const about = [
   {
     heading: 'Engineering & Operations Background',
     accent: 'orange',
-    map: 'china', // background outline (components/portfolio/mapOutlines.js)
     text: 'I hold a Bachelor of Engineering in Material Forming and Control Engineering, and my qualifications have been assessed by Engineers Australia. In Australia I have gained hands-on experience across labour-hire team supervision, farm and plantation operations, construction sites and commercial cleaning, including delivering cleaning services as a subcontractor. This work has built my skills in team coordination, site management and problem-solving, and my ability to run work independently.',
   },
   {
     heading: 'Technology, Data & Business Skills',
     accent: 'teal',
-    map: 'australia',
     text: 'I have completed all coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026. My skills cover data analysis, Power BI reporting and visualisation, Power Apps development and software development, and I have worked on a real-world business data analytics project. I also bring experience in finance-related work, book editing and publishing, e-commerce operations, digital content production and social media channel management, and I apply technical knowledge to practical business needs.',
   },
 ]
@@ -235,9 +234,8 @@ export const experience = [
     logo: ntcmsLogo,
     logoAlt: 'NT Cleaning & Maintenance Services logo',
     points: [
-      'Led a cleaning team of 4–5 people in Darwin and trained new cleaners on site routines',
-      'Cleaned construction sites, some RAAF facilities and Darwin Port (including vessel interiors), and the OLSH campus after school in Wadeye',
-      'Prepared cleaning-supply order lists for the school facilities team in Wadeye',
+      'In Darwin, led a cleaning team of 4–5 people and trained new cleaners on site routines, cleaning construction sites, some RAAF facilities and Darwin Port (including vessel interiors)',
+      'Provided after-school cleaning services at the OLSH campus in Wadeye and prepared cleaning supply order lists for the school’s facilities team',
     ],
     highlights: [
       // Full pass shown with Yuan's confirmed permission from the relevant parties
@@ -497,91 +495,68 @@ export const careerBackground = {
   text: 'During my early years working in Australia on a Working Holiday visa, I gained hands-on experience across agriculture, construction, production and site operations. Some roles were short-term or undertaken concurrently, including a mix of full-time and part-time work.',
 }
 
-// studied: true marks skills from Master's study rather than work experience
+// Six equal cards (3 × 2 on desktop)
 export const skills = [
   {
-    group: 'Software / Development',
+    group: 'Software & Development',
     accent: 'purple',
     items: [
       'Python',
       'Git',
       'Agile',
-      'Unit testing',
-      'Secure development',
+      'Unit Testing',
+      'Secure Development',
       'Power Apps',
       'WordPress',
+      'AI-Assisted Development',
+      'Generative AI Tools',
     ],
   },
   {
-    group: 'Data / BI',
+    group: 'Data & Business Intelligence',
     accent: 'teal',
-    items: [
-      'SQL',
-      'Relational databases',
-      'Power BI',
-      'Data modelling',
-      'DAX',
-      'Dashboards',
-      'Excel',
-      'VBA',
-      'Data analysis',
-      'Data verification & record reconciliation',
-    ],
+    items: ['SQL', 'Relational Databases', 'Power BI', 'Data Modelling', 'DAX', 'Excel', 'VBA', 'Data Analytics'],
   },
   {
-    group: 'IT / Systems',
+    group: 'IT & Systems',
     accent: 'blue',
     items: [
-      'Hardware, software & network troubleshooting',
-      'Windows',
+      'IT Support',
+      'Hardware & Software Troubleshooting',
       'Microsoft 365',
       'TechnologyOne CiAnywhere',
-      'Operating systems',
+      'Operating Systems',
       'Networking',
     ],
   },
   {
-    group: 'Engineering / Operations',
+    group: 'Engineering & Operations',
     accent: 'orange',
     items: [
-      'Site supervision, task allocation & safe work practices',
-      'Basic vehicle maintenance, minor repairs & routine oil changes',
-      'Parts sourcing & purchasing',
-      'Construction support: external wall framing & interior refurbishment',
-      'Basic drip-irrigation pipe repairs',
-      'Hand & power tools',
-      'Workplace safety awareness',
-      'General manufacturing & site operations',
-      'Basic inventory & materials handling',
-      'Materials Forming & Control Engineering',
+      'Site Supervision',
+      'Team Coordination',
+      'Workplace Safety',
+      'Construction Support',
+      'Parts & Supplies Sourcing',
+      'Tools & Basic Vehicle Maintenance',
     ],
   },
   {
-    group: 'Design / Content',
+    group: 'Design & Content',
     accent: 'coral',
     items: [
       'Adobe InDesign',
       'Adobe Photoshop',
-      'Desktop publishing',
-      'Print production',
-      'Video production',
-      'Content creation',
+      'Desktop Publishing',
+      'Print Production',
+      'Video Production',
+      'Content Creation',
     ],
   },
   {
-    group: 'Business / E-commerce',
+    group: 'Business & E-commerce',
     accent: 'coral',
-    items: [
-      'E-commerce operations',
-      'Online customer service',
-      'Order fulfilment',
-      'Product listing & visual content',
-    ],
-  },
-  {
-    group: 'Through Master’s study',
-    studied: true,
-    items: ['Machine learning & AI', 'Cyber security', 'Project management', 'Risk & reliability'],
+    items: ['E-commerce Operations', 'Customer Service', 'Order Fulfilment', 'Product Listings'],
   },
 ]
 
@@ -617,7 +592,7 @@ export const recognition = [
   },
 ]
 
-export const languages = ['Mandarin — Native', 'English']
+export const languages = ['Mandarin — Native', 'English — PTE Academic: Overall Score 62 (2023)']
 
 export const credentials = [
   'Full NT Class C driver licence — approx. 100,000 km driven in Australia with no traffic accidents',
