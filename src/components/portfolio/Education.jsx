@@ -7,16 +7,21 @@ export default function Education() {
     <Section id="education" title="Education" accent="blue">
       <div className="edu-grid">
         {education.map((item) => (
-          <article key={item.degree} className="edu-card">
-            {/* Logo shown only in its education context, on a white tile so
-                the original artwork is never recoloured. */}
-            {item.logo && (
-              <div className="logo-tile">
-                <img src={item.logo} alt={item.logoAlt} />
+          <article key={item.school} className="edu-card">
+            <div className="edu-top">
+              {/* Logo shown only in its education context, on a white tile so
+                  the original artwork is never recoloured. */}
+              {item.logo && (
+                <div className="logo-tile">
+                  <img src={item.logo} alt={item.logoAlt} />
+                </div>
+              )}
+              <div className="edu-top-text">
+                <p className="edu-period">{item.period}</p>
+                <h3>{item.degree}</h3>
               </div>
-            )}
-            <p className="edu-period">{item.period}</p>
-            <h3>{item.degree}</h3>
+            </div>
+            <p className="edu-field">{item.field}</p>
             <p className="edu-school">
               {item.school} <span className="muted">· {item.location}</span>
             </p>

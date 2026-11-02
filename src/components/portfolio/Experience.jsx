@@ -29,6 +29,11 @@ function JobDetails({ job, withMedia = true }) {
               <p className="position-org">
                 {position.org} · {position.location}
               </p>
+              {position.relations?.map((line) => (
+                <p key={line} className="position-relation">
+                  {line}
+                </p>
+              ))}
               <ul className="points">
                 {position.points.map((point) => (
                   <li key={point}>{point}</li>
@@ -76,7 +81,8 @@ export default function Experience() {
             const key = `${job.role}-${job.org}`
             const isOpen = open.has(key)
             const id = `xp-${i}`
-            const side = job.layout === 'side'
+            const side = job.layout === 'side' || job.layout === 'side-compact'
+            const logos = job.logos ?? (job.logo ? [{ src: job.logo, alt: job.logoAlt }] : [])
             return (
               // The li's class must stay constant: useReveal adds is-visible to it
               <li key={key} className={`timeline-item accent-${job.accent}`}>
@@ -85,30 +91,37 @@ export default function Experience() {
                   {job.period}
                 </span>
                 <span className="xp-node" aria-hidden="true" />
-                <div className={`xp-card${isOpen ? ' is-open' : ''}${side ? ' xp-side' : ''}${job.logo ? ' has-logo' : ''}`}>
-                  <h3 className="xp-head">
-                    <button
-                      type="button"
-                      className="xp-toggle"
-                      id={`${id}-toggle`}
-                      aria-expanded={isOpen}
-                      aria-controls={side ? `${id}-body ${id}-media` : `${id}-body`}
-                      onClick={(e) => toggle(key, e.currentTarget.closest('.xp-card'))}
-                    >
-                      {/* Phones: date on top of the card (desktop: left column) */}
-                      <span className="xp-period">{job.period}</span>
-                      <span className="xp-role">{job.role}</span>
-                      <span className="xp-org">
-                        {job.org} · {job.location}
+                <div className={`xp-card${isOpen ? ' is-open' : ''}${side ? ' xp-side' : ''}${job.layout === 'side-compact' ? ' xp-side-compact' : ''}${logos.length ? ' has-logo' : ''}${logos.length > 1 ? ' has-logo-2' : ''}`}>
+                  {/* Header bar: title button + organisation logo(s) (left of the chevron) */}
+                  <div className="xp-headbar">
+                    <h3 className="xp-head">
+                      <button
+                        type="button"
+                        className="xp-toggle"
+                        id={`${id}-toggle`}
+                        aria-expanded={isOpen}
+                        aria-controls={side ? `${id}-body ${id}-media` : `${id}-body`}
+                        onClick={(e) => toggle(key, e.currentTarget.closest('.xp-card'))}
+                      >
+                        {/* Phones: date on top of the card (desktop: left column) */}
+                        <span className="xp-period">{job.period}</span>
+                        <span className="xp-role">{job.role}</span>
+                        <span className="xp-org">
+                          {job.org} · {job.location}
+                        </span>
+                        <span className="xp-chevron" aria-hidden="true" />
+                      </button>
+                    </h3>
+                    {logos.length > 0 && (
+                      <span className="xp-logos">
+                        {logos.map((logo) => (
+                          <span key={logo.alt} className={`xp-logo${logo.fill ? ' is-fill' : ''}`}>
+                            <img src={logo.src} alt={logo.alt} />
+                          </span>
+                        ))}
                       </span>
-                      <span className="xp-chevron" aria-hidden="true" />
-                    </button>
-                  </h3>
-                  {job.logo && (
-                    <span className="logo-tile xp-logo">
-                      <img src={job.logo} alt={job.logoAlt} />
-                    </span>
-                  )}
+                    )}
+                  </div>
                   {/* Collapsed details stay in the page but are inert (no focus) */}
                   <div className="xp-body" id={`${id}-body`} inert={!isOpen}>
                     <div className="xp-body-inner">

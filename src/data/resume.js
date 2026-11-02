@@ -13,7 +13,12 @@
 // sensitive content). Folders: src/assets/{branding,work,publications}.
 
 import cduLogo from '../assets/branding/cdu-logo.png'
+import nanshanLogo from '../assets/branding/yantai-nanshan-university-logo.jpg' // supplied by Yuan (图片/)
 import ntcmsLogo from '../assets/branding/nt-cleaning-maintenance-logo-400.png'
+import olshCrest from '../assets/branding/olsh-crest-168.png' // from olshtnt.catholic.edu.au
+import ntsLogo from '../assets/branding/nts-logo.png' // from ntsnt.com.au
+import gfhLogo from '../assets/branding/gfh-logo.jpg' // supplied by Yuan (图片/), on its own background
+import quintisLogo from '../assets/branding/quintis-logo.png' // supplied by Yuan (图片/)
 import pitchBlackCertThumb from '../assets/work/pitch-black/certificate-800.jpg'
 import pitchBlackCertFull from '../assets/work/pitch-black/certificate-1600.jpg'
 import lpcPublicationsThumb from '../assets/publications/lpc/lpc-publications-800.jpg'
@@ -26,6 +31,10 @@ import tcassOverviewThumb from '../assets/projects/tcass/tcass-overview-800.jpg'
 import tcassOverviewFull from '../assets/projects/tcass/tcass-overview-1600.jpg'
 import tcassOperationsThumb from '../assets/projects/tcass/tcass-operations-800.jpg'
 import tcassOperationsFull from '../assets/projects/tcass/tcass-operations-1600.jpg'
+import tcassAppUploadThumb from '../assets/projects/tcass/tcass-app-upload-800.jpg'
+import tcassAppUploadFull from '../assets/projects/tcass/tcass-app-upload-1600.jpg'
+import tcassAppExplorerThumb from '../assets/projects/tcass/tcass-app-explorer-800.jpg'
+import tcassAppExplorerFull from '../assets/projects/tcass/tcass-app-explorer-1600.jpg'
 import gfhTractorThumb from '../assets/work/plantation/gfh-tractor-800.jpg'
 import gfhTractorFull from '../assets/work/plantation/gfh-tractor-1440.jpg'
 import plantationTeamThumb from '../assets/work/plantation/plantation-team-800.jpg'
@@ -107,7 +116,7 @@ export const projects = [
       alt: 'Yuan Li with team members during the TCASS client project',
       caption: 'TCASS Project Team',
     },
-    // Staff names obscured in the screenshots
+    // Staff names (Power BI) and the student ID (Power Apps) obscured
     media: [
       {
         image: tcassOverviewThumb,
@@ -120,6 +129,18 @@ export const projects = [
         imageFull: tcassOperationsFull,
         alt: 'Power BI Operations & Risk Analysis page showing task frequency by hour, tasks by day, difficulty by task type and patient movement flow',
         caption: 'Operations & Risk Analysis dashboard',
+      },
+      {
+        image: tcassAppUploadThumb,
+        imageFull: tcassAppUploadFull,
+        alt: 'Upload Data screen of the TCASS Visualizer Power Apps application, with file drop area and data type choice (incident, manual handling or sleep data)',
+        caption: 'Power Apps — Upload Data screen',
+      },
+      {
+        image: tcassAppExplorerThumb,
+        imageFull: tcassAppExplorerFull,
+        alt: 'Data Explorer screen of the TCASS Visualizer Power Apps application, listing uploaded data files with their status',
+        caption: 'Power Apps — Data Explorer screen',
       },
     ],
   },
@@ -195,9 +216,14 @@ const plantationTeamWork =
 
 // area: short label showing which part of the background this role covers
 // links: optional [{ label, url }] shown under the points (opens in a new tab)
-// layout: 'side' puts the role's media beside the text on desktop
+// layout: 'side' puts the role's media beside the text on desktop;
+//   'side-compact' keeps the header full width, then text and media in two equal columns
+// logo / logoAlt: organisation logo, shown in the same 56px tile for every role
+// logos: several logos side by side instead: [{ src, alt, fill }] — fill: the
+//   image keeps its own background and fills the tile
 // positions: optional, in place of points — separate roles grouped under one
-//   entry, each kept with its own details: [{ title, org, location, period, points }]
+//   entry, each kept with its own details: [{ title, org, location, period,
+//   relations, points }] — relations: optional lines under the organisation
 // media: work photos or certificates for any role, shown as small click-to-
 //   enlarge thumbnails: [{ image, imageFull, alt, caption }]. An empty list
 //   shows nothing. Obscure card numbers, signatures and internal data first.
@@ -212,6 +238,8 @@ export const experience = [
   {
     role: 'Finance Assistant — Timesheet Verification',
     org: 'OLSH Thamarrurr Catholic College',
+    logo: olshCrest,
+    logoAlt: 'Our Lady of the Sacred Heart Thamarrurr Catholic College crest',
     location: 'Wadeye, NT · Remote since Feb 2026',
     period: 'Oct 2025 – Present (part-time)',
     area: 'Finance · Administration',
@@ -269,6 +297,8 @@ export const experience = [
   {
     role: 'LPC Assistant — Publishing & Design',
     org: 'Literature Production Centre (LPC), OLSH Thamarrurr Catholic College',
+    logo: olshCrest,
+    logoAlt: 'Our Lady of the Sacred Heart Thamarrurr Catholic College crest',
     location: 'Wadeye, NT',
     period: 'Jun 2024 – Feb 2026',
     area: 'Design · Publishing',
@@ -310,7 +340,9 @@ export const experience = [
   },
   {
     role: 'Construction Labourer',
-    layout: 'side', // desktop: text left, the video right
+    logo: ntsLogo,
+    logoAlt: 'Northern Trade Solutions logo',
+    layout: 'side-compact', // desktop: text and video in two equal columns
     org: 'Northern Trade Solutions',
     location: 'Berrimah Farm & Defence Accommodation Precinct, Darwin, NT',
     period: 'Late 2023 – Early 2024',
@@ -332,6 +364,11 @@ export const experience = [
   // Two separate labour-hire roles, each with its own employer, place and dates
   {
     role: 'Farm & Plantation Operations — Katherine & Douglas Daly',
+    // GFH = labour-hire employer; Quintis = GFH's host plantation client (not an employer)
+    logos: [
+      { src: gfhLogo, alt: 'GFH Enterprises (Green Farm Hands) logo', fill: true },
+      { src: quintisLogo, alt: 'Quintis Sandalwood logo' },
+    ],
     org: 'GFH Enterprises Pty Ltd · Big Plantation Pty Ltd',
     location: 'Northern Territory',
     period: 'Apr 2023 – Oct 2023 · Jun 2019 – Feb 2020',
@@ -343,6 +380,10 @@ export const experience = [
         org: 'GFH Enterprises Pty Ltd',
         location: 'Katherine, NT',
         period: 'Apr 2023 – Oct 2023',
+        relations: [
+          'Labour-hire employer: GFH Enterprises Pty Ltd',
+          'Host plantation company (client): Quintis',
+        ],
         points: [
           'Supervised a labour-hire team on a sandalwood plantation, allocating tasks according to the host farm’s work plans',
           plantationTeamWork,
@@ -562,7 +603,8 @@ export const skills = [
 
 export const education = [
   {
-    degree: 'Master of Information Technology (Software Engineering)',
+    degree: 'Master of Information Technology',
+    field: 'Software Engineering',
     school: 'Charles Darwin University',
     logo: cduLogo,
     logoAlt: 'Charles Darwin University logo',
@@ -571,8 +613,11 @@ export const education = [
     notes:
       'Key areas: software engineering, security, machine learning & AI, IT service management, project management, risk and reliability',  },
   {
-    degree: 'Bachelor of Engineering — Material Forming and Control Engineering',
+    degree: 'Bachelor of Engineering',
+    field: 'Material Forming and Control Engineering',
     school: 'Yantai Nanshan University',
+    logo: nanshanLogo,
+    logoAlt: 'Yantai Nanshan University logo',
     location: 'China',
     period: 'Sep 2011 – Jun 2015',
     notes:

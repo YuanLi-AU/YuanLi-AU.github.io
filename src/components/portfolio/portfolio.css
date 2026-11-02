@@ -712,28 +712,54 @@
   color: var(--text);
 }
 
-/* Organisation logo in the card's top-right corner, left of the chevron */
-.logo-tile.xp-logo {
+/* Organisation logo: the same 56px tile for every role (logo centred and
+   scaled to fit, never cropped), left of the chevron in the header bar;
+   two logos sit side by side */
+.xp-headbar {
+  position: relative;
+}
+
+.xp-logos {
   position: absolute;
   top: 14px;
   right: 64px;
-  width: 66px;
-  height: 66px;
-  margin: 0;
-  padding: 6px;
-  justify-content: center;
+  display: flex;
+  gap: 8px;
   pointer-events: none;
 }
 
-.logo-tile.xp-logo img {
+.xp-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  padding: 6px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.xp-logo img {
+  display: block;
   width: 100%;
   height: 100%;
   object-fit: contain;
 }
 
+/* Logo on its own (square) background: fills the tile */
+.xp-logo.is-fill {
+  padding: 0;
+  overflow: hidden;
+}
+
 .has-logo .xp-toggle {
-  min-height: 94px;
-  padding-right: 148px;
+  min-height: 84px;
+  padding-right: 136px;
+}
+
+.has-logo-2 .xp-toggle {
+  padding-right: 200px;
 }
 
 /* layout 'side': text on the left, the role's single photo / video on the
@@ -748,7 +774,7 @@
   align-items: start;
 }
 
-.xp-side .xp-head {
+.xp-side .xp-headbar {
   grid-area: head;
 }
 
@@ -768,6 +794,28 @@
 
 .xp-card:not(.is-open) .xp-side-media {
   display: none;
+}
+
+/* layout 'side-compact' (Construction): the header spans the card, so the
+   logo and chevron sit where they do on every other card; below it the
+   text and the video in two equal columns, both starting at the same
+   height. The video is centred in its column; its caption keeps to the
+   video's width, aligned with its left edge. */
+.xp-card.xp-side.xp-side-compact {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: auto;
+  grid-template-areas:
+    'head head'
+    'body media';
+}
+
+.xp-side-compact .xp-side-media {
+  padding: 0 26px 24px;
+}
+
+.xp-side-compact .xp-side-media .exp-media {
+  grid-template-columns: 170px;
+  justify-content: center;
 }
 
 /* Round chevron button: points down when closed, up when open */
@@ -931,6 +979,37 @@
   display: block;
   height: 100%;
   width: auto;
+}
+
+/* First row: logo (own ratio) | period over degree; the field of study and
+   school start below it at the card's left edge */
+.edu-top {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 12px 18px;
+  margin-bottom: 14px;
+}
+
+.edu-top .logo-tile {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.edu-top-text {
+  flex: 1 1 120px;
+  min-width: 0;
+}
+
+.edu-top-text h3 {
+  margin: 0;
+}
+
+.edu-field {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--text-h);
 }
 
 .edu-period {
@@ -1205,7 +1284,19 @@
   }
 
   .card,
-  .edu-card,
+  .edu-card {
+    padding: 22px;
+  }
+
+  /* Smaller logo tile so the logo, period and degree can share a row */
+  .edu-top {
+    gap: 10px 14px;
+  }
+
+  .edu-top .logo-tile {
+    height: 48px;
+    padding: 6px 10px;
+  }
 
   .credential {
     flex-direction: column;
@@ -1543,6 +1634,12 @@
   color: var(--text-muted);
 }
 
+.position-relation {
+  margin: 2px 0 0;
+  font-size: 0.88rem;
+  color: var(--text);
+}
+
 .position .points {
   margin-top: 8px;
 }
@@ -1723,16 +1820,26 @@
     padding: 16px 48px 12px 16px;
   }
 
-  .logo-tile.xp-logo {
+  .xp-logos {
     top: 12px;
     right: 48px;
-    width: 52px;
-    height: 52px;
+    gap: 6px;
+  }
+
+  .xp-logo {
+    width: 44px;
+    height: 44px;
+    padding: 4px;
+    border-radius: 10px;
   }
 
   .has-logo .xp-toggle {
-    min-height: 76px;
-    padding-right: 108px;
+    min-height: 68px;
+    padding-right: 100px;
+  }
+
+  .has-logo-2 .xp-toggle {
+    padding-right: 150px;
   }
 
   .xp-card.xp-side {
