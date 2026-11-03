@@ -75,7 +75,7 @@ export const profile = {
     'Engineering, IT and data background — Master of IT (Software Engineering) coursework completed',
   location: 'Darwin, NT',
   intro:
-    'My background spans engineering, IT support, Power BI and Power Apps data work, school-based publishing and finance administration, and supervising labour-hire teams in the Northern Territory. I have completed the coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026.',
+    'I can independently design, build and deploy websites and software based on client requirements — this site, including its private cloud-synced planner, is my own work. My background spans engineering, IT support, Power BI and Power Apps data work, school-based publishing and finance administration, and supervising labour-hire teams in the Northern Territory. I have completed the coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026.',
   email: 'svip.leo@gmail.com',
   linkedin: 'https://www.linkedin.com/in/yuan-li-a982533b5/',
   // Public resume (phone number removed from the header)
@@ -86,7 +86,7 @@ export const about = [
   {
     heading: 'Engineering & Operations Background',
     accent: 'orange',
-    text: 'I hold a Bachelor of Engineering in Material Forming and Control Engineering, and my qualifications have been assessed by Engineers Australia. In Australia I have gained hands-on experience across labour-hire team supervision, farm and plantation operations, construction sites and commercial cleaning, including delivering cleaning services as a subcontractor. This work has built my skills in team coordination, site management and problem-solving, and my ability to run work independently.',
+    text: 'I hold a Bachelor of Engineering in Material Forming and Control Engineering, and my qualifications have been assessed by Engineers Australia. I first came to Australia on a Working Holiday visa, and since then I have gained hands-on experience across labour-hire team supervision, farm and plantation operations, construction sites and commercial cleaning, including delivering cleaning services as a subcontractor. This work has built my skills in team coordination, site management and problem-solving, and my ability to run work independently.',
   },
   {
     heading: 'Technology, Data & Business Skills',
@@ -598,6 +598,11 @@ export const skills = [
     group: 'Software & Development',
     accent: 'purple',
     items: [
+      'React',
+      'JavaScript',
+      'HTML & CSS',
+      'Firebase',
+      'GitHub Actions',
       'Python',
       'Git',
       'Agile',
