@@ -75,7 +75,7 @@ export const profile = {
     'Engineering, IT and data background — Master of IT (Software Engineering) coursework completed',
   location: 'Darwin, NT',
   intro:
-    'My background spans engineering, IT support, Power BI and Power Apps data work, school-based publishing and finance administration, and supervising labour-hire teams in the Northern Territory. I have completed the coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026. I independently design, develop and deploy websites and software applications.',
+    'I enjoy learning new things, taking on challenges and turning ideas into practical solutions. My experiences across engineering, business and technology have shaped the way I approach problems and work with people. Along the way, I\'ve also developed the ability to independently design, develop and deploy websites and software applications. I\'ve completed all coursework for my Master of Information Technology (Software Engineering) at Charles Darwin University and am now awaiting my final results, expected in November 2026.',
   email: 'svip.leo@gmail.com',
   linkedin: 'https://www.linkedin.com/in/yuan-li-a982533b5/',
   // Public resume (phone number removed from the header)
@@ -84,14 +84,14 @@ export const profile = {
 
 export const about = [
   {
-    heading: 'Engineering & Operations Background',
+    heading: 'Engineering & Life Experience',
     accent: 'orange',
-    text: 'I hold a Bachelor of Engineering in Material Forming and Control Engineering, and my qualifications have been assessed by Engineers Australia. I first came to Australia on a Working Holiday visa, and since then I have gained hands-on experience across labour-hire team supervision, farm and plantation operations, construction sites and commercial cleaning, including delivering cleaning services as a subcontractor. This work has built my skills in team coordination, site management and problem-solving, and my ability to run work independently.',
+    text: 'My journey began with an engineering background in China, alongside experiences in e-commerce and digital content creation. Coming to Australia on a Working Holiday visa opened a new chapter, taking me from farms and construction sites to team supervision and community publishing. Working with people from different backgrounds taught me to adapt, take responsibility and approach challenges from different perspectives.',
   },
   {
-    heading: 'Technology, Data & Business Skills',
+    heading: 'Technology & New Directions',
     accent: 'teal',
-    text: 'I have completed all coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026. My skills cover data analysis, Power BI reporting and visualisation, Power Apps development and software development, and I have worked on a real-world business data analytics project. I also bring experience in finance-related work, book editing and publishing, e-commerce operations, digital content production and social media channel management, and I apply technical knowledge to practical business needs.',
+    text: 'Building on these experiences, I went on to study Software Engineering at Charles Darwin University. Through my studies and practical projects, I\'ve developed skills in software development, data analytics and building applications that address real needs. I enjoy bringing together what I\'ve learned in technology with my experiences in business and hands-on work, turning ideas into useful solutions while continuing to explore new possibilities.',
   },
 ]
 
@@ -123,9 +123,9 @@ export const projects = [
     logoFull: tcassLogoFull,
     logoAlt: 'TCASS (Territory Care & Support Services) logo',
     summary:
-      'Team client project during my Master of IT for Territory Care & Support Services (TCASS), an NDIS service provider in Darwin.',
+      'During my Master of IT, our team worked with Territory Care & Support Services (TCASS), an NDIS service provider in Darwin.',
     points: [
-      'My contribution: the manual-handling data analysis in Power BI and the build of the overall Power Apps application',
+      'My contribution: carrying out manual-handling data analysis in Power BI and building the overall Power Apps application',
       'Team outcome: the solution has been put into use, making manual-handling information easier for managers and staff to access and understand',
       'Power BI report with Overview, Operations & Risk Analysis and Data Table pages, analysing task volume, difficulty and pain rates, equipment use, transfer paths, staff performance and trends',
       'Power Apps application with an Upload Data screen for submitting manual-handling data files and a Data Explorer screen for browsing and managing uploaded files',
@@ -221,11 +221,11 @@ export const projects = [
     logo: `${import.meta.env.BASE_URL}icons/icon-512.png`,
     logoAlt: 'Yuan Li website app icon (YL)',
     summary:
-      'A personal portfolio website with a private planner for managing daily, mid-term and long-term goals. Demonstrates my ability to independently design and develop websites and applications tailored to client requirements.',
+      'I designed and built this website as a place to share my experiences, projects and interests. It also includes a private planner for organising my daily, mid-term and long-term goals.',
     points: [
       'Responsive React portfolio with a private planner, secured by Firebase Authentication and owner-only Firestore security rules',
       'Daily, mid-term and long-term plans with drag-and-drop prioritisation, due dates and live countdowns; tasks move to the daily list automatically when due',
-      'Real-time sync across devices, using Firestore transactions and a three-way merge so changes from different devices are combined safely',
+      'Real-time sync across devices, using Firestore transactions and a three-way merge to help reconcile changes made on different devices',
       'Installable PWA with automated build and deployment to GitHub Pages via GitHub Actions',
     ],
     tags: [
@@ -238,7 +238,6 @@ export const projects = [
       'GitHub Pages',
       'GitHub Actions',
     ],
-    links: [{ label: 'Visit Website', url: 'https://yuanli-au.github.io/' }],
     // Planner screenshots are from an isolated demo build with sample data
     // (no real plans). The mid- and long-term thumbnails show the tabs and
     // the list; tall: the lightbox shows the whole screen at phone width.
@@ -306,7 +305,7 @@ export const experience = [
     points: [
       'Verify handwritten timesheets, leave records and balances, checking leave categories, overtime and back pay against the applicable rules',
       'Prepare weekly Excel summaries and enter verified timesheets into TechnologyOne CiAnywhere, with two final checks to help ensure staff are paid accurately',
-      'Follow up discrepancies, and missing, inactive or incorrectly numbered staff records, with staff and the Finance Officer',
+      'Follow up with staff and the Finance Officer on discrepancies and missing, inactive or incorrectly numbered staff records',
     ],
     media: [],
   },
@@ -321,7 +320,7 @@ export const experience = [
     logo: ntcmsLogo,
     logoAlt: 'NT Cleaning & Maintenance Services logo',
     points: [
-      'In Darwin, led a cleaning team of 4–5 people and trained new cleaners on site routines, cleaning construction sites, some RAAF facilities and Darwin Port (including vessel interiors)',
+      'In Darwin, led a team of 4–5 cleaners, trained new cleaners in site routines and cleaned construction sites, some RAAF facilities and Darwin Port, including vessel interiors',
       'Provided after-school cleaning services at the OLSH campus in Wadeye and prepared cleaning supply order lists for the school’s facilities team',
     ],
     highlights: [
@@ -364,7 +363,7 @@ export const experience = [
     accent: 'blue',
     featured: true,
     points: [
-      'Main desktop publisher, with local Aboriginal colleagues, for 3 newly published primary-school reading books; updated and corrected nearly 20 existing titles',
+      'Main desktop publisher for 3 newly published primary-school reading books, working with local Aboriginal colleagues; updated and corrected nearly 20 existing titles',
       'Laid out language text and scanned children’s drawings in Adobe InDesign and Photoshop, through to print production and binding',
       'Gave colleagues day-to-day help with basic hardware, software and connectivity issues',
       'Contributed as a volunteer before taking up the paid role',
@@ -481,7 +480,7 @@ export const experience = [
     area: 'Content · Media',
     accent: 'coral',
     points: [
-      'Ran content planning, filming, editing and audience engagement end to end',
+      'Planned content, filmed and edited videos, and engaged with viewers',
       'Reached approximately 27,000 subscribers at its peak; about 22.4K today, with no new content for about four years',
     ],
     links: [{ label: 'YouTube channel', url: 'https://www.youtube.com/@qingganrexian' }],

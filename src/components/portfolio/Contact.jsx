@@ -76,7 +76,7 @@ export default function Contact() {
 
         <div className="contact-details">
           <p className="contact-intro">
-            I’m always open to meaningful opportunities, new ideas and professional connections.
+            I'm happy to hear about opportunities, exchange ideas and meet new people.
             Feel free to get in touch.
           </p>
 
