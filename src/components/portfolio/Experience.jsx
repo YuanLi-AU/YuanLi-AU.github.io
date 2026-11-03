@@ -21,14 +21,27 @@ function JobDetails({ job, withMedia = true }) {
         // Separate roles grouped under one entry, each with its own details
         <div className="positions">
           {job.positions.map((position) => (
-            <div key={`${position.org}-${position.period}`} className="position">
+            <div key={`${position.title}-${position.org ?? position.records[0].org}`} className="position">
               <div className="position-head">
                 <h4>{position.title}</h4>
-                <span className="timeline-period">{position.period}</span>
+                {position.period && <span className="timeline-period">{position.period}</span>}
               </div>
-              <p className="position-org">
-                {position.org} · {position.location}
-              </p>
+              {position.records ? (
+                // One title held with several employers: one line each
+                <ul className="position-records">
+                  {position.records.map((record) => (
+                    <li key={record.org}>
+                      <p className="position-org">
+                        <strong>{record.org}</strong> · {record.location} · {record.period}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p className="position-org">
+                  {position.org} · {position.location}
+                </p>
+              )}
               {position.relations?.map((line) => (
                 <p key={line} className="position-relation">
                   {line}
@@ -82,6 +95,7 @@ export default function Experience() {
             const isOpen = open.has(key)
             const id = `xp-${i}`
             const side = job.layout === 'side' || job.layout === 'side-compact'
+            const compact = job.layout === 'side-compact'
             const logos = job.logos ?? (job.logo ? [{ src: job.logo, alt: job.logoAlt }] : [])
             return (
               // The li's class must stay constant: useReveal adds is-visible to it
@@ -91,7 +105,7 @@ export default function Experience() {
                   {job.period}
                 </span>
                 <span className="xp-node" aria-hidden="true" />
-                <div className={`xp-card${isOpen ? ' is-open' : ''}${side ? ' xp-side' : ''}${job.layout === 'side-compact' ? ' xp-side-compact' : ''}${logos.length ? ' has-logo' : ''}${logos.length > 1 ? ' has-logo-2' : ''}`}>
+                <div className={`xp-card${isOpen ? ' is-open' : ''}${side ? ' xp-side' : ''}${compact ? ' xp-side-compact' : ''}${logos.length ? ' has-logo' : ''}${logos.length > 1 ? ' has-logo-2' : ''}`}>
                   {/* Header bar: title button + organisation logo(s) (left of the chevron) */}
                   <div className="xp-headbar">
                     <h3 className="xp-head">

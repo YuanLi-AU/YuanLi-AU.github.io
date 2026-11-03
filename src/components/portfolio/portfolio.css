@@ -796,26 +796,45 @@
   display: none;
 }
 
-/* layout 'side-compact' (Construction): the header spans the card, so the
-   logo and chevron sit where they do on every other card; below it the
-   text and the video in two equal columns, both starting at the same
-   height. The video is centred in its column; its caption keeps to the
-   video's width, aligned with its left edge. */
+/* layout 'side-compact' (Construction): a narrow title-and-duties column
+   with the 9:16 video right beside it, both starting at the title. The
+   logo and chevron are placed against the card (not the narrow header),
+   so they sit exactly where they do on every other card; the last column
+   only keeps that corner clear. The caption stays on one line. */
 .xp-card.xp-side.xp-side-compact {
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  grid-template-rows: auto;
+  grid-template-columns: minmax(0, 420px) auto minmax(136px, 1fr);
   grid-template-areas:
-    'head head'
-    'body media';
+    'head media .'
+    'body media .';
+}
+
+.xp-side-compact .xp-headbar,
+.xp-side-compact .xp-toggle {
+  position: static;
+}
+
+.has-logo.xp-side-compact .xp-toggle {
+  padding-right: 12px;
+}
+
+.xp-side-compact .xp-details {
+  margin-right: 12px;
 }
 
 .xp-side-compact .xp-side-media {
-  padding: 0 26px 24px;
+  padding: 20px 12px 24px 16px;
 }
 
 .xp-side-compact .xp-side-media .exp-media {
-  grid-template-columns: 170px;
-  justify-content: center;
+  grid-template-columns: auto;
+}
+
+.xp-side-compact .media-video {
+  width: 170px;
+}
+
+.xp-side-compact .exp-media-caption {
+  white-space: nowrap;
 }
 
 /* Round chevron button: points down when closed, up when open */
@@ -1644,6 +1663,20 @@
   margin-top: 8px;
 }
 
+/* One title held with several employers: one block per employment */
+.position-records {
+  display: grid;
+  gap: 2px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.position-records .position-org strong {
+  font-weight: 600;
+  color: var(--text-h);
+}
+
 /* ---------- Work highlights ---------- */
 .highlights {
   margin-top: 28px;
@@ -1838,12 +1871,30 @@
     padding-right: 100px;
   }
 
+  /* Two logos: they and the chevron get their own row above the title */
   .has-logo-2 .xp-toggle {
-    padding-right: 150px;
+    padding-top: 66px;
+    padding-right: 48px;
   }
 
   .xp-card.xp-side {
     display: block;
+  }
+
+  .xp-side-compact .xp-details {
+    margin-right: 16px;
+  }
+
+  .has-logo.xp-side-compact .xp-toggle {
+    padding-right: 100px;
+  }
+
+  .xp-side-compact .xp-side-media {
+    padding: 0 16px 18px;
+  }
+
+  .xp-side-compact .xp-side-media .exp-media {
+    justify-content: center;
   }
 
   .xp-side-media {

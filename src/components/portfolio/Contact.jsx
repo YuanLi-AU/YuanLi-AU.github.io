@@ -52,7 +52,7 @@ export default function Contact() {
   }, [rootRef])
 
   return (
-    <Section id="contact" title="Contact" accent="teal">
+    <Section id="contact" title="Contact Me" accent="teal">
       <div
         className="contact-wrap accent-teal"
         ref={rootRef}
@@ -76,7 +76,8 @@ export default function Contact() {
 
         <div className="contact-details">
           <p className="contact-intro">
-            The best way to reach me is by email. I’m based in {profile.location}.
+            Open to professional opportunities, collaborations and new connections in IT, data
+            analytics and engineering.
           </p>
 
           <ul className="contact-list">

@@ -210,20 +210,18 @@ export const projects = [
   },
 ]
 
-// Field work led on the host farm's instructions (Katherine role)
-const plantationTeamWork =
-  'Led the team in drip-irrigation pipe repairs, tree pruning, weeding and vine removal, pesticide spraying, planting new trees and manual removal of unwanted trees'
-
 // area: short label showing which part of the background this role covers
 // links: optional [{ label, url }] shown under the points (opens in a new tab)
 // layout: 'side' puts the role's media beside the text on desktop;
-//   'side-compact' keeps the header full width, then text and media in two equal columns
+//   'side-compact': title and text in a narrow column, the media right beside it
 // logo / logoAlt: organisation logo, shown in the same 56px tile for every role
 // logos: several logos side by side instead: [{ src, alt, fill }] — fill: the
 //   image keeps its own background and fills the tile
 // positions: optional, in place of points — separate roles grouped under one
 //   entry, each kept with its own details: [{ title, org, location, period,
-//   relations, points }] — relations: optional lines under the organisation
+//   relations, points }] — relations: optional lines under the organisation.
+//   One title shared by several employments: { title, records: [{ org,
+//   location, period }], relations, points } in place of org/location/period
 // media: work photos or certificates for any role, shown as small click-to-
 //   enlarge thumbnails: [{ image, imageFull, alt, caption }]. An empty list
 //   shows nothing. Obscure card numbers, signatures and internal data first.
@@ -342,7 +340,7 @@ export const experience = [
     role: 'Construction Labourer',
     logo: ntsLogo,
     logoAlt: 'Northern Trade Solutions logo',
-    layout: 'side-compact', // desktop: text and video in two equal columns
+    layout: 'side-compact', // desktop: narrow text column, the video right beside it
     org: 'Northern Trade Solutions',
     location: 'Berrimah Farm & Defence Accommodation Precinct, Darwin, NT',
     period: 'Late 2023 – Early 2024',
@@ -357,11 +355,11 @@ export const experience = [
         video: ntsVideo,
         image: ntsVideoPoster,
         alt: 'Short site video of external wall framing work from an elevated work platform on a Darwin construction site',
-        caption: 'On-site construction work · External wall framing at Berrimah Farm',
+        caption: 'External wall framing at Berrimah Farm',
       },
     ],
   },
-  // Two separate labour-hire roles, each with its own employer, place and dates
+  // One labour-hire supervisor role held with two separate employers
   {
     role: 'Farm & Plantation Operations — Katherine & Douglas Daly',
     // GFH = labour-hire employer; Quintis = GFH's host plantation client (not an employer)
@@ -377,27 +375,24 @@ export const experience = [
     positions: [
       {
         title: 'Labour-hire Supervisor',
-        org: 'GFH Enterprises Pty Ltd',
-        location: 'Katherine, NT',
-        period: 'Apr 2023 – Oct 2023',
-        relations: [
-          'Labour-hire employer: GFH Enterprises Pty Ltd',
-          'Host plantation company (client): Quintis',
+        records: [
+          {
+            org: 'GFH Enterprises Pty Ltd',
+            location: 'Katherine, NT',
+            period: 'Apr 2023 – Oct 2023',
+          },
+          {
+            org: 'Big Plantation Pty Ltd',
+            location: 'Douglas Daly, NT',
+            period: 'Jun 2019 – Feb 2020',
+          },
         ],
+        relations: ['GFH: Labour-hire employer · Quintis: Host plantation company (client)'],
         points: [
-          'Supervised a labour-hire team on a sandalwood plantation, allocating tasks according to the host farm’s work plans',
-          plantationTeamWork,
-        ],
-      },
-      {
-        title: 'Labour-hire Supervisor',
-        org: 'Big Plantation Pty Ltd',
-        location: 'Douglas Daly, NT',
-        period: 'Jun 2019 – Feb 2020',
-        points: [
-          'Supervised a labour-hire team of up to 20 workers on a sandalwood plantation, leading the same range of field work as directed by the farm',
-          'Carried out simple repairs and routine oil changes on team vehicles, and sourced and replaced faulty parts',
-          'Organised water and rest breaks for work in high heat, and promptly reported injuries and safety hazards',
+          'Supervised labour-hire teams of 6–20 workers across sandalwood plantation operations, allocating tasks according to the host farms’ work plans',
+          'Coordinated daily field activities, including drip-irrigation repairs, tree pruning, weeding, vine removal, pesticide spraying, tree planting and removal of unwanted trees',
+          'Performed basic vehicle maintenance, routine oil changes and replacement of faulty parts, and sourced necessary parts and supplies',
+          'Managed water and rest breaks during high-temperature work, and promptly reported injuries and workplace safety hazards',
         ],
       },
     ],
