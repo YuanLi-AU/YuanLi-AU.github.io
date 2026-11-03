@@ -29,7 +29,7 @@ export default function Home() {
         <Contact />
       </main>
       <footer className="footer">
-        © {YEAR} {profile.name}
+        Copyright © {YEAR} {profile.name}.
       </footer>
     </div>
   )

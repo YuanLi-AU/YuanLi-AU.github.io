@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { experience } from '../../data/resume.js'
 import ExperienceMedia from './ExperienceMedia.jsx'
 import FeaturedExperience from './FeaturedExperience.jsx'
+import LogoZoom from './LogoZoom.jsx'
 import Section from './Section.jsx'
 import useReveal from './useReveal.js'
 
@@ -96,7 +97,7 @@ export default function Experience() {
             const id = `xp-${i}`
             const side = job.layout === 'side' || job.layout === 'side-compact'
             const compact = job.layout === 'side-compact'
-            const logos = job.logos ?? (job.logo ? [{ src: job.logo, alt: job.logoAlt }] : [])
+            const logos = job.logos ?? (job.logo ? [{ src: job.logo, full: job.logoFull, alt: job.logoAlt }] : [])
             return (
               // The li's class must stay constant: useReveal adds is-visible to it
               <li key={key} className={`timeline-item accent-${job.accent}`}>
@@ -129,9 +130,13 @@ export default function Experience() {
                     {logos.length > 0 && (
                       <span className="xp-logos">
                         {logos.map((logo) => (
-                          <span key={logo.alt} className={`xp-logo${logo.fill ? ' is-fill' : ''}`}>
-                            <img src={logo.src} alt={logo.alt} />
-                          </span>
+                          <LogoZoom
+                            key={logo.alt}
+                            src={logo.src}
+                            full={logo.full}
+                            alt={logo.alt}
+                            className={`xp-logo${logo.fill ? ' is-fill' : ''}`}
+                          />
                         ))}
                       </span>
                     )}

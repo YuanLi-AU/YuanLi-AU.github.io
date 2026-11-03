@@ -536,9 +536,112 @@
   color: var(--text-muted);
 }
 
+.card-meta {
+  margin: 6px 0 0;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.card-meta span {
+  display: block;
+}
+
+/* Cards without an icon: the organisation logo on the left, the title
+   beside it (vertically centred, wrapping as needed) */
+.card-header.card-header-title {
+  justify-content: flex-start;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 0;
+}
+
+.card-header-title h3 {
+  flex: 1 1 auto;
+  min-width: 0;
+  margin: 0;
+}
+
+/* Lead logo: a white 68px tile, the whole logo shown at its own ratio */
+.card-header-title .card-lead {
+  flex: none;
+  width: 68px;
+  height: 68px;
+  padding: 5px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.card-logo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center;
+}
+
+.card-logo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@media (max-width: 600px) {
+  .card-header.card-header-title {
+    gap: 14px;
+  }
+
+  .card-header-title .card-lead {
+    width: 56px;
+    height: 56px;
+    padding: 4px;
+    border-radius: 10px;
+  }
+}
+
 .card .tags {
   margin-top: auto;
   padding-top: 20px;
+}
+
+/* Tags with small square photos on the right (they wrap below when the
+   card is narrow); each photo opens whole in the lightbox */
+.card-foot {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  gap: 14px 16px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.card .card-foot .tags {
+  flex: 1 1 220px;
+  margin-top: 0;
+  padding-top: 0;
+}
+
+.card-foot-photos {
+  display: flex;
+  flex: none;
+  gap: 10px;
+  margin-left: auto;
+}
+
+.card-foot-photos .media.card-foot-photo {
+  width: 68px;
+  height: 68px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+@media (max-width: 600px) {
+  .card-foot-photos .media.card-foot-photo {
+    width: 56px;
+    height: 56px;
+    border-radius: 10px;
+  }
 }
 
 .card-image {
@@ -745,6 +848,31 @@
   width: 100%;
   height: 100%;
   object-fit: contain;
+}
+
+/* Logo tiles open the logo larger (LogoZoom): a button with the tile's own
+   look, highlighted on hover / keyboard focus */
+.logo-zoom {
+  font: inherit;
+  color: inherit;
+  cursor: zoom-in;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+.logo-zoom:hover {
+  border-color: color-mix(in srgb, var(--c, var(--blue)) 55%, var(--border));
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.12);
+}
+
+.logo-zoom:focus-visible {
+  outline: 3px solid var(--blue);
+  outline-offset: 2px;
+}
+
+.xp-logos .logo-zoom {
+  pointer-events: auto; /* the row itself lets clicks through to the title */
 }
 
 /* Logo on its own (square) background: fills the tile */
@@ -1417,14 +1545,6 @@
 }
 
 /* Small team photo in a project card header */
-.card-photo {
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.78rem;
-  color: var(--text-muted);
-}
-
 .media.media-mini {
   width: 52px;
   height: 52px;
@@ -1538,13 +1658,13 @@
   object-position: top left;
 }
 
-/* Two main project images side by side: a 16:10 desktop screenshot and a
-   narrower phone screen that matches its height (top of the long shot) */
+/* Main project image (16:10) on the left with the other previews stacked
+   beside it, together as tall as the main image (each shows the top of its
+   screenshot); one column on phones */
 .card-previews {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.36fr);
+  grid-template-columns: minmax(0, 3.2fr) minmax(0, 1fr);
   gap: 16px;
-  max-width: 760px;
   margin-top: 18px;
 }
 
@@ -1554,18 +1674,28 @@
   margin: 0;
 }
 
-.card-previews figure:first-child .media {
+.card-previews > figure .media {
   height: auto;
   aspect-ratio: 16 / 10;
 }
 
-/* The phone tile takes the row height set by the desktop tile */
-.card-previews figure + figure .media {
+.card-previews-side {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-previews-side figure {
   flex: 1 1 0;
   min-height: 0;
 }
 
-.card-previews figure + figure .media img {
+.card-previews-side .media {
+  flex: 1 1 0;
+  min-height: 0;
+}
+
+.card-previews-side .media img {
   position: absolute;
   inset: 0;
   object-position: top center;
@@ -1580,17 +1710,22 @@
 
 @media (max-width: 600px) {
   .card-previews {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.5fr);
-    gap: 10px;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
   }
 
-  .card-previews figcaption {
-    font-size: 0.8rem;
-    white-space: nowrap; /* one line, so both tiles keep the same height */
+  .card-previews-side {
+    gap: 14px;
   }
 
-  .card-previews figure + figure .media-expand {
-    display: none; /* would cover the task rows; the tile still opens on tap */
+  .card-previews-side figure,
+  .card-previews-side .media {
+    flex: none;
+  }
+
+  .card-previews-side .media {
+    height: auto;
+    aspect-ratio: 600 / 579;
   }
 }
 
@@ -1731,6 +1866,7 @@
   padding: 0;
   border: 0;
   background: transparent;
+  pointer-events: auto; /* also when opened from a click-through logo row */
 }
 
 .lightbox::backdrop {
@@ -1754,6 +1890,16 @@
   max-height: calc(100dvh - 140px);
   object-fit: contain;
   border-radius: 8px;
+}
+
+/* Logos: on a white panel at up to their own size, never stretched */
+.lightbox-logo .lightbox-figure img {
+  width: auto;
+  max-width: min(100%, 560px);
+  max-height: min(calc(100dvh - 140px), 560px);
+  padding: 24px;
+  background: #ffffff;
+  border-radius: 16px;
 }
 
 /* Long phone screenshots: full phone width, scroll down to read */
@@ -1922,17 +2068,6 @@
     padding-left: 18px;
   }
 
-  .card-cert {
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-    text-align: center;
-  }
-
-  .card-cert figcaption {
-    align-items: center;
-  }
-
   .featured {
     padding: 20px;
   }
@@ -1969,26 +2104,59 @@
   margin-top: 16px;
 }
 
-/* Certificate and its issuer / date / PDF link side by side, centred as a
-   pair (stacked and centred on phones) */
+/* Main project visual (whole image at its own ratio, caption below) with
+   the certificate as a narrow column beside it; stacked on phones */
+.card-visuals {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  margin-top: 18px;
+}
+
+.card-cover {
+  flex: 1 1 0;
+  min-width: 0;
+  margin: 0;
+}
+
+.card-cover .media {
+  height: auto;
+  aspect-ratio: 3 / 2;
+  border-radius: 10px;
+}
+
+.card-cover .media img {
+  object-fit: contain;
+}
+
+.card-cover figcaption {
+  margin-top: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+/* Certificate as supporting proof: a small thumbnail with its issuer, date
+   and PDF link below it */
 .card-cert {
   display: flex;
-  align-items: flex-end;
-  justify-content: center;
-  gap: 18px;
-  margin: 18px 0 0;
+  flex: none;
+  flex-direction: column;
+  gap: 10px;
+  width: 120px;
+  margin: 0;
 }
 
 .card-cert .media.card-cert-img {
   flex: none;
-  width: min(100%, 262px);
+  width: 100%;
 }
 
 /* Full A4 page, never cropped */
 .media.card-cert-img {
   height: auto;
   aspect-ratio: 1400 / 1981;
-  border-radius: 8px;
+  border-radius: 6px;
   box-shadow: var(--shadow);
 }
 
@@ -2015,6 +2183,47 @@
 .card-cert a {
   margin-top: 4px;
   font-weight: 600;
+}
+
+/* Narrower cards: a slimmer certificate column keeps the image the focus */
+@media (max-width: 1100px) {
+  .card-cert {
+    width: 100px;
+  }
+
+  .card-cert figcaption {
+    font-size: 0.82rem;
+  }
+}
+
+/* Phones: image on its own, then the certificate as a row (thumbnail +
+   details) under it */
+@media (max-width: 600px) {
+  .card-visuals {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .card-cover {
+    flex: none;
+  }
+
+  .card-cert {
+    flex-direction: row;
+    align-items: center;
+    gap: 14px;
+    width: auto;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+  }
+
+  .card-cert .media.card-cert-img {
+    width: 84px;
+  }
+
+  .card-cert figcaption {
+    font-size: 0.9rem;
+  }
 }
 
 /* ---------- Compact project preview (bottom of a project card) ---------- */

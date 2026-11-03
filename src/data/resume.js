@@ -6,7 +6,8 @@
 //
 // Presentation fields:
 //   accent: 'blue' | 'purple' | 'teal' | 'coral' | 'orange' — category colour
-//   icon:   name of an icon in components/portfolio/Icon.jsx
+//   icon:   name of an icon in components/portfolio/Icon.jsx (project cards
+//           without one show the title in the top row instead)
 //
 // Images: import them below, then reference them in the data. Only add
 // images that are confirmed safe to publish (no private or community-
@@ -17,8 +18,12 @@ import nanshanLogo from '../assets/branding/yantai-nanshan-university-logo.jpg' 
 import ntcmsLogo from '../assets/branding/nt-cleaning-maintenance-logo-400.png'
 import olshCrest from '../assets/branding/olsh-crest-168.png' // from olshtnt.catholic.edu.au
 import ntsLogo from '../assets/branding/nts-logo.png' // from ntsnt.com.au
+import treescapeLogo from '../assets/branding/treescape-power-logo.png' // supplied by Yuan (图片/)
+import treescapeLogoFull from '../assets/branding/treescape-power-logo-full.jpg'
 import gfhLogo from '../assets/branding/gfh-logo.jpg' // supplied by Yuan (图片/), on its own background
+import gfhLogoFull from '../assets/branding/gfh-logo-980.jpg'
 import quintisLogo from '../assets/branding/quintis-logo.png' // supplied by Yuan (图片/)
+import quintisLogoFull from '../assets/branding/quintis-logo-1200.png'
 import pitchBlackCertThumb from '../assets/work/pitch-black/certificate-800.jpg'
 import pitchBlackCertFull from '../assets/work/pitch-black/certificate-1600.jpg'
 import lpcPublicationsThumb from '../assets/publications/lpc/lpc-publications-800.jpg'
@@ -27,6 +32,10 @@ import lpcWorkplaceThumb from '../assets/publications/lpc/lpc-workplace-800.jpg'
 import lpcWorkplaceFull from '../assets/publications/lpc/lpc-workplace-1800.jpg'
 import tcassTeamThumb from '../assets/projects/tcass/tcass-team-400.jpg'
 import tcassTeamFull from '../assets/projects/tcass/tcass-team-1600.jpg'
+import tcassPresentationThumb from '../assets/projects/tcass/tcass-final-presentation-420.jpg'
+import tcassPresentationFull from '../assets/projects/tcass/tcass-final-presentation-1536.jpg'
+import tcassLogo from '../assets/branding/tcass-logo-168.png' // supplied by Yuan (图片/)
+import tcassLogoFull from '../assets/branding/tcass-logo-full.png'
 import tcassOverviewThumb from '../assets/projects/tcass/tcass-overview-800.jpg'
 import tcassOverviewFull from '../assets/projects/tcass/tcass-overview-1600.jpg'
 import tcassOperationsThumb from '../assets/projects/tcass/tcass-operations-800.jpg'
@@ -42,6 +51,8 @@ import plantationTeamFull from '../assets/work/plantation/plantation-team-1600.j
 import whiteCardThumb from '../assets/work/builder-clean/white-card-800.jpg'
 import whiteCardFull from '../assets/work/builder-clean/white-card-1600.jpg'
 import treescapeCertThumb from '../assets/projects/treescape/internship-certificate-600.jpg'
+import ss724CourseThumb from '../assets/projects/treescape/ss724-level1-course-1000.jpg'
+import ss724CourseFull from '../assets/projects/treescape/ss724-level1-course-1536.jpg'
 import treescapeCertFull from '../assets/projects/treescape/internship-certificate-1400.jpg'
 import ntsVideo from '../assets/work/nts/nts-site-framing.mp4'
 import ntsVideoPoster from '../assets/work/nts/nts-site-framing-poster.jpg'
@@ -52,8 +63,10 @@ import raafPassFull from '../assets/work/regina/raaf-pass-1600.jpg'
 import lpcMaterialsThumb from '../assets/publications/lpc/lpc-materials-800.jpg'
 import lpcMaterialsFull from '../assets/publications/lpc/lpc-materials-1600.jpg'
 import websiteShowcaseFull from '../assets/projects/website/website-showcase-1600.jpg'
-import plannerDailyThumb from '../assets/projects/website/planner-daily-400.jpg'
-import plannerDailyFull from '../assets/projects/website/planner-daily-1170.jpg'
+import plannerMidThumb from '../assets/projects/website/planner-mid-tabs-600.jpg'
+import plannerMidFull from '../assets/projects/website/planner-mid-1170.jpg'
+import plannerLongThumb from '../assets/projects/website/planner-long-tabs-600.jpg'
+import plannerLongFull from '../assets/projects/website/planner-long-1170.jpg'
 
 export const profile = {
   name: 'Yuan Li',
@@ -84,22 +97,31 @@ export const about = [
 
 // status: optional label such as 'In progress'
 // image: optional screenshot path in public/, e.g. '/projects/tcass.png'
-// teamPhoto: optional small photo shown in the card header (opens the lightbox)
+// photos: optional small square photos beside the tags (click to enlarge,
+//   whole photo in the lightbox): [{ image, imageFull, alt, caption,
+//   objectPosition }] — objectPosition: which part the square thumbnail shows
 // showcase: optional preview at the bottom of the card: { label, note, image,
 //   imageFull, alt, caption, icon }. With an image it opens the lightbox and
 //   the card spans the full row; without one it shows a small placeholder.
-// previews: optional pair of main images shown side by side, each with a
-//   label: [{ label, image, imageFull, alt, caption, tall }]; the card spans
-//   the full row.
+// previews: optional main image (first) with the others stacked beside it,
+//   each with a label: [{ label, image, imageFull, alt, caption, tall }]; the
+//   card spans the full row.
+// meta: optional organisation / place / dates under the title, one entry per line
+// logo / logoAlt: optional organisation logo beside the title (click to
+//   enlarge; logoFull: a larger copy for the lightbox, when one exists)
+// cover: optional main visual under the points, shown whole at its own ratio:
+//   { image, imageFull, alt, caption }
 // media: optional screenshots (same format as Experience media below)
 // certificate: optional proof document { title, image, imageFull, alt, caption,
-//   issuer, issued, pdf }, shown large under the points
+//   issuer, issued, pdf }, shown as a small thumbnail with its details
 // links: optional [{ label, url }]
 export const projects = [
   {
     title: 'TCASS Manual Handling Analytics & Power Apps Application',
     accent: 'coral',
-    icon: 'chart',
+    logo: tcassLogo,
+    logoFull: tcassLogoFull,
+    logoAlt: 'TCASS (Territory Care & Support Services) logo',
     summary:
       'Team client project during my Master of IT for Territory Care & Support Services (TCASS), an NDIS service provider in Darwin.',
     points: [
@@ -109,13 +131,22 @@ export const projects = [
       'Analyses task volume, difficulty rate, pain rate, equipment usage, transfer paths, staff performance and trends',
     ],
     tags: ['Power BI', 'Power Apps', 'Data analysis', 'Client project', 'Teamwork'],
-    teamPhoto: {
-      label: 'Project team',
-      image: tcassTeamThumb,
-      imageFull: tcassTeamFull,
-      alt: 'Yuan Li with team members during the TCASS client project',
-      caption: 'TCASS Project Team',
-    },
+    photos: [
+      {
+        image: tcassTeamThumb,
+        imageFull: tcassTeamFull,
+        alt: 'Yuan Li with team members during the TCASS client project',
+        caption: 'Project team',
+        objectPosition: 'center 30%',
+      },
+      {
+        image: tcassPresentationThumb,
+        imageFull: tcassPresentationFull,
+        alt: 'The project team presenting the Manual Handling report to the client at the end of the TCASS project',
+        caption: 'Final client presentation',
+        objectPosition: '31% center',
+      },
+    ],
     // Staff names (Power BI) and the student ID (Power Apps) obscured
     media: [
       {
@@ -145,16 +176,32 @@ export const projects = [
     ],
   },
   {
-    title: 'Singapore Internship Project — SS 724 Bilingual Training Content',
+    // Facts from the internship certificate (12 Jan – 3 Apr 2026, Development
+    // Content & LMS). SS 724 is the Singapore standard; the Digital Academy is
+    // Treescape's own training programme, not something Yuan built.
+    title: 'SS 724 Digital Training & E-Learning',
+    meta: ['Treescape Power Pte Ltd · Singapore', 'Remote Internship · Jan–Apr 2026'],
+    logo: treescapeLogo,
+    logoFull: treescapeLogoFull,
+    logoAlt: 'Treescape Power logo',
     accent: 'teal',
-    icon: 'book',
     summary:
-      'Remote internship with Treescape Power Pte Ltd, Singapore (Jan – Apr 2026), as Intern — Content Development & LMS.',
+      'Contributed to the development and delivery of bilingual digital training content covering all eight modules of Singapore Standard SS 724, focused on tree pruning and management.',
     points: [
-      'Developed English and Chinese training content for all 8 modules of Singapore Standard SS 724',
-      'Produced training videos and built quizzes in WP Courseware',
+      'Produced 10+ English training videos and 6 short-form videos, managing scripting, recording, editing and final delivery',
+      'Developed a complete Chinese-language course version, including narrated videos and refined presentation slides',
+      'Designed and implemented module-aligned online quizzes using WP Courseware',
+      'Contributed to early-stage research on AI-enhanced personalised learning',
     ],
-    tags: ['WP Courseware', 'WordPress', 'Training content', 'Video production', 'English / Chinese'],
+    tags: ['WP Courseware', 'WordPress', 'E-Learning', 'Video Production', 'Bilingual Localisation', 'Assessment Design'],
+    // Re-made high-resolution promotional visual for the course (supplied by
+    // Yuan) — not a system screenshot and not Yuan's own interface design
+    cover: {
+      image: ss724CourseThumb,
+      imageFull: ss724CourseFull,
+      alt: 'Treescape Digital Academy promotional graphic for the SS 724 Level 1: Awareness e-learning course',
+      caption: 'SS 724 Level 1: Awareness — E-Learning Training',
+    },
     // Issued by Treescape; shown in full with Yuan's permission
     certificate: {
       title: 'Internship Certificate',
@@ -170,12 +217,16 @@ export const projects = [
   {
     title: 'Personal Portfolio & Planner Website',
     accent: 'purple',
-    icon: 'laptop',
+    // The site's own app icon (PWA icon in public/icons)
+    logo: `${import.meta.env.BASE_URL}icons/icon-512.png`,
+    logoAlt: 'Yuan Li website app icon (YL)',
     summary:
-      'Designed and developed this responsive personal portfolio and private planning web app with React and Vite, deployed to GitHub Pages through automated GitHub Actions.',
+      'A personal portfolio website with a private planner for managing daily, mid-term and long-term goals. Demonstrates my ability to independently design and develop websites and applications tailored to client requirements.',
     points: [
-      'Public portfolio plus a password-protected Planner (daily, mid-term and long-term plans) using Firebase Authentication and real-time Cloud Firestore sync',
-      'Installable PWA with responsive desktop and mobile layouts',
+      'Public portfolio with a secure, password-protected planner',
+      'Daily task management with priorities and completion tracking',
+      'Mid-term and long-term goal planning',
+      'Cloud synchronisation across devices and installable PWA support',
     ],
     tags: [
       'React',
@@ -188,22 +239,31 @@ export const projects = [
       'GitHub Actions',
     ],
     links: [{ label: 'Visit Website', url: 'https://yuanli-au.github.io/' }],
-    // Planner screenshot is from an isolated demo build with sample data.
-    // tall: the lightbox shows the long screenshot at phone width and scrolls.
+    // Planner screenshots are from an isolated demo build with sample data
+    // (no real plans). The mid- and long-term thumbnails show the tabs and
+    // the list; tall: the lightbox shows the whole screen at phone width.
     previews: [
       {
-        label: 'Desktop Website',
+        label: 'Portfolio Homepage + Mobile Daily Planner',
         image: websiteShowcaseFull,
         imageFull: websiteShowcaseFull,
         alt: 'Screenshots of this website: the portfolio home page on desktop and the unlocked Planner (sample data) on mobile',
         caption: 'Personal Portfolio & Planner Website — yuanli-au.github.io',
       },
       {
-        label: 'Mobile Planner',
-        image: plannerDailyThumb,
-        imageFull: plannerDailyFull,
-        alt: 'Full-page mobile screenshot of the unlocked Planner showing the Daily plan with sample data',
-        caption: 'Daily Planner · sample data',
+        label: 'Mid-term Plans',
+        image: plannerMidThumb,
+        imageFull: plannerMidFull,
+        alt: 'Mobile screenshot of the Planner Mid-term Plans page with sample goals',
+        caption: 'Planner — Mid-term Plans · sample data',
+        tall: true,
+      },
+      {
+        label: 'Long-term Plans',
+        image: plannerLongThumb,
+        imageFull: plannerLongFull,
+        alt: 'Mobile screenshot of the Planner Long-term Plans page with sample goals',
+        caption: 'Planner — Long-term Plans · sample data',
         tall: true,
       },
     ],
@@ -215,8 +275,9 @@ export const projects = [
 // layout: 'side' puts the role's media beside the text on desktop;
 //   'side-compact': title and text in a narrow column, the media right beside it
 // logo / logoAlt: organisation logo, shown in the same 56px tile for every role
-// logos: several logos side by side instead: [{ src, alt, fill }] — fill: the
-//   image keeps its own background and fills the tile
+//   (click to enlarge; logoFull: a larger copy for the lightbox, when one exists)
+// logos: several logos side by side instead: [{ src, full, alt, fill }] — fill:
+//   the image keeps its own background and fills the tile
 // positions: optional, in place of points — separate roles grouped under one
 //   entry, each kept with its own details: [{ title, org, location, period,
 //   relations, points }] — relations: optional lines under the organisation.
@@ -364,8 +425,8 @@ export const experience = [
     role: 'Farm & Plantation Operations — Katherine & Douglas Daly',
     // GFH = labour-hire employer; Quintis = GFH's host plantation client (not an employer)
     logos: [
-      { src: gfhLogo, alt: 'GFH Enterprises (Green Farm Hands) logo', fill: true },
-      { src: quintisLogo, alt: 'Quintis Sandalwood logo' },
+      { src: gfhLogo, full: gfhLogoFull, alt: 'GFH Enterprises (Green Farm Hands) logo', fill: true },
+      { src: quintisLogo, full: quintisLogoFull, alt: 'Quintis Sandalwood logo' },
     ],
     org: 'GFH Enterprises Pty Ltd · Big Plantation Pty Ltd',
     location: 'Northern Territory',

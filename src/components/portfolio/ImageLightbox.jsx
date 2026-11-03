@@ -3,7 +3,8 @@ import Icon from './Icon.jsx'
 
 // Minimal lightbox built on the native <dialog> element: the browser handles
 // Escape-to-close, focus and the backdrop. Clicking outside the image closes it.
-export default function ImageLightbox({ open, src, alt, caption, tall = false, onClose }) {
+// logo: the image is shown on a white panel (dark or transparent logos).
+export default function ImageLightbox({ open, src, alt, caption, tall = false, logo = false, onClose }) {
   const ref = useRef(null)
 
   useEffect(() => {
@@ -15,7 +16,7 @@ export default function ImageLightbox({ open, src, alt, caption, tall = false, o
   return (
     <dialog
       ref={ref}
-      className={tall ? 'lightbox lightbox-tall' : 'lightbox'}
+      className={`lightbox${tall ? ' lightbox-tall' : ''}${logo ? ' lightbox-logo' : ''}`}
       aria-label={alt}
       onClose={onClose}
       onClick={(e) => {

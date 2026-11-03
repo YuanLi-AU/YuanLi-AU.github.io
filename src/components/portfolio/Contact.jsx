@@ -76,8 +76,8 @@ export default function Contact() {
 
         <div className="contact-details">
           <p className="contact-intro">
-            Open to professional opportunities, collaborations and new connections in IT, data
-            analytics and engineering.
+            I’m always open to meaningful opportunities, new ideas and professional connections.
+            Feel free to get in touch.
           </p>
 
           <ul className="contact-list">

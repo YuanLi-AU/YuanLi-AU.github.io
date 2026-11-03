@@ -1,9 +1,20 @@
 import { projects } from '../../data/resume.js'
 import ExperienceMedia from './ExperienceMedia.jsx'
 import Icon from './Icon.jsx'
+import LogoZoom from './LogoZoom.jsx'
 import MediaSlot from './MediaSlot.jsx'
 import Section from './Section.jsx'
 import Tags from './Tags.jsx'
+
+// One labelled preview image (click to enlarge)
+function Preview({ item }) {
+  return (
+    <figure>
+      <MediaSlot {...item} />
+      <figcaption>{item.label}</figcaption>
+    </figure>
+  )
+}
 
 export default function Projects() {
   return (
@@ -19,19 +30,35 @@ export default function Projects() {
             {project.image && (
               <img src={project.image} alt={`${project.title} screenshot`} className="card-image" />
             )}
-            <div className="card-header">
-              <span className="icon-badge">
-                <Icon name={project.icon} size={24} />
-              </span>
-              {project.status && <span className="status">{project.status}</span>}
-              {project.teamPhoto && (
-                <div className="card-photo">
-                  <span>{project.teamPhoto.label}</span>
-                  <MediaSlot {...project.teamPhoto} className="media-mini" />
-                </div>
+            {/* No icon: the organisation logo leads the top row, title beside it */}
+            <div className={`card-header${project.icon ? '' : ' card-header-title'}`}>
+              {project.icon ? (
+                <span className="icon-badge">
+                  <Icon name={project.icon} size={24} />
+                </span>
+              ) : (
+                <>
+                  {project.logo && (
+                    <LogoZoom
+                      src={project.logo}
+                      full={project.logoFull}
+                      alt={project.logoAlt}
+                      className="card-logo card-lead"
+                    />
+                  )}
+                  <h3>{project.title}</h3>
+                </>
               )}
+              {project.status && <span className="status">{project.status}</span>}
             </div>
-            <h3>{project.title}</h3>
+            {project.icon && <h3>{project.title}</h3>}
+            {project.meta && (
+              <p className="card-meta">
+                {project.meta.map((line) => (
+                  <span key={line}>{line}</span>
+                ))}
+              </p>
+            )}
             <p className="card-summary">{project.summary}</p>
             <ul className="points">
               {project.points.map((point) => (
@@ -39,36 +66,56 @@ export default function Projects() {
               ))}
             </ul>
             {project.previews && (
-              // Two main images side by side (e.g. desktop site + phone screen)
+              // Main image on the left, the other previews stacked beside it
               <div className="card-previews">
-                {project.previews.map((item) => (
-                  <figure key={item.label}>
-                    <MediaSlot {...item} />
-                    <figcaption>{item.label}</figcaption>
-                  </figure>
-                ))}
+                <Preview item={project.previews[0]} />
+                <div className="card-previews-side">
+                  {project.previews.slice(1).map((item) => (
+                    <Preview key={item.label} item={item} />
+                  ))}
+                </div>
               </div>
             )}
             <ExperienceMedia items={project.media} className="exp-media-screens" />
-            {project.certificate && (
-              // Proof of the project, shown large: full A4 preview (click to
-              // enlarge) with the issuer, date and the original PDF
-              <figure className="card-cert">
-                <MediaSlot
-                  {...project.certificate}
-                  image={project.certificate.imageFull}
-                  className="card-cert-img"
-                />
-                <figcaption>
-                  <span className="card-cert-title">{project.certificate.issuer}</span>
-                  <span className="muted">{project.certificate.issued}</span>
-                  <a href={project.certificate.pdf} target="_blank" rel="noreferrer">
-                    View PDF ↗
-                  </a>
-                </figcaption>
-              </figure>
+            {(project.cover || project.certificate) && (
+              // Main visual with the certificate as a smaller column beside it
+              // (below it on phones); both open larger on click
+              <div className="card-visuals">
+                {project.cover && (
+                  <figure className="card-cover">
+                    <MediaSlot {...project.cover} />
+                    <figcaption>{project.cover.caption}</figcaption>
+                  </figure>
+                )}
+                {project.certificate && (
+                  // Supporting proof: small A4 thumbnail with the issuer, date
+                  // and the original PDF
+                  <figure className="card-cert">
+                    <MediaSlot {...project.certificate} className="card-cert-img" />
+                    <figcaption>
+                      <span className="card-cert-title">{project.certificate.issuer}</span>
+                      <span className="muted">{project.certificate.issued}</span>
+                      <a href={project.certificate.pdf} target="_blank" rel="noreferrer">
+                        View PDF ↗
+                      </a>
+                    </figcaption>
+                  </figure>
+                )}
+              </div>
             )}
-            <Tags items={project.tags} />
+            {project.photos ? (
+              // Tags with small photos beside them (wrapping below on narrow cards)
+              <div className="card-foot">
+                <Tags items={project.tags} />
+                <div className="card-foot-photos">
+                  {project.photos.map((photo) => (
+                    <MediaSlot key={photo.caption} {...photo} className="media-mini card-foot-photo" />
+                  ))}
+                </div>
+              </div>
+            ) : (
+              <Tags items={project.tags} />
+            )}
             {project.links?.length > 0 && (
               <p className="card-links">
                 {project.links.map((link) => (
