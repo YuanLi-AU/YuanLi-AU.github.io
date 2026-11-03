@@ -75,7 +75,7 @@ export const profile = {
     'Engineering, IT and data background — Master of IT (Software Engineering) coursework completed',
   location: 'Darwin, NT',
   intro:
-    'I can independently design, build and deploy websites and software based on client requirements — this site, including its private cloud-synced planner, is my own work. My background spans engineering, IT support, Power BI and Power Apps data work, school-based publishing and finance administration, and supervising labour-hire teams in the Northern Territory. I have completed the coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026.',
+    'My background spans engineering, IT support, Power BI and Power Apps data work, school-based publishing and finance administration, and supervising labour-hire teams in the Northern Territory. I have completed the coursework for a Master of Information Technology (Software Engineering) at Charles Darwin University, with results due in November 2026. I independently design, develop and deploy websites and software applications.',
   email: 'svip.leo@gmail.com',
   linkedin: 'https://www.linkedin.com/in/yuan-li-a982533b5/',
   // Public resume (phone number removed from the header)
@@ -127,8 +127,8 @@ export const projects = [
     points: [
       'My contribution: the manual-handling data analysis in Power BI and the build of the overall Power Apps application',
       'Team outcome: the solution has been put into use, making manual-handling information easier for managers and staff to access and understand',
-      'Report pages: Overview, Operations & Risk Analysis, and Data Table',
-      'Analyses task volume, difficulty rate, pain rate, equipment usage, transfer paths, staff performance and trends',
+      'Power BI report with Overview, Operations & Risk Analysis and Data Table pages, analysing task volume, difficulty and pain rates, equipment use, transfer paths, staff performance and trends',
+      'Power Apps application with an Upload Data screen for submitting manual-handling data files and a Data Explorer screen for browsing and managing uploaded files',
     ],
     tags: ['Power BI', 'Power Apps', 'Data analysis', 'Client project', 'Teamwork'],
     photos: [
@@ -223,10 +223,10 @@ export const projects = [
     summary:
       'A personal portfolio website with a private planner for managing daily, mid-term and long-term goals. Demonstrates my ability to independently design and develop websites and applications tailored to client requirements.',
     points: [
-      'Public portfolio with a secure, password-protected planner',
-      'Daily task management with priorities and completion tracking',
-      'Mid-term and long-term goal planning',
-      'Cloud synchronisation across devices and installable PWA support',
+      'Responsive React portfolio with a private planner, secured by Firebase Authentication and owner-only Firestore security rules',
+      'Daily, mid-term and long-term plans with drag-and-drop prioritisation, due dates and live countdowns; tasks move to the daily list automatically when due',
+      'Real-time sync across devices, using Firestore transactions and a three-way merge so changes from different devices are combined safely',
+      'Installable PWA with automated build and deployment to GitHub Pages via GitHub Actions',
     ],
     tags: [
       'React',
@@ -602,16 +602,11 @@ export const skills = [
       'JavaScript',
       'HTML & CSS',
       'Firebase',
-      'GitHub Actions',
       'Python',
       'Git',
-      'Agile',
-      'Unit Testing',
-      'Secure Development',
       'Power Apps',
       'WordPress',
       'AI-Assisted Development',
-      'Generative AI Tools',
     ],
   },
   {
@@ -658,7 +653,16 @@ export const skills = [
   {
     group: 'Business & E-commerce',
     accent: 'coral',
-    items: ['E-commerce Operations', 'Customer Service', 'Order Fulfilment', 'Product Listings'],
+    items: [
+      'E-commerce Operations',
+      'Customer Service',
+      'Order Fulfilment',
+      'Product Listings',
+      'Store Management',
+      'Sourcing & Purchasing',
+      'Product Imagery',
+      'After-sales Support',
+    ],
   },
 ]
 
